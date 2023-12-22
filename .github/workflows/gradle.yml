@@ -28,12 +28,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Set secret yaml
-      env:
-       SECRET_YAML: ${{ secrets.SECRET_YAML }}
-      run: echo $SECRET_YAML | base64 --decode > src/main/resources/application-secret.yaml &&
-        echo $SECRET_YAML | base64 --decode > src/test/resources/application-secret.yaml
-
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2.6.0
       with:
