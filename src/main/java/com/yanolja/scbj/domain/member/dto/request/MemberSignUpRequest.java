@@ -1,5 +1,7 @@
 package com.yanolja.scbj.domain.member.dto.request;
 
+import com.yanolja.scbj.domain.member.validation.Password;
+import com.yanolja.scbj.domain.member.validation.Phone;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +22,6 @@ public record MemberSignUpRequest(
 
     @NotNull
     @Phone
-    @NotBlank(message = NOT_BLANK_MESSAGE)
     String phone
 ) {
 

@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.member.dto.request;
 
+import com.yanolja.scbj.domain.member.validation.Password;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
