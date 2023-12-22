@@ -1,4 +1,4 @@
-package com.example.jwt.global.config.jwt.util;
+package com.yanolja.scbj.global.util;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

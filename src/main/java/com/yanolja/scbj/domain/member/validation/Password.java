@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.member.validation;
 
+import com.yanolja.scbj.domain.member.validation.validator.PasswordValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;

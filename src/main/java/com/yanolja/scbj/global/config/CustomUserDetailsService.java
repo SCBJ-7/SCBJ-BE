@@ -1,5 +1,7 @@
 package com.yanolja.scbj.global.config;
 
+import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.member.util.MemberMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

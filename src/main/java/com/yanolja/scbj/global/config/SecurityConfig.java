@@ -1,5 +1,7 @@
 package com.yanolja.scbj.global.config;
 
+import com.yanolja.scbj.global.config.jwt.JwtRequestFilter;
+import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
