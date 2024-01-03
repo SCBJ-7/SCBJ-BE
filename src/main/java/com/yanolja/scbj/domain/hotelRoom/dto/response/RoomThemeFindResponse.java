@@ -9,18 +9,19 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 public class RoomThemeFindResponse {
-    private boolean hasParkingZone;
-    private boolean hasBreakfast;
-    private boolean hasPool;
-    private boolean hasOceanView;
+
+    private boolean parkingZone;
+    private boolean breakfast;
+    private boolean pool;
+    private boolean oceanView;
 
     @Builder
-    private RoomThemeFindResponse(boolean hasParkingZone, boolean hasBreakfast, boolean hasPool,
-        boolean hasOceanView) {
-        this.hasParkingZone = hasParkingZone;
-        this.hasBreakfast = hasBreakfast;
-        this.hasPool = hasPool;
-        this.hasOceanView = hasOceanView;
+    private RoomThemeFindResponse(boolean parkingZone, boolean breakfast, boolean pool,
+        boolean oceanView) {
+        this.parkingZone = parkingZone;
+        this.breakfast = breakfast;
+        this.pool = pool;
+        this.oceanView = oceanView;
     }
 }
 
