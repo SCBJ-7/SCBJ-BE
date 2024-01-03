@@ -17,7 +17,7 @@ spring:
       port: 6379
 
 jwt:
-  secret: KF81YSUjd3Q3KCFfaXd6cHlwMyNAKitkamFtYj02OXh2X3JfN2sqZShyamQrZysoXzVhJSN3dDcoIV9pd3pweXAzI0AqK2RqYW1iPTY5eHZfcl83ayplKHJqZCtnKw==   # Replace with your actual secret key
-  expiration: 3600000       # Replace with your desired expiration time in milliseconds
-  refreshExpiration: 604800000 # Replace with your desired refresh expiration time in milliseconds
-  redisRefreshKeyPrefix: "Refresh-token:" # Replace with your desired Redis refresh key prefix
+  secret: KF81YSUjd3Q3KCFfaXd6cHlwMyNAKitkamFtYj02OXh2X3JfN2sqZShyamQrZysoXzVhJSN3dDcoIV9pd3pweXAzI0AqK2RqYW1iPTY5eHZfcl83ayplKHJqZCtnKw==
+  expiration: 3600000
+  refreshExpiration: 604800000
+  redisRefreshKeyPrefix: "Refresh-token:"
