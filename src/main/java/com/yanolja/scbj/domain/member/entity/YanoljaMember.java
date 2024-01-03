@@ -27,11 +27,12 @@ public class YanoljaMember {
     private String email;
 
     @OneToMany(mappedBy = "yanoljaMember")
-    private final List<Reservation> reservationList = new ArrayList<>();
+    private List<Reservation> reservationList = new ArrayList<>();
 
     @Builder
-    private YanoljaMember(Long id, String email) {
+    private YanoljaMember(Long id, String email, List<Reservation> reservationList) {
         this.id = id;
         this.email = email;
+        this.reservationList = reservationList;
     }
 }
