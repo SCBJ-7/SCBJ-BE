@@ -60,10 +60,11 @@ public class Product extends BaseEntity {
 
 
     @Builder
-    private Product(Long id, Reservation reservation, int firstPrice, int secondPrice,
+    private Product(Long id, Reservation reservation, Member member, int firstPrice, int secondPrice,
         String bank, String accountNumber, int secondGrantPeriod) {
         this.id = id;
         this.reservation = reservation;
+        this.member = member;
         this.firstPrice = firstPrice;
         this.secondPrice = secondPrice;
         this.bank = bank;
