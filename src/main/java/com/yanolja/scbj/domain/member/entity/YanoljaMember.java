@@ -3,6 +3,7 @@ package com.yanolja.scbj.domain.member.entity;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,12 +27,13 @@ public class YanoljaMember {
     @Column(nullable = false)
     private String email;
 
-    @OneToMany(mappedBy = "yanoljaMember")
-    private final List<Reservation> reservationList = new ArrayList<>();
+    @OneToMany(mappedBy = "yanoljaMember", fetch = FetchType.LAZY)
+    private List<Reservation> reservationList = new ArrayList<>();
 
     @Builder
-    private YanoljaMember(Long id, String email) {
+    private YanoljaMember(Long id, String email, List<Reservation> reservationList) {
         this.id = id;
         this.email = email;
+        this.reservationList = reservationList;
     }
 }
