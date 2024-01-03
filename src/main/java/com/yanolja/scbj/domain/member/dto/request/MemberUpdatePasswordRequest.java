@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.member.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 
 public record MemberUpdatePasswordRequest(
@@ -13,6 +14,7 @@ public record MemberUpdatePasswordRequest(
 
     private static final String NOT_BLANK_MESSAGE = "공백은 사용할 수 없습니다.";
 
+    @Builder
     public MemberUpdatePasswordRequest(String password) {
         this.password = password;
     }

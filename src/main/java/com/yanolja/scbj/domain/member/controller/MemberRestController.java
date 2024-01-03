@@ -64,6 +64,7 @@ public class MemberRestController {
     MemberUpdateAccountRequest memberUpdateAccountRequest) {
         log.info("accountNumber:{}, bank:{}", memberUpdateAccountRequest.accountNumber(),
             memberUpdateAccountRequest.bank());
+        memberService.updateMemberAccount(memberUpdateAccountRequest);
 
         return ResponseEntity.ok().body(ResponseDTO.res(HttpStatus.OK, "성공적으로 계좌번호를 등록/수정했습니다."));
     }
