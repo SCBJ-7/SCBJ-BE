@@ -1,16 +1,22 @@
 package com.yanolja.scbj.global.common;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
+import lombok.Getter;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@EnableJpaAuditing
-public class BaseEntity {
+@MappedSuperclass
+@Getter
+@EntityListeners(AuditingEntityListener.class)
+public abstract class BaseEntity {
 
-    @CreatedDate
+    @CreatedDate //JPA
     @Comment("생성일")
     private LocalDateTime createdAt;
 
@@ -37,4 +43,15 @@ public class BaseEntity {
         deletedAt = null;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return this.deletedAt;
+    }
 }
