@@ -1,8 +1,10 @@
 package com.yanolja.scbj.domain.member.entity;
 
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,7 +28,7 @@ public class YanoljaMember {
     @Column(nullable = false)
     private String email;
 
-    @OneToMany(mappedBy = "yanoljaMember")
+    @OneToMany(mappedBy = "yanoljaMember", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Reservation> reservationList = new ArrayList<>();
 
     @Builder
