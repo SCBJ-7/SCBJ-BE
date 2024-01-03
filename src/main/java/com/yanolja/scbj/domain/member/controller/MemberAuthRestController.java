@@ -24,7 +24,8 @@ public class MemberAuthRestController {
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refreshAccessToken(
         @RequestBody RefreshRequest refreshRequest) {
-        log.info("accessToken:{}, refreshToken:{}",refreshRequest.getAccessToken(), refreshRequest.getRefreshToken());
+        log.info("accessToken:{}, refreshToken:{}", refreshRequest.getAccessToken(),
+            refreshRequest.getRefreshToken());
         return ResponseEntity.ok().body(memberAuthService.refreshAccessToken(refreshRequest));
     }
 

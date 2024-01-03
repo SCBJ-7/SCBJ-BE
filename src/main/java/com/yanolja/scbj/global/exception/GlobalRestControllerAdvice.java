@@ -11,8 +11,10 @@ public class GlobalRestControllerAdvice {
 
     @ExceptionHandler
     public ResponseEntity<String> bindException(BindException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
+
     @ExceptionHandler
     public ResponseEntity<String> ApplicationException(ApplicationException e) {
         return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(e.getMessage());

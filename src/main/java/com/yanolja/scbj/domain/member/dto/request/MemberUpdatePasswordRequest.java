@@ -10,6 +10,7 @@ public record MemberUpdatePasswordRequest(
     @NotBlank(message = NOT_BLANK_MESSAGE)
     String password
 ) {
+
     private static final String NOT_BLANK_MESSAGE = "공백은 사용할 수 없습니다.";
 
     public MemberUpdatePasswordRequest(String password) {

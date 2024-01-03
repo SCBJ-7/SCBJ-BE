@@ -12,11 +12,14 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Phone {
-    String message() default  "입력된 핸드폰 번호 형식이 맞지 않습니다.";
+
+    String message() default "입력된 핸드폰 번호 형식이 맞지 않습니다.";
+
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-    String regexp() default  "^01([0|1|6|7|8|9])-?([0-9]{4})-?([0-9]{4})$";
+
+    String regexp() default "^01([0|1|6|7|8|9])-?([0-9]{4})-?([0-9]{4})$";
 
 }
 

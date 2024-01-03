@@ -18,21 +18,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
+    private final String grantType = "Bearer ";
+    private final RedisTemplate<String, Object> redisTemplate;
     @Value("${jwt.secret}")
     private String secret;
-
     @Value("${jwt.expiration}")
     private Long expiration;
-
     @Value("${jwt.refreshExpiration}")
     private Long refreshExpiration;
-
     @Value("${jwt.redisRefreshKeyPrefix}")
     private String redisRefreshKeyPrefix;
-
-    private final String grantType= "Bearer ";
-
-    private final RedisTemplate<String, Object> redisTemplate;
 
     public JwtUtil(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;

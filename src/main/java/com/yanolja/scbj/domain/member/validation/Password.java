@@ -13,10 +13,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Password {
 
-    String message() default  "입력된 패스워드 형식이 맞지 않습니다.";
+    String message() default "입력된 패스워드 형식이 맞지 않습니다.";
+
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-    String regexp() default  "^(?=.*[a-zA-Z])(?=.*[0-9!@#$%^&*()_+])[a-zA-Z0-9!@#$%^&*()_+]{8,16}$";
+
+    String regexp() default "^(?=.*[a-zA-Z])(?=.*[0-9!@#$%^&*()_+])[a-zA-Z0-9!@#$%^&*()_+]{8,16}$";
 
 }
