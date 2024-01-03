@@ -24,27 +24,43 @@ public class RoomTheme {
 
     @Column(nullable = false)
     @Comment("주차 가능")
-    private boolean hasParkingZone;
+    private boolean parkingZone;
 
     @Column(nullable = false)
     @Comment("조식 제공")
-    private boolean hasBreakfast;
+    private boolean breakfast;
 
     @Column(nullable = false)
     @Comment("수영장")
-    private boolean hasPool;
+    private boolean pool;
 
     @Column(nullable = false)
     @Comment("오션뷰")
-    private boolean hasOceanView;
+    private boolean oceanView;
 
     @Builder
-    private RoomTheme(Long id, boolean hasParkingZone, boolean hasBreakfast, boolean hasPool,
-        boolean hasOceanView) {
+    private RoomTheme(Long id, boolean parkingZone, boolean breakfast, boolean pool,
+        boolean oceanView) {
         this.id = id;
-        this.hasParkingZone = hasParkingZone;
-        this.hasBreakfast = hasBreakfast;
-        this.hasPool = hasPool;
-        this.hasOceanView = hasOceanView;
+        this.parkingZone = parkingZone;
+        this.breakfast = breakfast;
+        this.pool = pool;
+        this.oceanView = oceanView;
+    }
+
+    public boolean hasParkingZone() {
+        return parkingZone;
+    }
+
+    public boolean hasBreakfast() {
+        return breakfast;
+    }
+
+    public boolean hasPool() {
+        return pool;
+    }
+
+    public boolean hasOceanView() {
+        return oceanView;
     }
 }
