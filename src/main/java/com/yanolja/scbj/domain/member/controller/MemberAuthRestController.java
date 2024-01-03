@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Log4j2
 @RestController
-@RequestMapping("/api/token")
+@RequestMapping("/v1/token")
 public class MemberAuthRestController {
 
     private final MemberAuthService memberAuthService;
