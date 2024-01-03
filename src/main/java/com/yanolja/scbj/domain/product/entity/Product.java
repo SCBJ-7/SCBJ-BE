@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.prdouct.entity;
+package com.yanolja.scbj.domain.product.entity;
 
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
@@ -60,8 +60,9 @@ public class Product extends BaseEntity {
 
 
     @Builder
-    private Product(Reservation reservation, int firstPrice, int secondPrice,
+    private Product(Long id, Reservation reservation, int firstPrice, int secondPrice,
         String bank, String accountNumber, int secondGrantPeriod) {
+        this.id = id;
         this.reservation = reservation;
         this.firstPrice = firstPrice;
         this.secondPrice = secondPrice;

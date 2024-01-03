@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class PhoneValidator implements ConstraintValidator<Phone, String> {
 
-    private String PHONE_REGEX ;
+    private String PHONE_REGEX;
 
     @Override
     public void initialize(Phone constraintAnnotation) {

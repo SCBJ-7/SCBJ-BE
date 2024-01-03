@@ -25,17 +25,18 @@ public class HotelRoomImage {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "hotel_room_id", nullable = false)
+    @JoinColumn(name = "hotel_id", nullable = false)
     @Comment("호텔 객실 식별자")
-    private HotelRoom hotelRoom;
+    private Hotel hotel;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     @Comment("이미지 url")
     private String url;
 
     @Builder
-    private HotelRoomImage(HotelRoom hotelRoom, String url) {
-        this.hotelRoom = hotelRoom;
+    private HotelRoomImage(Long id, Hotel hotel, String url) {
+        this.id = id;
+        this.hotel = hotel;
         this.url = url;
     }
 }

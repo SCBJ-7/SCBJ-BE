@@ -1,6 +1,5 @@
 package com.yanolja.scbj.domain.hotelRoom.entity;
 
-import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoom;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,9 +24,9 @@ public class HotelRoomPrice {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "hotel_room_id", nullable = false)
+    @JoinColumn(name = "hotel_id", nullable = false)
     @Comment("호텔 객실 식별자")
-    private HotelRoom hotelRoom;
+    private Hotel hotel;
 
     @Column(nullable = false)
     @Comment("가격(성수기_정가)")
@@ -38,8 +37,9 @@ public class HotelRoomPrice {
     private int offPeakPrice;
 
     @Builder
-    private HotelRoomPrice(HotelRoom hotelRoom, int peakPrice, int offPeakPrice) {
-        this.hotelRoom = hotelRoom;
+    private HotelRoomPrice(Long id, Hotel hotel, int peakPrice, int offPeakPrice) {
+        this.id = id;
+        this.hotel = hotel;
         this.peakPrice = peakPrice;
         this.offPeakPrice = offPeakPrice;
     }

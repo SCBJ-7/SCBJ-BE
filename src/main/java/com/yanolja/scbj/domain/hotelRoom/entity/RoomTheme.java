@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,7 +39,9 @@ public class RoomTheme {
     private boolean hasOceanView;
 
     @Builder
-    private RoomTheme(boolean hasParkingZone, boolean hasBreakfast, boolean hasPool, boolean hasOceanView) {
+    private RoomTheme(Long id, boolean hasParkingZone, boolean hasBreakfast, boolean hasPool,
+        boolean hasOceanView) {
+        this.id = id;
         this.hasParkingZone = hasParkingZone;
         this.hasBreakfast = hasBreakfast;
         this.hasPool = hasPool;

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
+
     private final MemberRepository memberRepository;
 
     CustomUserDetailsService(MemberRepository memberRepository) {
@@ -21,6 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         return memberRepository.findById(Long.parseLong(userId))
             .map(MemberMapper::toUserDetails)
-            .orElseThrow(() -> new UsernameNotFoundException("해당 AccessToken과 관련된 userId:"+userId+"를 DB에서 찾을 수 없습니다."));
+            .orElseThrow(() -> new UsernameNotFoundException(
+                "해당 AccessToken과 관련된 userId:" + userId + "를 DB에서 찾을 수 없습니다."));
     }
 }

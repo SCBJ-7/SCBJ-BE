@@ -7,9 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,14 +18,15 @@ import org.hibernate.annotations.Comment;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class RefundPolicy {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Comment(value = "호텔 룸 식별자")
     @ManyToOne
-    @JoinColumn(name = "hotel_room_id", nullable = false)
-    private HotelRoom hotelRoom;
+    @JoinColumn(name = "hotel_id", nullable = false)
+    private Hotel hotel;
 
     @Comment(value = "기준 날짜")
     @Column(nullable = false)
@@ -38,8 +37,9 @@ public class RefundPolicy {
     private int percent;
 
     @Builder
-    private RefundPolicy(HotelRoom hotelRoom, LocalDate baseDate, int percent) {
-        this.hotelRoom = hotelRoom;
+    private RefundPolicy(Long id, Hotel hotel, LocalDate baseDate, int percent) {
+        this.id = id;
+        this.hotel = hotel;
         this.baseDate = baseDate;
         this.percent = percent;
     }

@@ -1,6 +1,6 @@
 package com.yanolja.scbj.domain.reservation.entity;
 
-import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoom;
+import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.global.common.BaseEntity;
 import jakarta.persistence.Column;
@@ -20,7 +20,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Reservation extends BaseEntity{
+public class Reservation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,9 +28,9 @@ public class Reservation extends BaseEntity{
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "hotel_room_id", nullable = false)
+    @JoinColumn(name = "hotel_id", nullable = false)
     @Comment("호텔 룸 식별자")
-    private HotelRoom hotelRoom;
+    private Hotel hotel;
 
     @ManyToOne
     @JoinColumn(name = "yanolja_member_id", nullable = false)
@@ -50,8 +50,10 @@ public class Reservation extends BaseEntity{
     private int purchasePrice;
 
     @Builder
-    private Reservation(HotelRoom hotelRoom, YanoljaMember yanoljaMember, LocalDate startDate, LocalDate endDate, int purchasePrice) {
-        this.hotelRoom = hotelRoom;
+    private Reservation(Long id, Hotel hotel, YanoljaMember yanoljaMember, LocalDate startDate,
+        LocalDate endDate, int purchasePrice) {
+        this.id = id;
+        this.hotel = hotel;
         this.yanoljaMember = yanoljaMember;
         this.startDate = startDate;
         this.endDate = endDate;

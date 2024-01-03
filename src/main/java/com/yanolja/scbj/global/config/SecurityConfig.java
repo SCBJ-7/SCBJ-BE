@@ -21,22 +21,23 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 public class SecurityConfig implements WebMvcConfigurer {
 
+    private static final String[] PERMIT_URL_ARRAY = {
+        "/api/member/signup",
+        "/api/member/signin",
+        "/api/token/refresh",
+        "/h2-console/**",
+        "/**"
+    };
     private final CorsConfig corsConfig;
     private final RedisTemplate<String, Object> redisTemplate;
     private final CustomUserDetailsService customUserDetailsService;
 
     SecurityConfig(CorsConfig corsConfig, RedisTemplate<String, Object> redisTemplate,
-        CustomUserDetailsService customUserDetailsService ) {
+        CustomUserDetailsService customUserDetailsService) {
         this.redisTemplate = redisTemplate;
         this.corsConfig = corsConfig;
         this.customUserDetailsService = customUserDetailsService;
     }
-
-    private static final String[] PERMIT_URL_ARRAY = {
-        "/api/member/signup",
-        "/api/member/signin",
-        "/api/token/refresh"
-    };
 
     @Bean
     public PasswordEncoder passwordEncoder() {

@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class YanoljaMember {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,10 +27,11 @@ public class YanoljaMember {
     private String email;
 
     @OneToMany(mappedBy = "yanoljaMember")
-    private List<Reservation> reservationList = new ArrayList<>();
+    private final List<Reservation> reservationList = new ArrayList<>();
 
     @Builder
-    private YanoljaMember(String email) {
+    private YanoljaMember(Long id, String email) {
+        this.id = id;
         this.email = email;
     }
 }

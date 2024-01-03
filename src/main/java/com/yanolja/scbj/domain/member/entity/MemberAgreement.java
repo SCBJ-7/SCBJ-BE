@@ -24,7 +24,7 @@ public class MemberAgreement {
     @Column(nullable = false)
     @ColumnDefault(value = "false")
     @Comment("개인정보 수집 및 이용약관")
-    private Boolean userConsentedToPrivacy;
+    private Boolean privacyPolicy;
 
     @Column(nullable = false)
     @ColumnDefault(value = "false")
