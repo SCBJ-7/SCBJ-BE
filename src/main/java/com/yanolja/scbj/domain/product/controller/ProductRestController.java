@@ -1,6 +1,6 @@
 package com.yanolja.scbj.domain.product.controller;
 
-import com.yanolja.scbj.domain.product.dto.ProductFindResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;

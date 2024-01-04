@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.product.dto;
+package com.yanolja.scbj.domain.product.dto.response;
 
 import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
 import java.time.LocalDateTime;

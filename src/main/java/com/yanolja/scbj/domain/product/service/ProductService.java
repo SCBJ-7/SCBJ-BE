@@ -8,8 +8,8 @@ import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
-import com.yanolja.scbj.domain.product.dto.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.FirstPriceHigherException;
@@ -73,9 +73,9 @@ public class ProductService {
             .accountNumber(productPostRequest.getAccountNumber())
             .secondGrantPeriod(productPostRequest.getSecondGrantPeriod()).build();
 
-        productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
 
-        return new ProductPostResponse(product);
+        return ProductPostResponse.builder().productId(savedProduct.getId()).build();
 
     }
 
