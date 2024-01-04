@@ -12,7 +12,7 @@ import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
-import com.yanolja.scbj.domain.product.dto.ProductFindResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
@@ -71,11 +71,8 @@ class ProductServiceTest {
                 .email("yang980329@naver.com").password("yang8126042").name("양유림")
                 .phone("010-3996-6042").build();
 
-            Hotel hotel = Hotel.builder().hotelName("a호텔").hotelMainAddress("경기도")
-                .hotelDetailAddress("고양시").hotelInfoUrl("www.naver.com").build();
-
             Reservation reservation = Reservation.builder().id(reservationId)
-                .yanoljaMember(yanoljaMember).purchasePrice(5000000).hotel(hotel).startDate(
+                .yanoljaMember(yanoljaMember).purchasePrice(5000000).startDate(
                     LocalDate.now()).endDate(LocalDate.now()).build();
 
             given(memberRepository.findById(any(Long.TYPE))).willReturn(
@@ -101,7 +98,7 @@ class ProductServiceTest {
 
             // then
             assertThat(result).isNotNull();
-//            assertThat(result).extracting("productId").isEqualTo(1L);
+            assertThat(result.getProductId()).isEqualTo(1L);
         }
     }
 
