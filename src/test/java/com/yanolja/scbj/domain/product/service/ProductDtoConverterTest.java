@@ -1,8 +1,5 @@
 package com.yanolja.scbj.domain.product.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
@@ -10,39 +7,29 @@ import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.dto.ProductFindResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
-import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-
 @ExtendWith(MockitoExtension.class)
-class ProductServiceTest {
-
-    @Mock
-    private ProductRepository productRepository;
-
-    @Mock
-    private ProductDtoConverter productDtoConverter;
+class ProductDtoConverterTest {
 
     @InjectMocks
-    private ProductService productService;
+    private ProductDtoConverter productDtoConverter;
 
     @Nested
-    @DisplayName("상품 상세 조회는 ")
-    class Context_findProduct {
+    @DisplayName("상품 -> 조회 dto 변환은 ")
+    class Context_ProductConverter {
 
         @Test
-        @DisplayName("성공시 상품 정보를 반환한다.")
+        @DisplayName("결제 내역이 존재하는 경우 saleStatus가 true로 반환된다.")
         void _will_success() {
             // given
             RoomTheme roomTheme = RoomTheme.builder()
@@ -95,21 +82,12 @@ class ProductServiceTest {
                 .paymentHistory(paymentHistory)
                 .build();
 
-            ProductFindResponse ConverterResponse = ProductFindResponse.builder()
-                .hotelName(hotel.getHotelName())
-                .saleStatus(true)
-                .build();
-
-            given(productRepository.findById(any())).willReturn(Optional.of(product));
-            given(productDtoConverter.toFindResponse(any())).willReturn(ConverterResponse);
-
             // when
-            ProductFindResponse response = productService.findProduct(product.getId());
+            ProductFindResponse response = productDtoConverter.toFindResponse(product);
 
             // then
             Assertions.assertThat(response).isNotNull();
             Assertions.assertThat(response.isSaleStatus()).isEqualTo(true);
         }
     }
-
 }
