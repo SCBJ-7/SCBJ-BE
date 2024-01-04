@@ -3,7 +3,9 @@ package com.yanolja.scbj.domain.product.controller;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -13,8 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
-import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.config.SecurityConfig;
@@ -46,11 +48,9 @@ import org.springframework.test.web.servlet.ResultActions;
 class ProductRestControllerTest {
 
     @Autowired
-    private MockMvc mvc;
-
-    @Autowired
     protected ObjectMapper objectMapper;
-
+    @Autowired
+    private MockMvc mvc;
     @MockBean
     private ProductService productService;
 
@@ -142,6 +142,27 @@ class ProductRestControllerTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.data.hotelName", is(findResponse.getHotelName())));
 
+        }
+    }
+
+    @Nested
+    @DisplayName("상품 삭제는 ")
+    class Context_deleteProduct {
+
+        @Test
+        @DisplayName("성공 시 204가 반환된다.")
+        void _will_success() throws Exception {
+            // given
+            Long targetProductId = 1L;
+
+            doNothing().when(productService).deleteProduct(any());
+
+            // when
+            ResultActions response = mvc.perform(delete("/v1/products/" + targetProductId));
+
+            // then
+            response.andExpect(status().isNoContent())
+                .andDo(print());
         }
     }
 }
