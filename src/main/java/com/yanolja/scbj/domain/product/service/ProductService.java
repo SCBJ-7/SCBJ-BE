@@ -30,6 +30,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductDtoConverter productDtoConverter;
 
+    private static final int MIN_SECOND_GRANT_PERIOD = 3;
+
     @Transactional
     public ProductPostResponse postProduct(Long memberId, Long reservationId,
         ProductPostRequest productPostRequest) {
@@ -51,7 +53,7 @@ public class ProductService {
             throw new SecondPriceHigherException(ErrorCode.SECOND_PRICE_HIGHER);
         }
 
-        if (productPostRequest.getSecondGrantPeriod() < 3) {
+        if (productPostRequest.getSecondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
             throw new SecondPricePeriodException(ErrorCode.INVALID_SECOND_PRICE_PERIOD);
         }
 
