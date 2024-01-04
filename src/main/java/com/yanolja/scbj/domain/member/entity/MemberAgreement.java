@@ -23,13 +23,13 @@ public class MemberAgreement {
 
     @Column(nullable = false)
     @ColumnDefault(value = "false")
-    @Comment("개인정보 수집 및 이용약관")
+    @Comment("개인 정보 처리 방침")
     private Boolean privacyPolicy;
 
     @Column(nullable = false)
     @ColumnDefault(value = "false")
-    @Comment("개인정보 제3자 제공약관")
-    private Boolean isThirdPartyDisclosureAgreed;
+    @Comment("이용 약관")
+    private Boolean termOfUse;
 
 
 }
