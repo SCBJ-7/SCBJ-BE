@@ -1,12 +1,15 @@
 package com.yanolja.scbj.domain.member.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.global.config.CustomUserDetailsService;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import org.junit.jupiter.api.Test;
@@ -29,19 +32,18 @@ class MemberAuthServiceTest {
 
     @Test
     void refreshAccessToken() {
-        //given
-        Member member = Member.builder(
-                .
-            build();
+        RefreshRequest refreshRequest = RefreshRequest.builder().refreshToken("").accessToken("")
+            .build();
         TokenResponse tokenResponse = TokenResponse.builder()
             .accessToken("")
-            .refreshToken("")
-            .build();
+                .refreshToken("")
+                    .build();
 
-        //when
-        given(jwtUtil.isRefreshTokenValid(any(),any())).willReturn(true);
-        given(customUserDetailsService.loadUserByUsername(any())).willReturn()
+        given(jwtUtil.isRefreshTokenValid(any(), any())).willReturn(true);
+        given(jwtUtil.generateToken(any())).willReturn("");
+        given(jwtUtil.generateRefreshToken(any())).willReturn("");
 
-        //then
+        //when & then
+        assertThat(tokenResponse).usingRecursiveComparison().isEqualTo(memberAuthService.refreshAccessToken(refreshRequest));
     }
 }
