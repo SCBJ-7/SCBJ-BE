@@ -26,6 +26,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         "/api/member/signin",
         "/api/token/refresh",
         "/h2-console/**",
+        "/v1/products/**:GET",
         "/**"
     };
     private final CorsConfig corsConfig;
