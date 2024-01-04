@@ -31,6 +31,9 @@ class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private ProductDtoConverter productDtoConverter;
+
     @InjectMocks
     private ProductService productService;
 
@@ -42,7 +45,6 @@ class ProductServiceTest {
         @DisplayName("성공시 상품 정보를 반환한다.")
         void _will_success() {
             // given
-
             RoomTheme roomTheme = RoomTheme.builder()
                 .id(1L)
                 .build();
@@ -93,7 +95,13 @@ class ProductServiceTest {
                 .paymentHistory(paymentHistory)
                 .build();
 
+            ProductFindResponse ConverterResponse = ProductFindResponse.builder()
+                .hotelName(hotel.getHotelName())
+                .saleStatus(true)
+                .build();
+
             given(productRepository.findById(any())).willReturn(Optional.of(product));
+            given(productDtoConverter.toFindResponse(any())).willReturn(ConverterResponse);
 
             // when
             ProductFindResponse response = productService.findProduct(product.getId());
