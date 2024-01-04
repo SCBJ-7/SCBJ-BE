@@ -14,13 +14,13 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "입력된 패스워드 형식이 맞지 않습니다."),
 
     //PRODUCT
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 정보를 찾을 수 없습니다."),
     FIRST_PRICE_HIGHER(HttpStatus.BAD_REQUEST, "양도 가격이 구매가보다 높습니다. 양도 가격을 확인해주세요."),
     SECOND_PRICE_HIGHER(HttpStatus.BAD_REQUEST, "2차 양도 가격이 1차 양도 가격보다 높습니다. 2차 가격을 확인해주세요."),
 
 
     //RESERVATION
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다.");
-
 
 
     private final HttpStatus httpStatus;

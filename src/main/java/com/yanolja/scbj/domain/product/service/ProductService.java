@@ -1,21 +1,29 @@
 package com.yanolja.scbj.domain.product.service;
 
+import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
+import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.Room;
+import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
-import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
+import com.yanolja.scbj.domain.product.dto.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.FirstPriceHigherException;
+import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.exception.SecondPriceHigherException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.exception.ReservationNotFoundException;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
+import com.yanolja.scbj.global.util.SeasonValidator;
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +32,6 @@ import org.springframework.stereotype.Service;
 public class ProductService {
 
     private final MemberRepository memberRepository;
-    private final YanoljaMemberRepository yanoljaMemberRepository;
     private final ReservationRepository reservationRepository;
     private final ProductRepository productRepository;
 
@@ -52,6 +59,9 @@ public class ProductService {
         }
 
         // 2차 양도 시점이 체크인 잔류시간보다 작아야한다. (기획미정)
+        // 체크인 : 2월 16일(Reservation - 시작날짜) + 10:00 (Hotel - 체크인)
+        // 지금 : 2월 15일 10:00
+        // 2차 양도 시점 : 체크인 시간 - 지금 보다 작아야한다.
         //if(productPostRequest.getSecondGrantPeriod() )
 
         Product product = Product.builder()
@@ -69,8 +79,54 @@ public class ProductService {
 
     }
 
-    // 체크인 : 2월 16일(Reservation - 시작날짜) + 10:00 (Hotel - 체크인)
-    // 지금 : 2월 15일 10:00
-    // 2차 양도 시점 : 체크인 시간 - 지금 보다 작아야한다.
+
+    public ProductFindResponse findProduct(Long productId) {
+        Product foundProduct = productRepository.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        Reservation foundReservation = foundProduct.getReservation();
+        Hotel foundHotel = foundReservation.getHotel();
+        Room foundRoom = foundHotel.getRoom();
+
+        LocalDateTime checkInDateTime = LocalDateTime.of(foundReservation.getStartDate(),
+            foundRoom.getCheckIn());
+        LocalDateTime checkOutDateTime = LocalDateTime.of(foundReservation.getEndDate(),
+            foundRoom.getCheckOut());
+
+        int price = foundHotel.getHotelRoomPrice().getOffPeakPrice();
+
+        if (SeasonValidator.isPeakTime(LocalDate.now())) {
+            price = foundHotel.getHotelRoomPrice().getPeakPrice();
+        }
+
+        RoomTheme foundRoomTheme = foundRoom.getRoomTheme();
+
+        RoomThemeFindResponse roomThemeResponse = RoomThemeFindResponse.builder()
+            .parkingZone(foundRoomTheme.hasParkingZone())
+            .breakfast(foundRoomTheme.hasBreakfast())
+            .pool(foundRoomTheme.hasPool())
+            .oceanView(foundRoomTheme.hasOceanView())
+            .build();
+
+        return ProductFindResponse.builder()
+            .hotelName(foundHotel.getHotelName())
+            .roomName(foundRoom.getRoomName())
+            .checkIn(checkInDateTime)
+            .checkOut(checkOutDateTime)
+            .originalPrice(price)
+            .sellingPrice(foundReservation.getPurchasePrice())
+            .standardPeople(foundRoom.getStandardPeople())
+            .maxPeople(foundRoom.getMaxPeople())
+            .bedType(foundRoom.getBedType())
+            .roomTheme(roomThemeResponse)
+            .hotelAddress(foundHotel.getHotelDetailAddress())
+            .saleStatus(getSaleStatus(foundProduct))
+            .hotelInfoUrl(foundHotel.getHotelInfoUrl())
+            .build();
+    }
+
+    private boolean getSaleStatus(Product product) {
+        return product.getPaymentHistory() != null;
+    }
 
 }
