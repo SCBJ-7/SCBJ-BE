@@ -83,8 +83,7 @@ public class MemberService {
     }
 
     public void updateMemberAccount(final MemberUpdateAccountRequest memberUpdateAccountRequest) {
-        Member currentMember = Optional.of(
-                memberRepository.getReferenceById(securityUtil.getCurrentMemberId()))
+        Member currentMember = memberRepository.findById(securityUtil.getCurrentMemberId())
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         currentMember.updateAccount(memberUpdateAccountRequest.accountNumber(),
