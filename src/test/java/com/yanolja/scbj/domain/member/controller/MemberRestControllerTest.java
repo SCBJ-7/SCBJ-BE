@@ -31,10 +31,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-@WebMvcTest(controllers = MemberRestController.class,
-    excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
-    excludeAutoConfiguration = SecurityAutoConfiguration.class)
+
 @ExtendWith(MockitoExtension.class)
+@WebMvcTest(
+    controllers = MemberRestController.class,
+    excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)
+    },
+    excludeAutoConfiguration = SecurityAutoConfiguration.class
+)
 class MemberRestControllerTest {
 
     @Autowired
@@ -42,7 +47,8 @@ class MemberRestControllerTest {
     @MockBean
     private MemberService memberService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     @Nested

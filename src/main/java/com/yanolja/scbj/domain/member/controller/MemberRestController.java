@@ -36,7 +36,7 @@ public class MemberRestController {
             memberSignUpRequest.password(),
             memberSignUpRequest.name(), memberSignUpRequest.phone());
         return ResponseEntity.ok()
-            .body(ResponseDTO.res(HttpStatus.OK, memberService.signUp(memberSignUpRequest),
+            .body(ResponseDTO.res(memberService.signUp(memberSignUpRequest),
                 "성공적으로 회원가입했습니다."));
     }
 
@@ -46,7 +46,7 @@ public class MemberRestController {
         log.info("email:{}, password:{}", memberSignInRequest.email(),
             memberSignInRequest.password());
         return ResponseEntity.ok()
-            .body(ResponseDTO.res(HttpStatus.OK, memberService.signIn(memberSignInRequest),
+            .body(ResponseDTO.res(memberService.signIn(memberSignInRequest),
                 "성공적으로 로그인했습니다."));
     }
 
@@ -56,7 +56,7 @@ public class MemberRestController {
         log.info("password:{}", memberUpdatePasswordRequest.password());
         memberService.updateMemberPassword(memberUpdatePasswordRequest);
 
-        return ResponseEntity.ok().body(ResponseDTO.res(HttpStatus.OK, "성공적으로 비밀번호를 변경했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 비밀번호를 변경했습니다."));
     }
 
     @PatchMapping("/account")
@@ -66,7 +66,7 @@ public class MemberRestController {
             memberUpdateAccountRequest.bank());
         memberService.updateMemberAccount(memberUpdateAccountRequest);
 
-        return ResponseEntity.ok().body(ResponseDTO.res(HttpStatus.OK, "성공적으로 계좌번호를 등록/수정했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 계좌번호를 등록/수정했습니다."));
     }
 
 

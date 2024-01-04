@@ -43,15 +43,4 @@ public abstract class BaseEntity {
         deletedAt = null;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return this.updatedAt;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return this.deletedAt;
-    }
 }

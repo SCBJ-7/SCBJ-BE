@@ -6,10 +6,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.service.MemberAuthService;
-import com.yanolja.scbj.global.config.AbstractContainersSupport;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,19 +22,25 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest(controllers = MemberAuthRestController.class,
-    excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
-    excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ExtendWith(MockitoExtension.class)
-class MemberAuthRestControllerTest extends AbstractContainersSupport {
+@WebMvcTest(
+    controllers = MemberAuthRestController.class,
+    excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)
+    },
+    excludeAutoConfiguration = SecurityAutoConfiguration.class
+)
+class MemberAuthRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @MockBean
     private MemberAuthService memberAuthService;
-    ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     void refreshAccessToken() throws Exception {
