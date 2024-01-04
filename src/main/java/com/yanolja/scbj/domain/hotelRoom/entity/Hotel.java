@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -45,19 +46,23 @@ public class Hotel {
     @Comment("호텔 정보 url")
     private String hotelInfoUrl;
 
+    @OneToOne(mappedBy = "hotel")
+    private HotelRoomPrice hotelRoomPrice;
+
     @Embedded
     private Room room;
 
     @Builder
     private Hotel(Long id, List<Reservation> reservationList, String hotelName,
         String hotelMainAddress,
-        String hotelDetailAddress, String hotelInfoUrl, Room room) {
+        String hotelDetailAddress, String hotelInfoUrl, HotelRoomPrice hotelRoomPrice, Room room) {
         this.id = id;
         this.reservationList = reservationList;
         this.hotelName = hotelName;
         this.hotelMainAddress = hotelMainAddress;
         this.hotelDetailAddress = hotelDetailAddress;
         this.hotelInfoUrl = hotelInfoUrl;
+        this.hotelRoomPrice = hotelRoomPrice;
         this.room = room;
     }
 }
