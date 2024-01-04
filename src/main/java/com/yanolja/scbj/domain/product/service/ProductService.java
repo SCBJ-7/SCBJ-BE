@@ -11,7 +11,7 @@ import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
-import com.yanolja.scbj.domain.product.dto.ProductFindResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.FirstPriceHigherException;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
@@ -22,7 +22,6 @@ import com.yanolja.scbj.domain.reservation.exception.ReservationNotFoundExceptio
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.SeasonValidator;
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import com.yanolja.scbj.global.exception.ErrorCode;
