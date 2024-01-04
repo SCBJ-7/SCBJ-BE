@@ -1,9 +1,5 @@
 package com.yanolja.scbj.domain.product.service;
 
-import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
-import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
-import com.yanolja.scbj.domain.hotelRoom.entity.Room;
-import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
@@ -11,7 +7,6 @@ import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
-import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.FirstPriceHigherException;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
@@ -21,10 +16,7 @@ import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.exception.ReservationNotFoundException;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
-import com.yanolja.scbj.global.util.SeasonValidator;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import com.yanolja.scbj.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,5 +80,13 @@ public class ProductService {
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
         return productDtoConverter.toFindResponse(foundProduct);
+    }
+
+    @Transactional
+    public void deleteProduct(Long productId) {
+        Product targetProduct = productRepository.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        targetProduct.delete(LocalDateTime.now());
     }
 }
