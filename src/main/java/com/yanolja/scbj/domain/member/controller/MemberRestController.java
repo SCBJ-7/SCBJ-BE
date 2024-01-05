@@ -82,8 +82,9 @@ public class MemberRestController {
     }
 
     @PatchMapping("/phone")
-    public ResponseEntity<ResponseDTO<String>> updateMemberPhone(@Phone @RequestBody String
-        phoneToUpdate) {
+    public ResponseEntity<ResponseDTO<String>> updateMemberPhone(
+        @Phone
+        @RequestBody String phoneToUpdate) {
         memberService.updateMemberPhone(phoneToUpdate);
         return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 핸드폰 번호를 변경했습니다."));
     }

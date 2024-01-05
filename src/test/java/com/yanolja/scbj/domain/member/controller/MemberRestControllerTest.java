@@ -153,10 +153,10 @@ class MemberRestControllerTest {
         @DisplayName("핸드폰 수정 시")
         void updateMemberPhone() throws Exception {
             //given
-            String phoneToUpdate = "010-1234-5678";
+            String phoneToUpdate = memberResponse.getPhone();
             //when & then
             mockMvc.perform(patch("/v1/members/phone")
-                    .content(objectMapper.writeValueAsString(phoneToUpdate))
+                    .content(phoneToUpdate)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());

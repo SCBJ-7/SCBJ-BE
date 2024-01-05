@@ -155,5 +155,19 @@ class MemberServiceTest {
             assertEquals(testMember.getName(), nameToUpdate);
 
         }
+
+        @Test
+        @DisplayName("핸드폰 번호 수정 시")
+        void updateMemberPhone() {
+            //given
+            String phoneToUpdate = "010-1234-5678";
+
+            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            //when
+            memberService.updateMemberPhone(phoneToUpdate);
+            //then
+            assertEquals(testMember.getPhone(), phoneToUpdate);
+
+        }
     }
 }
