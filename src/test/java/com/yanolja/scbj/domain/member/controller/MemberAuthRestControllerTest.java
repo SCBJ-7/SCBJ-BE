@@ -11,6 +11,7 @@ import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.service.MemberAuthService;
 import com.yanolja.scbj.global.config.SecurityConfig;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,6 +44,7 @@ class MemberAuthRestControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @DisplayName("리프레쉬 토큰 재발급할 때")
     void refreshAccessToken() throws Exception {
         // given
         TokenResponse tokenResponse = TokenResponse.builder().accessToken("").refreshToken("")

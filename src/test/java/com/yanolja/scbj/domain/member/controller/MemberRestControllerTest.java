@@ -52,8 +52,8 @@ class MemberRestControllerTest {
 
 
     @Nested
-    @DisplayName("성공 테스트")
-    class Success {
+    @DisplayName("멤버 관련 API 사용시")
+    class SuccessTests {
 
         private String testPassword = "test1234@";
         private MemberResponse memberResponse = MemberResponse.builder()
@@ -73,6 +73,7 @@ class MemberRestControllerTest {
             .build();
 
         @Test
+        @DisplayName("회원가입할 때")
         void signUp() throws Exception {
             //given
             MemberSignUpRequest memberSignUpRequest = MemberSignUpRequest.builder()
@@ -92,6 +93,7 @@ class MemberRestControllerTest {
         }
 
         @Test
+        @DisplayName("로그인할 때")
         void signIn() throws Exception {
             //given
             MemberSignInRequest memberSignInRequest = MemberSignInRequest.builder()
@@ -107,6 +109,7 @@ class MemberRestControllerTest {
         }
 
         @Test
+        @DisplayName("비밀번호 수정 시")
         void updateMemberPassword() throws Exception {
             //given
             MemberUpdatePasswordRequest memberUpdatePasswordRequest = MemberUpdatePasswordRequest
@@ -120,6 +123,7 @@ class MemberRestControllerTest {
         }
 
         @Test
+        @DisplayName("계좌번호 수정 시")
         void updateMemberAccount() throws Exception {
             //given
             MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest

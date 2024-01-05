@@ -43,7 +43,7 @@ class MemberServiceTest {
     private MemberService memberService;
 
     @Nested
-    @DisplayName("성공 테스트")
+    @DisplayName("유저 관련 서비스 사용 시")
     class SuccessTests {
 
         private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -59,6 +59,7 @@ class MemberServiceTest {
             .build();
 
         @Test
+        @DisplayName("회원가입할 때")
         void signUp() {
             //given
             MemberSignUpRequest memberSignUpRequest = MemberSignUpRequest.builder()
@@ -84,6 +85,7 @@ class MemberServiceTest {
         }
 
         @Test
+        @DisplayName("로그인할 때")
         void signIn() {
             //given
             MemberSignInRequest memberSignInRequest = MemberSignInRequest.builder()
@@ -106,6 +108,7 @@ class MemberServiceTest {
         }
 
         @Test
+        @DisplayName("비밀번호 수정 시")
         void updateMemberPassword() {
             //given
             String changedPassword = "test1234!";
@@ -122,6 +125,7 @@ class MemberServiceTest {
         }
 
         @Test
+        @DisplayName("계좌번호 수정 시")
         void updateMemberAccount() {
             //given
             MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()

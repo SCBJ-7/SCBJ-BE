@@ -12,6 +12,7 @@ import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.global.config.CustomUserDetailsService;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +32,7 @@ class MemberAuthServiceTest {
 
 
     @Test
+    @DisplayName("리프레쉬 토큰 재발급할 때")
     void refreshAccessToken() {
         RefreshRequest refreshRequest = RefreshRequest.builder().refreshToken("").accessToken("")
             .build();
