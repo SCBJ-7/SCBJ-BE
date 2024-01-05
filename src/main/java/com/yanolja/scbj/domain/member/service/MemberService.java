@@ -90,4 +90,11 @@ public class MemberService {
             memberUpdateAccountRequest.bank());
     }
 
+    public void updateMemberName(final String nameToUpdate) {
+        Member currentMember = memberRepository.findById(securityUtil.getCurrentMemberId())
+            .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        currentMember.updateName(nameToUpdate);
+    }
+
 }

@@ -135,5 +135,19 @@ class MemberRestControllerTest {
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         }
+
+        @Test
+        @DisplayName("이름 수정 시")
+        void updateMemberPassowrd() throws Exception {
+            //given
+            String nameToUpdate = "이상해씨";
+            //when & then
+            mockMvc.perform(patch("/v1/members/name")
+                    .content(objectMapper.writeValueAsString(nameToUpdate))
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        }
     }
+
 }

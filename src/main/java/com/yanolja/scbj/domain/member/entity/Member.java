@@ -116,4 +116,8 @@ public class Member extends BaseEntity {
         this.accountNumber = accountNumber;
         this.bank = bank;
     }
+
+    public void updateName(final String nameToUpdate) {
+        this.name = nameToUpdate;
+    }
 }
