@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -18,4 +19,10 @@ public class PaymentAgreement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Comment("결제 내역 식별자")
     private Long id;
+
+
+    @Builder
+    public PaymentAgreement(Long id) {
+        this.id = id;
+    }
 }
