@@ -3,6 +3,8 @@ package com.yanolja.scbj.domain.product.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
@@ -12,8 +14,8 @@ import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
-import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
@@ -48,8 +50,8 @@ class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
-  
-     @Mock
+
+    @Mock
     private ProductDtoConverter productDtoConverter;
 
     @Nested
@@ -177,6 +179,35 @@ class ProductServiceTest {
             // then
             Assertions.assertThat(response).isNotNull();
             Assertions.assertThat(response.isSaleStatus()).isEqualTo(true);
+        }
+    }
+
+
+    @Nested
+    @DisplayName("상품 삭제는 ")
+    class Context_deleteProduct {
+
+        @Test
+        @DisplayName("성공 시 deletedAt에 값이 생긴다")
+        void _will_success() {
+            // given
+            Product product = Product.builder()
+                .id(1L)
+                .firstPrice(200000)
+                .secondPrice(100000)
+                .bank("국민")
+                .accountNumber("12512-2131-12512")
+                .secondGrantPeriod(24)
+                .build();
+
+            given(productRepository.findById(any())).willReturn(Optional.of(product));
+
+            // when
+            productService.deleteProduct(1L);
+
+            // then
+            verify(productRepository, atLeastOnce()).findById(any());
+            Assertions.assertThat(product.getDeletedAt()).isNotNull();
         }
     }
 }

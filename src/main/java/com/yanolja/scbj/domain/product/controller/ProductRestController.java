@@ -1,7 +1,7 @@
 package com.yanolja.scbj.domain.product.controller;
 
-import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.common.ResponseDTO;
@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,4 +45,11 @@ public class ProductRestController {
             "상품 상세 조회에 성공했습니다."), HttpStatus.OK);
     }
 
+    @DeleteMapping("/{product_id}")
+    public ResponseEntity<ResponseDTO<Void>> deleteProduct(
+        @PathVariable("product_id") Long productId) {
+        productService.deleteProduct(productId);
+        return new ResponseEntity<>(ResponseDTO.res(null, "상품 삭제에 성공했습니다."), HttpStatus.NO_CONTENT);
+    }
+  
 }
