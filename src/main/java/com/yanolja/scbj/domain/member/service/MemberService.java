@@ -89,7 +89,7 @@ public class MemberService {
     }
 
     private Member getCurrentMember() {
-        Member currentMember = memberRepository.findById(securityUtil.getCurrentMemberId())
+        return memberRepository.findById(securityUtil.getCurrentMemberId())
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
