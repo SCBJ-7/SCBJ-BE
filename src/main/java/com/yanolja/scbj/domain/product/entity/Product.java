@@ -1,6 +1,7 @@
 package com.yanolja.scbj.domain.product.entity;
 
 import com.yanolja.scbj.domain.member.entity.Member;
+import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.common.BaseEntity;
 import jakarta.persistence.Column;
@@ -58,10 +59,13 @@ public class Product extends BaseEntity {
     @Comment("2차 양도시점 ")
     private int secondGrantPeriod;
 
+    @OneToOne(mappedBy = "product")
+    private PaymentHistory paymentHistory;
 
     @Builder
-    private Product(Long id, Reservation reservation, Member member, int firstPrice, int secondPrice,
-        String bank, String accountNumber, int secondGrantPeriod) {
+    private Product(Long id, Reservation reservation, Member member, int firstPrice,
+        int secondPrice,
+        String bank, String accountNumber, int secondGrantPeriod, PaymentHistory paymentHistory) {
         this.id = id;
         this.reservation = reservation;
         this.member = member;
@@ -70,5 +74,6 @@ public class Product extends BaseEntity {
         this.bank = bank;
         this.accountNumber = accountNumber;
         this.secondGrantPeriod = secondGrantPeriod;
+        this.paymentHistory = paymentHistory;
     }
 }
