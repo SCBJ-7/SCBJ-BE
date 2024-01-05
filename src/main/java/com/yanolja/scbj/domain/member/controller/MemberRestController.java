@@ -15,6 +15,7 @@ import jakarta.validation.constraints.Size;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -74,11 +75,16 @@ public class MemberRestController {
     public ResponseEntity<ResponseDTO<String>> updateMemberName(
         @Size(min = 1, max = 20, message = "이름의 길이는 1 ~ 20 이어야 합니다.")
         @Pattern(regexp = "[^0-9]*", message = "이름에 숫자는 입력할 수 없습니다.")
-        @RequestBody  String nameToUpdate) {
+        @RequestBody String nameToUpdate) {
         memberService.updateMemberName(nameToUpdate);
 
         return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));
     }
 
+    @GetMapping
+    public ResponseEntity<ResponseDTO<MemberResponse>> getMemberInfo() {
+        return ResponseEntity.ok()
+            .body(ResponseDTO.res(memberService.getMemberInfo(), "성공적으로 회원정보를 조회했습니다."));
+    }
 
 }
