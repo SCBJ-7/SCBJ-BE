@@ -67,11 +67,8 @@ public class MemberService {
 
     public void updateMemberPassword(
         final MemberUpdatePasswordRequest memberUpdatePasswordRequest) {
-        Member member = memberRepository.findById(securityUtil.getCurrentMemberId())
-            .orElseThrow(() -> new MemberNotFoundException(
-                ErrorCode.MEMBER_NOT_FOUND));
-
-        member.updatePassword(passwordEncoder.encode(memberUpdatePasswordRequest.password()));
+        getCurrentMember().updatePassword(
+            passwordEncoder.encode(memberUpdatePasswordRequest.password()));
     }
 
     private void checkPassword(String email, String password) {
@@ -83,18 +80,17 @@ public class MemberService {
     }
 
     public void updateMemberAccount(final MemberUpdateAccountRequest memberUpdateAccountRequest) {
-        Member currentMember = memberRepository.findById(securityUtil.getCurrentMemberId())
-            .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-        currentMember.updateAccount(memberUpdateAccountRequest.accountNumber(),
+        getCurrentMember().updateAccount(memberUpdateAccountRequest.accountNumber(),
             memberUpdateAccountRequest.bank());
     }
 
     public void updateMemberName(final String nameToUpdate) {
+        getCurrentMember().updateName(nameToUpdate);
+    }
+
+    private Member getCurrentMember() {
         Member currentMember = memberRepository.findById(securityUtil.getCurrentMemberId())
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-        currentMember.updateName(nameToUpdate);
     }
 
 }
