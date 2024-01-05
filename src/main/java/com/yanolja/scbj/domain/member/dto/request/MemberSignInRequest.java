@@ -4,6 +4,7 @@ import com.yanolja.scbj.domain.member.validation.Password;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import lombok.Getter;
 
 public record MemberSignInRequest(
     @NotNull

@@ -42,4 +42,5 @@ public abstract class BaseEntity {
     protected void restore() {
         deletedAt = null;
     }
+
 }

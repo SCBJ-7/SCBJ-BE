@@ -116,5 +116,4 @@ public class Member extends BaseEntity {
         this.accountNumber = accountNumber;
         this.bank = bank;
     }
-
 }

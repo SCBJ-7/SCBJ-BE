@@ -47,6 +47,8 @@ dependencies {
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
+	//test-container
+	testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.17.2'
 
 	//mysql
 	runtimeOnly 'com.mysql:mysql-connector-j'
