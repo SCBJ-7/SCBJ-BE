@@ -136,6 +136,7 @@ class PaymentHistoryRepositoryTest {
             PurchasedHistoryResponse firstResult = results.getContent().get(0);
             assertThat(firstResult.name()).isEqualTo("롯데 시그니엘 호텔");
             assertThat(firstResult.price()).isEqualTo(20000);
+            assertThat(firstResult.checkInDate()).isEqualTo("2024-01-05");
         }
     }
 
