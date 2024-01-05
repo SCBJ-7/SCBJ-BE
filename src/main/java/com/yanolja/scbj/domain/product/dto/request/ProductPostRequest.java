@@ -12,12 +12,12 @@ public class ProductPostRequest {
 
     @NotNull(message = "1차 양도 가격을 입력하세요.")
     private int firstPrice;
-    private Integer secondPrice;
+    private int secondPrice;
     @NotBlank(message = "정산 은행을 입력하세요.")
     private String bank;
     @NotBlank(message = "정산 계좌를 입력하세요.")
     private String accountNumber;
-    private Integer secondGrantPeriod;
+    private int secondGrantPeriod;
 
     @Builder
     public ProductPostRequest(int firstPrice, int secondPrice, String bank,

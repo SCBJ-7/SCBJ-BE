@@ -47,7 +47,7 @@ public class Product extends BaseEntity {
 
     @Column
     @Comment("2차 양도 가격")
-    private Integer secondPrice;
+    private int secondPrice;
 
     @Column(length = 50, nullable = false)
     @Comment("정산 은행")
@@ -59,15 +59,15 @@ public class Product extends BaseEntity {
 
     @Column
     @Comment("2차 양도시점")
-    private Integer secondGrantPeriod;
+    private int secondGrantPeriod;
 
     @OneToOne(mappedBy = "product")
     private PaymentHistory paymentHistory;
 
     @Builder
     private Product(Long id, Reservation reservation, Member member, int firstPrice,
-        Integer secondPrice,
-        String bank, String accountNumber, Integer secondGrantPeriod, PaymentHistory paymentHistory) {
+        int secondPrice,
+        String bank, String accountNumber, int secondGrantPeriod, PaymentHistory paymentHistory) {
         this.id = id;
         this.reservation = reservation;
         this.member = member;
