@@ -88,6 +88,10 @@ public class MemberService {
         getCurrentMember().updateName(nameToUpdate);
     }
 
+    public void updateMemberPhone(final String phoneToUpdate) {
+        getCurrentMember().updatePhone(phoneToUpdate);
+    }
+
     private Member getCurrentMember() {
         return memberRepository.findById(securityUtil.getCurrentMemberId())
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
