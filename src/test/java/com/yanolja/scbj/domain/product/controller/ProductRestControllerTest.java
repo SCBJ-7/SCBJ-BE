@@ -87,24 +87,49 @@ class ProductRestControllerTest {
     class Context_postProduct {
 
         @Test
-        @DisplayName("양도글 작성을 성공했습니다.")
-        void _willSuccess() throws Exception {
+        @DisplayName("2차 가격이 있는 양도글 작성을 성공했습니다.")
+        void _willSuccesswithSecond() throws Exception {
             // given
             long reservationId = 1L;
             ProductPostResponse productPostResponse = ProductPostResponse.builder()
                 .productId(1L)
                 .build();
-            ProductPostRequest productPostRequest = ProductPostRequest.builder()
+            ProductPostRequest productPostRequestwithSecond = ProductPostRequest.builder()
                 .firstPrice(350000)
-                .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330")
-                .secondGrantPeriod(48).build();
+                .secondPrice(20000)
+                .bank("신한은행").accountNumber("1000-4400-3330")
+                .secondGrantPeriod(48)
+                .build();
             given(productService.postProduct(any(Long.TYPE), any(Long.TYPE),
                 any(ProductPostRequest.class))).willReturn(productPostResponse);
 
             // when, then
-            mvc.perform(post("/v1/products/{reservationId}", reservationId)
+            mvc.perform(post("/v1/products/{reservation_id}", reservationId)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(productPostRequest)))
+                    .content(objectMapper.writeValueAsString(productPostRequestwithSecond)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data").exists()).andDo(print());
+        }
+
+        @Test
+        @DisplayName("2차 가격이 없는 양도글 작성을 성공했습니다.")
+        void _willSuccesswithoutSecond() throws Exception {
+            // given
+            long reservationId = 1L;
+            ProductPostResponse productPostResponse = ProductPostResponse.builder()
+                .productId(1L)
+                .build();
+            ProductPostRequest productPostRequestwithoutSecond = ProductPostRequest.builder()
+                .firstPrice(350000)
+                .bank("신한은행").accountNumber("1000-4400-3330")
+                .build();
+            given(productService.postProduct(any(Long.TYPE), any(Long.TYPE),
+                any(ProductPostRequest.class))).willReturn(productPostResponse);
+
+            // when, then
+            mvc.perform(post("/v1/products/{reservation_id}", reservationId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(productPostRequestwithoutSecond)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data").exists()).andDo(print());
         }
