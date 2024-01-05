@@ -17,6 +17,7 @@ import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.exception.ReservationNotFoundException;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,5 +79,13 @@ public class ProductService {
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
         return productDtoConverter.toFindResponse(foundProduct);
+    }
+
+    @Transactional
+    public void deleteProduct(Long productId) {
+        Product targetProduct = productRepository.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        targetProduct.delete(LocalDateTime.now());
     }
 }
