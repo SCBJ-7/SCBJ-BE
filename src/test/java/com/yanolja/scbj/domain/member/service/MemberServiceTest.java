@@ -11,6 +11,7 @@ import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
+import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
@@ -20,11 +21,14 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
 
     @Mock
@@ -48,6 +52,7 @@ class MemberServiceTest {
         private Member testMember = Member.builder()
             .id(1L)
             .email("test@gmail.com")
+            .authority(Authority.ROLE_USER)
             .password(bCryptPasswordEncoder.encode(testRawPassword))
             .name("test")
             .phone("010-1234-5678")
@@ -104,15 +109,16 @@ class MemberServiceTest {
         void updateMemberPassword() {
             //given
             String changedPassword = "test1234!";
+            String encodedPassword = passwordEncoder.encode("test1234!");
             MemberUpdatePasswordRequest memberUpdatePasswordRequest = MemberUpdatePasswordRequest.builder()
                 .password(changedPassword).build();
             given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
             given(passwordEncoder.encode(changedPassword)).willReturn(
-                bCryptPasswordEncoder.encode(changedPassword));
+                encodedPassword);
             //when
             memberService.updateMemberPassword(memberUpdatePasswordRequest);
             //then
-            assertEquals(testMember.getPassword(), bCryptPasswordEncoder.encode(changedPassword));
+            assertEquals(testMember.getPassword(), encodedPassword);
         }
 
         @Test
