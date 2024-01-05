@@ -141,5 +141,19 @@ class MemberServiceTest {
             assertEquals(testMember.getBank(), memberUpdateAccountRequest.bank());
 
         }
+
+        @Test
+        @DisplayName("이름 수정 시")
+        void updateMemberName() {
+            //given
+            String nameToUpdate = "이상해씨";
+
+            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            //when
+            memberService.updateMemberName(nameToUpdate);
+            //then
+            assertEquals(testMember.getName(), nameToUpdate);
+
+        }
     }
 }
