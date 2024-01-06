@@ -1,9 +1,7 @@
 package com.yanolja.scbj.domain.payment.repository;
 
 import com.yanolja.scbj.domain.payment.dto.PurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.dto.SaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,6 +20,7 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     )
     Page<PurchasedHistoryResponse> findPurchasedHistoriesByMemberId(
         @Param("memberId") Long memberId, Pageable pageable);
+
 }
 
 //    @Query("""
