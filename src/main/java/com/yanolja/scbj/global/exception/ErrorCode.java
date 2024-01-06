@@ -21,8 +21,10 @@ public enum ErrorCode {
 
 
     //RESERVATION
-    RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다.");
+    RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),
 
+    //HOTELROOM
+    REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "환불 규정을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String simpleMessage;
