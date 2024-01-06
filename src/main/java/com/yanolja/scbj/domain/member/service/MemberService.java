@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.member.service;
 
 import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
+import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
@@ -15,6 +16,7 @@ import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.SecurityUtil;
+import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,11 +67,8 @@ public class MemberService {
 
     public void updateMemberPassword(
         final MemberUpdatePasswordRequest memberUpdatePasswordRequest) {
-        Member member = memberRepository.findById(securityUtil.getCurrentMemberId())
-            .orElseThrow(() -> new MemberNotFoundException(
-                ErrorCode.MEMBER_NOT_FOUND));
-
-        member.updatePassword(passwordEncoder.encode(memberUpdatePasswordRequest.password()));
+        getCurrentMember().updatePassword(
+            passwordEncoder.encode(memberUpdatePasswordRequest.password()));
     }
 
     private void checkPassword(String email, String password) {
@@ -78,6 +77,20 @@ public class MemberService {
             password) || email.replaceAll("@", "").equals(password)) {
             throw new InvalidPasswordException(ErrorCode.INVALID_PASSWORD);
         }
+    }
+
+    public void updateMemberAccount(final MemberUpdateAccountRequest memberUpdateAccountRequest) {
+        getCurrentMember().updateAccount(memberUpdateAccountRequest.accountNumber(),
+            memberUpdateAccountRequest.bank());
+    }
+
+    public void updateMemberName(final String nameToUpdate) {
+        getCurrentMember().updateName(nameToUpdate);
+    }
+
+    private Member getCurrentMember() {
+        return memberRepository.findById(securityUtil.getCurrentMemberId())
+            .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
 }

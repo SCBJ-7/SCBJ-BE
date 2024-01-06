@@ -85,6 +85,7 @@ public class Member extends BaseEntity {
 
     @Builder
     private Member(Long id, String email, String password, String name, String phone,
+        YanoljaMember yanoljaMember,
         MemberAgreement memberAgreement,
         Authority authority, List<Product> productList, List<PaymentHistory> paymentHistory) {
         this.id = id;
@@ -96,6 +97,7 @@ public class Member extends BaseEntity {
         this.productList = productList;
         this.paymentHistory = paymentHistory;
         this.memberAgreement = memberAgreement;
+        this.yanoljaMember = yanoljaMember;
     }
 
     public void setYanoljaMember(final YanoljaMember yanoljaMember) {
@@ -115,4 +117,7 @@ public class Member extends BaseEntity {
         this.bank = bank;
     }
 
+    public void updateName(final String nameToUpdate) {
+        this.name = nameToUpdate;
+    }
 }
