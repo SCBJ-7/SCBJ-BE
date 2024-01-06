@@ -18,5 +18,6 @@ public class MemberResponse {
         this.email = email;
         this.name = name;
         this.phone = phone;
+        this.linkedToYanolja = linkedToYanolja;
     }
 }
