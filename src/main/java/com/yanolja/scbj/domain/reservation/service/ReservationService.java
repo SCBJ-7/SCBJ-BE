@@ -1,5 +1,8 @@
 package com.yanolja.scbj.domain.reservation.service;
 
+import com.yanolja.scbj.domain.hotelRoom.entity.RefundPolicy;
+import com.yanolja.scbj.domain.hotelRoom.exception.RefundNotFoundException;
+import com.yanolja.scbj.domain.hotelRoom.repository.RefundPolicyRepository;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
@@ -19,6 +22,8 @@ public class ReservationService {
 
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
+    private final RefundPolicyRepository refundPolicyRepository;
+    private final ReservationDtoConverter reservationDtoConverter;
 
     @Transactional
     public ReservationFindResponse findReservation(Long memberId) {
@@ -31,15 +36,10 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findByYanoljaMemberId(yanoljaMember.getId())
             .orElseThrow(() -> new ReservationNotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
 
-        return ReservationFindResponse.builder()
-            .hotelName(reservation.getHotel().getHotelName())
-            .roomName(reservation.getHotel().getRoom().getRoomName())
-            .startDate(reservation.getStartDate())
-            .endDate(reservation.getEndDate())
-            .refundPrice()
-            .purchasePrice(reservation.getPurchasePrice())
-            .remainingDays()
-            .remainingTimes()
-            .build();
+        RefundPolicy refundPolicy = refundPolicyRepository.findByHotelId(
+                reservation.getHotel().getId())
+            .orElseThrow(() -> new RefundNotFoundException(ErrorCode.REFUND_NOT_FOUND));
+
+        return reservationDtoConverter.toFindResponse(reservation, refundPolicy);
     }
 }

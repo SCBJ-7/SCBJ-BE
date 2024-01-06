@@ -2,7 +2,11 @@ package com.yanolja.scbj.domain.reservation.dto.response;
 
 import java.time.LocalDate;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
 public class ReservationFindResponse {
 
     private String hotelName;
