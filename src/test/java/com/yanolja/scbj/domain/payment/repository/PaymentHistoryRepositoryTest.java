@@ -3,6 +3,7 @@ package com.yanolja.scbj.domain.payment.repository;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
@@ -43,7 +44,7 @@ class PaymentHistoryRepositoryTest {
     class Context_purchaseHistory {
 
         @Test
-        @DisplayName("성공시 구매내역 리스트를 보여준다")
+        @DisplayName("조회 성공시 구매내역 리스트를 보여준다")
         public void testFindPurchasedHistoriesByMemberId() {
             //given
             Member member = Member.builder()
@@ -63,7 +64,6 @@ class PaymentHistoryRepositoryTest {
                 .build();
             entityManager.persist(roomTheme);
 
-            // Room 인스턴스 생성
             Room room = Room.builder()
                 .roomName("Deluxe Room")
                 .checkIn(LocalTime.of(14, 0))
@@ -74,6 +74,7 @@ class PaymentHistoryRepositoryTest {
                 .roomTheme(roomTheme)
                 .build();
 
+
             Hotel hotel = Hotel.builder()
                 .hotelName("롯데 시그니엘 호텔")
                 .hotelMainAddress("Seoul")
@@ -82,6 +83,13 @@ class PaymentHistoryRepositoryTest {
                 .room(room)
                 .build();
             entityManager.persist(hotel);
+
+            HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
+                .hotel(hotel) // 이미 생성된 Hotel 인스턴스
+                .url("http://example.com/hotel-room-image.jpg")
+                .build();
+            entityManager.persist(hotelRoomImage);
+
 
             HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
                 .hotel(hotel)
@@ -128,13 +136,14 @@ class PaymentHistoryRepositoryTest {
             //when
             Page<PurchasedHistoryResponse> results =
                 paymentHistoryRepository.findPurchasedHistoriesByMemberId(member.getId(),
-                    PageRequest.of(0, 10));
+                    PageRequest.of(0, 1));
 
             // then
             assertThat(results).isNotNull();
             assertThat(results.getContent()).isNotNull();
             PurchasedHistoryResponse firstResult = results.getContent().get(0);
             assertThat(firstResult.name()).isEqualTo("롯데 시그니엘 호텔");
+            assertThat(firstResult.imageUrl()).isEqualTo("http://example.com/hotel-room-image.jpg");
             assertThat(firstResult.price()).isEqualTo(20000);
             assertThat(firstResult.checkInDate()).isEqualTo(LocalDate.now());
         }

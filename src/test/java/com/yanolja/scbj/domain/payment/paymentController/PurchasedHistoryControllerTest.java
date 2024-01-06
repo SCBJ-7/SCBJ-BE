@@ -74,15 +74,17 @@ public class PurchasedHistoryControllerTest {
             // given
             Pageable pageable = PageRequest.of(0, 10);
             List<PurchasedHistoryResponse> responses = List.of(
-                new PurchasedHistoryResponse(1L, LocalDateTime.now(), "A 호텔", "디럭스", 20000,
+                new PurchasedHistoryResponse(1L, LocalDateTime.now(), "wwww.yanolja.com", "A 호텔",
+                    "디럭스", 20000,
                     LocalDate.now(), LocalDate.now().plusDays(2)),
-                new PurchasedHistoryResponse(2L, LocalDateTime.now().minusDays(3), "B 호텔", "스텐다드",
+                new PurchasedHistoryResponse(2L, LocalDateTime.now().minusDays(3),
+                    "wwww.yanolja.com", "B 호텔", "스텐다드",
                     15000, LocalDate.now().minusDays(1), LocalDate.now().plusDays(1))
             );
             Page<PurchasedHistoryResponse> response =
                 new PageImpl<>(responses, pageable, responses.size());
 
-            given(purchasedHistoryService.getPurchasedBeforeCheckIn(any(Pageable.class),
+            given(purchasedHistoryService.getUsersPurchasedHistory(any(Pageable.class),
                 anyLong())).willReturn(response);
 
             // when

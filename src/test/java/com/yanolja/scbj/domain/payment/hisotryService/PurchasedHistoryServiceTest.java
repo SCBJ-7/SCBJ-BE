@@ -48,6 +48,7 @@ class PurchasedHistoryServiceTest {
             PurchasedHistoryResponse response = new PurchasedHistoryResponse(
                 1L, // id
                 LocalDateTime.now(), // createdAt
+                "www.naver.co.kr",
                 "서울 호텔", // name
                 "디럭스", // roomType
                 1500000, // price
@@ -62,7 +63,7 @@ class PurchasedHistoryServiceTest {
 
             // when
             Page<PurchasedHistoryResponse> result =
-                purchasedHistoryService.getPurchasedBeforeCheckIn(pageable, memberId);
+                purchasedHistoryService.getUsersPurchasedHistory(pageable, memberId);
 
             //then
             assertThat(result.getContent()).containsExactly(response);

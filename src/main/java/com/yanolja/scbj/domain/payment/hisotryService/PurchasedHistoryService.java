@@ -13,7 +13,7 @@ public class PurchasedHistoryService {
 
     private final PaymentHistoryRepository paymentHistoryRepository;
 
-    public Page<PurchasedHistoryResponse> getPurchasedBeforeCheckIn(Pageable pageable, Long id) {
+    public Page<PurchasedHistoryResponse> getUsersPurchasedHistory(Pageable pageable, Long id) {
         Page<PurchasedHistoryResponse> response =
             paymentHistoryRepository.findPurchasedHistoriesByMemberId(id, pageable);
         return response.isEmpty() ? Page.empty() : response;
