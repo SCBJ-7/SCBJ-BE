@@ -50,7 +50,7 @@ dependencies {
 	//test-container
 	testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.17.2'
 
-	//mysql
+	//mysqlpo
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -58,8 +58,7 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	//email - sender
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
-
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 }
 
