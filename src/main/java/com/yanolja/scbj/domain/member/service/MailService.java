@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class MailService {
 
     private final JavaMailSender emailSender;
-    private String emailTitle = "숙취방지 이메일 인증 번호";
+    private String EMAIL_TITLE = "숙취방지 이메일 인증 번호";
 
     MailService(JavaMailSender javaMailSender) {
         this.emailSender = javaMailSender;
@@ -21,7 +21,7 @@ public class MailService {
 
     public String certifyEmail(final String email) {
         String authCode = createCode();
-        sendEmail(email, emailTitle, authCode);
+        sendEmail(email, EMAIL_TITLE, authCode);
         return authCode;
     }
 
