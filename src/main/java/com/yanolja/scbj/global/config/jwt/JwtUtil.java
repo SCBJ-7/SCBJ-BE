@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-    private final String grantType = "Bearer ";
+    private final String GRANT_TYPE = "Bearer ";
     private final RedisTemplate<String, Object> redisTemplate;
     @Value("${jwt.secret}")
     private String secret;
@@ -46,6 +46,15 @@ public class JwtUtil {
         return refreshToken;
     }
 
+    public void setBlackList (String accessToken, String refreshToken) {
+        deleteRefreshToken(extractUsername(accessToken), refreshToken);
+        redisTemplate.opsForValue().set(accessToken, true, expiration, TimeUnit.SECONDS);
+    }
+
+    public void deleteRefreshToken(String username, String refreshToken) {
+        redisTemplate.opsForValue().getAndDelete(getRefreshTokenKey(username, refreshToken));
+    }
+
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
@@ -69,7 +78,7 @@ public class JwtUtil {
     }
 
     public String createToken(Map<String, Object> claims, String subject) {
-        return grantType + Jwts.builder()
+        return GRANT_TYPE + Jwts.builder()
             .setClaims(claims)
             .setSubject(subject)
             .setIssuedAt(new Date(System.currentTimeMillis()))

@@ -4,6 +4,7 @@ import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.entity.Member;
@@ -17,6 +18,7 @@ import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.util.Optional;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +65,11 @@ public class MemberService {
         } else {
             throw new NotMatchPasswordException(ErrorCode.NOT_MATCH_PASSWORD);
         }
+    }
+
+
+    public void logout(final RefreshRequest refreshRequest) {
+        jwtUtil.setBlackList(refreshRequest.getAccessToken(), refreshRequest.getRefreshToken());
     }
 
     public void updateMemberPassword(

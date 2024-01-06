@@ -4,6 +4,7 @@ import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.service.MemberService;
@@ -51,6 +52,13 @@ public class MemberRestController {
             .body(ResponseDTO.res(memberService.signIn(memberSignInRequest), "성공적으로 로그인했습니다."));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<ResponseDTO<String>> logout(
+        @Valid @RequestBody RefreshRequest refreshRequest) {
+        return ResponseEntity.ok()
+            .body(ResponseDTO.res("성공적으로 로그아웃했습니다."));
+    }
+
     @PatchMapping("/password")
     public ResponseEntity<ResponseDTO<String>> updateMemberPassword(
         @Valid @RequestBody MemberUpdatePasswordRequest memberUpdatePasswordRequest) {
@@ -74,7 +82,7 @@ public class MemberRestController {
     public ResponseEntity<ResponseDTO<String>> updateMemberName(
         @Size(min = 1, max = 20, message = "이름의 길이는 1 ~ 20 이어야 합니다.")
         @Pattern(regexp = "[^0-9]*", message = "이름에 숫자는 입력할 수 없습니다.")
-        @RequestBody  String nameToUpdate) {
+        @RequestBody String nameToUpdate) {
         memberService.updateMemberName(nameToUpdate);
 
         return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));

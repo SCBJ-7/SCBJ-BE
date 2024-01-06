@@ -4,11 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.entity.Authority;
@@ -105,6 +108,18 @@ class MemberServiceTest {
             assertThat(memberSignInResponse).usingRecursiveComparison()
                 .isEqualTo(memberService.signIn(memberSignInRequest));
 
+        }
+
+        @Test
+        @DisplayName("로그아웃할 때")
+        void logout() {
+            //given
+            RefreshRequest refreshRequest = RefreshRequest.builder()
+                .accessToken("123")
+                .refreshToken("123").build();
+            //when & then
+            memberService.logout(refreshRequest);
+            verify(jwtUtil, times(1)).setBlackList(refreshRequest.getAccessToken(), refreshRequest.getRefreshToken());
         }
 
         @Test

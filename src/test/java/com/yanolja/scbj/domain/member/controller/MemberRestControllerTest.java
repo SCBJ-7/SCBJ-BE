@@ -11,6 +11,7 @@ import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
@@ -103,6 +104,22 @@ class MemberRestControllerTest {
             //when & then
             mockMvc.perform(post("/v1/members/signin")
                     .content(objectMapper.writeValueAsString(memberSignInRequest))
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        }
+
+        @Test
+        @DisplayName("로그아웃 할 때")
+        void logout() throws Exception {
+            //given
+            RefreshRequest refreshRequest = RefreshRequest.builder()
+                    .accessToken("123")
+                        .refreshToken("123")
+                            .build();
+            //when & then
+            mockMvc.perform(post("/v1/members/logout")
+                    .content(objectMapper.writeValueAsString(refreshRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
