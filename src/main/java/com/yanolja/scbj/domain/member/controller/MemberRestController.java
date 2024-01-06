@@ -6,14 +6,14 @@ import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
+import com.yanolja.scbj.domain.member.service.MailService;
 import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,8 +28,11 @@ public class MemberRestController {
 
     private final MemberService memberService;
 
-    MemberRestController(MemberService memberService) {
+    private final MailService mailService;
+
+    MemberRestController(MemberService memberService, MailService mailService) {
         this.memberService = memberService;
+        this.mailService = mailService;
     }
 
     @PostMapping("/signup")
@@ -74,10 +77,18 @@ public class MemberRestController {
     public ResponseEntity<ResponseDTO<String>> updateMemberName(
         @Size(min = 1, max = 20, message = "이름의 길이는 1 ~ 20 이어야 합니다.")
         @Pattern(regexp = "[^0-9]*", message = "이름에 숫자는 입력할 수 없습니다.")
-        @RequestBody  String nameToUpdate) {
+        @RequestBody String nameToUpdate) {
         memberService.updateMemberName(nameToUpdate);
 
         return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));
+    }
+
+    @PostMapping("/email")
+    public ResponseEntity<ResponseDTO<String>> certifyEmail(
+        @Email
+        @RequestBody String email) {
+        return ResponseEntity.ok()
+            .body(ResponseDTO.res(mailService.certifyEmail(email), "이메일 인증번호를 성공적으로 발급했습니다."));
     }
 
 

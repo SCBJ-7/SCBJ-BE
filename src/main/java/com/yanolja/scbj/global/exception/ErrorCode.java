@@ -13,6 +13,8 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 리프레쉬 토큰입니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "입력된 패스워드 형식이 맞지 않습니다."),
 
+    EMAIL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 서버가 연결되지 않습니다."),
+
     //PRODUCT
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 정보를 찾을 수 없습니다."),
     FIRST_PRICE_HIGHER(HttpStatus.BAD_REQUEST, "양도 가격이 구매가보다 높습니다. 양도 가격을 확인해주세요."),
