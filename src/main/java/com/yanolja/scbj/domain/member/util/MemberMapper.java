@@ -34,6 +34,8 @@ public class MemberMapper {
             .email(member.getEmail())
             .name(member.getName())
             .phone(member.getPhone())
+            .accountNumber(member.getAccountNumber())
+            .bank(member.getBank())
             .build();
     }
 
