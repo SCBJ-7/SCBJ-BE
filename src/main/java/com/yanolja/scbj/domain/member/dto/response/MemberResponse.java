@@ -10,13 +10,13 @@ public class MemberResponse {
     private final String email;
     private final String name;
     private final String phone;
+    private final boolean linkedToYanolja;
 
     @Builder
-    private MemberResponse(Long id, String email, String name, String phone) {
+    private MemberResponse(Long id, String email, String name, String phone, boolean linkedToYanolja) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.phone = phone;
     }
-
 }

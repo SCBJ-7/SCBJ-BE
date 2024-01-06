@@ -34,6 +34,7 @@ public class MemberMapper {
             .email(member.getEmail())
             .name(member.getName())
             .phone(member.getPhone())
+            .linkedToYanolja(member.getYanoljaMember() != null)
             .build();
     }
 
