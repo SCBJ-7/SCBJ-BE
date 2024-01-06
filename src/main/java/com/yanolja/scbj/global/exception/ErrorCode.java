@@ -18,7 +18,7 @@ public enum ErrorCode {
 
     //PAYMENT
     PAYMENT_LOAD_FAIL(HttpStatus.BAD_REQUEST, "결제에 실패하였습니다."),
-    PURCHASE_LOAD_FAIL(HttpStatus.BAD_REQUEST, "구매내역을 불러오지 못하였습니다");
+    PURCHASE_LOAD_FAIL(HttpStatus.BAD_REQUEST, "구매내역을 불러오지 못하였습니다"),
     FIRST_PRICE_HIGHER(HttpStatus.BAD_REQUEST, "양도 가격이 구매가보다 높습니다. 양도 가격을 확인해주세요."),
     SECOND_PRICE_HIGHER(HttpStatus.BAD_REQUEST, "2차 양도 가격이 1차 양도 가격보다 높습니다. 2차 가격을 확인해주세요."),
     INVALID_SECOND_PRICE_PERIOD(HttpStatus.BAD_REQUEST, "2차 양도 가격 변동 시기는 체크인 기준 12시간 이상이어야 합니다."),
