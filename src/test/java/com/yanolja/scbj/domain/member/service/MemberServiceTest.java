@@ -16,6 +16,7 @@ import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
+import com.yanolja.scbj.domain.member.helper.TestConstants;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
@@ -115,11 +116,13 @@ class MemberServiceTest {
         void logout() {
             //given
             RefreshRequest refreshRequest = RefreshRequest.builder()
-                .accessToken("123")
-                .refreshToken("123").build();
+                .accessToken(TestConstants.GRANT_TYPE.getValue())
+                .refreshToken(TestConstants.REFRESH_PREFIX.getValue()).build();
+
             //when & then
             memberService.logout(refreshRequest);
-            verify(jwtUtil, times(1)).setBlackList(refreshRequest.getAccessToken(), refreshRequest.getRefreshToken());
+            verify(jwtUtil, times(1)).setBlackList(refreshRequest.getAccessToken().substring(7),
+                refreshRequest.getRefreshToken());
         }
 
         @Test

@@ -15,6 +15,7 @@ import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
+import com.yanolja.scbj.domain.member.helper.TestConstants;
 import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
@@ -114,9 +115,9 @@ class MemberRestControllerTest {
         void logout() throws Exception {
             //given
             RefreshRequest refreshRequest = RefreshRequest.builder()
-                    .accessToken("123")
-                        .refreshToken("123")
-                            .build();
+                .accessToken(TestConstants.GRANT_TYPE.getValue())
+                .refreshToken(TestConstants.REFRESH_PREFIX.getValue())
+                .build();
             //when & then
             mockMvc.perform(post("/v1/members/logout")
                     .content(objectMapper.writeValueAsString(refreshRequest))
