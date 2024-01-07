@@ -20,11 +20,4 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     )
     Page<PurchasedHistoryResponse> findPurchasedHistoriesByMemberId(
         @Param("memberId") Long memberId, Pageable pageable);
-
 }
-
-//    @Query("""
-//SELECT new """)
-//    Page<SaleHistoryResponse> findPaymentHistoriesByMemberId(
-//        @Param("memberId") Long memberId, Pageable pageable);
-//}
