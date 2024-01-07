@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -44,7 +45,7 @@ public class Product extends BaseEntity {
     @Comment("1차 양도 가격")
     private int firstPrice;
 
-    @Column(nullable = false)
+    @Column
     @Comment("2차 양도 가격")
     private int secondPrice;
 
@@ -56,8 +57,8 @@ public class Product extends BaseEntity {
     @Comment("정산 계좌")
     private String accountNumber;
 
-    @Column(nullable = false)
-    @Comment("2차 양도시점 ")
+    @Column
+    @Comment("2차 양도시점")
     private int secondGrantPeriod;
 
     @OneToOne(mappedBy = "product")
