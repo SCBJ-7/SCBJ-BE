@@ -81,6 +81,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private void sendErrorResponse(HttpServletResponse response, int status, String message)
         throws IOException {
         response.setStatus(status);
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(message);
     }
 }
