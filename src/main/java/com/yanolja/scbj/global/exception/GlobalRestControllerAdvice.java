@@ -1,5 +1,10 @@
 package com.yanolja.scbj.global.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -16,8 +21,18 @@ public class GlobalRestControllerAdvice {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> ApplicationException(ApplicationException e) {
+    public ResponseEntity<String> applicationException(ApplicationException e) {
         return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(e.getMessage());
 
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> expiredJWTException(ExpiredJwtException e) {
+        return ResponseEntity.status(ErrorCode.EXPIRED_TOKEN.getHttpStatus()).body(ErrorCode.EXPIRED_TOKEN.getSimpleMessage());
+    }
+
+    @ExceptionHandler({MalformedJwtException.class, SignatureException.class, UnsupportedJwtException.class})
+    public ResponseEntity<String> invalidJWTException(Exception e) {
+        return ResponseEntity.status(ErrorCode.INVALID_TOKEN.getHttpStatus()).body(ErrorCode.INVALID_TOKEN.getSimpleMessage());
     }
 }

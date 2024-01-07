@@ -69,7 +69,7 @@ public class MemberService {
 
 
     public void logout(final RefreshRequest refreshRequest) {
-        jwtUtil.setBlackList(refreshRequest.getAccessToken(), refreshRequest.getRefreshToken());
+        jwtUtil.setBlackList(refreshRequest.getAccessToken().substring(JwtUtil.GRANT_TYPE.length()), refreshRequest.getRefreshToken());
     }
 
     public void updateMemberPassword(

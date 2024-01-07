@@ -21,7 +21,8 @@ public class MemberAuthService {
     }
 
     public TokenResponse refreshAccessToken(final RefreshRequest refreshRequest) {
-        String username = jwtUtil.extractUsername(refreshRequest.getAccessToken());
+
+        String username = jwtUtil.extractUsername(refreshRequest.getAccessToken().substring(7));
         if (jwtUtil.isRefreshTokenValid(username, refreshRequest.getRefreshToken())) {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
             String newAccessToken = jwtUtil.generateToken(userDetails);

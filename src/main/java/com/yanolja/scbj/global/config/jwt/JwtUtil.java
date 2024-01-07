@@ -18,7 +18,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-    private final String GRANT_TYPE = "Bearer ";
+    public static final String GRANT_TYPE = "Bearer ";
+
+    public static final String BLACK_LIST_PREFIX = "DEL ";
     private final RedisTemplate<String, Object> redisTemplate;
     @Value("${jwt.secret}")
     private String secret;
@@ -48,7 +50,7 @@ public class JwtUtil {
 
     public void setBlackList (String accessToken, String refreshToken) {
         deleteRefreshToken(extractUsername(accessToken), refreshToken);
-        redisTemplate.opsForValue().set(accessToken, true, expiration, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(BLACK_LIST_PREFIX+accessToken, true, expiration, TimeUnit.SECONDS);
     }
 
     public void deleteRefreshToken(String username, String refreshToken) {

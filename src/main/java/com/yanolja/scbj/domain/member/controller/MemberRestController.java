@@ -55,6 +55,7 @@ public class MemberRestController {
     @PostMapping("/logout")
     public ResponseEntity<ResponseDTO<String>> logout(
         @Valid @RequestBody RefreshRequest refreshRequest) {
+        memberService.logout(refreshRequest);
         return ResponseEntity.ok()
             .body(ResponseDTO.res("성공적으로 로그아웃했습니다."));
     }
