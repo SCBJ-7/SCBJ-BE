@@ -167,6 +167,17 @@ class MemberServiceTest {
             memberService.updateMemberPhone(phoneToUpdate);
             //then
             assertEquals(testMember.getPhone(), phoneToUpdate);
+        }
+
+        @DisplayName("회원정보 조회 시")
+        void getMemberInfo() {
+            //given
+            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            //when
+            MemberResponse resultMemberResponse = memberService.getMemberInfo();
+            //then
+            assertThat(MemberMapper.toMemberResponse(testMember)).usingRecursiveComparison()
+                .isEqualTo(resultMemberResponse);
 
         }
     }

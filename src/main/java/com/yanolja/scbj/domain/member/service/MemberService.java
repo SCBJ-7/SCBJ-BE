@@ -92,6 +92,10 @@ public class MemberService {
         getCurrentMember().updatePhone(phoneToUpdate);
     }
 
+    public MemberResponse getMemberInfo() {
+        return MemberMapper.toMemberResponse(getCurrentMember());
+    }
+
     private Member getCurrentMember() {
         return memberRepository.findById(securityUtil.getCurrentMemberId())
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));

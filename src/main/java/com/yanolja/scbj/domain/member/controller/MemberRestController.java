@@ -16,6 +16,7 @@ import jakarta.validation.constraints.Size;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -89,5 +90,10 @@ public class MemberRestController {
         return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 핸드폰 번호를 변경했습니다."));
     }
 
+    @GetMapping
+    public ResponseEntity<ResponseDTO<MemberResponse>> getMemberInfo() {
+        return ResponseEntity.ok()
+            .body(ResponseDTO.res(memberService.getMemberInfo(), "성공적으로 회원정보를 조회했습니다."));
+    }
 
 }

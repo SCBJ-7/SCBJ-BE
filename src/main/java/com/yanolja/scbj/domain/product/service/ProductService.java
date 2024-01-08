@@ -49,13 +49,14 @@ public class ProductService {
         if (productPostRequest.getFirstPrice() > reservation.getPurchasePrice()) {
             throw new FirstPriceHigherException(ErrorCode.FIRST_PRICE_HIGHER);
         }
-
-        if (productPostRequest.getSecondPrice() > productPostRequest.getFirstPrice()) {
-            throw new SecondPriceHigherException(ErrorCode.SECOND_PRICE_HIGHER);
-        }
-
-        if (productPostRequest.getSecondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
-            throw new SecondPricePeriodException(ErrorCode.INVALID_SECOND_PRICE_PERIOD);
+        if (productPostRequest.getSecondPrice() != 0
+            && productPostRequest.getSecondGrantPeriod() != 0) {
+            if (productPostRequest.getSecondPrice() > productPostRequest.getFirstPrice()) {
+                throw new SecondPriceHigherException(ErrorCode.SECOND_PRICE_HIGHER);
+            }
+            if (productPostRequest.getSecondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
+                throw new SecondPricePeriodException(ErrorCode.INVALID_SECOND_PRICE_PERIOD);
+            }
         }
 
         Product product = Product.builder()
