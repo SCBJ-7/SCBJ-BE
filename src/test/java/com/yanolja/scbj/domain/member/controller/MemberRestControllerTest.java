@@ -151,6 +151,19 @@ class MemberRestControllerTest {
         }
 
         @Test
+        @DisplayName("야놀자 계정 연동 시")
+        void linkUpYanolja() throws Exception {
+            //given
+            String yanoljaEmail = "test@gmail.com";
+            //when & then
+            mockMvc.perform(post("/v1/members/yanolja")
+                    .content(yanoljaEmail)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        }
+
+        @Test
         @DisplayName("핸드폰 수정 시")
         void updateMemberPhone() throws Exception {
             //given
@@ -163,6 +176,7 @@ class MemberRestControllerTest {
                 .andDo(MockMvcResultHandlers.print());
         }
 
+        @Test
         @DisplayName("회원정보 조회 시")
         void getMemberInfo() throws Exception {
             //given

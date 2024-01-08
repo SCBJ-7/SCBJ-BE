@@ -10,11 +10,10 @@ import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.member.validation.Phone;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -80,6 +79,15 @@ public class MemberRestController {
         memberService.updateMemberName(nameToUpdate);
 
         return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));
+    }
+
+    @PostMapping("/yanolja")
+    public ResponseEntity<ResponseDTO<String>> linkUpYanolja(
+        @Email
+        @RequestBody String yanoljaEmail
+    ) {
+        memberService.linkUpYanolja(yanoljaEmail);
+        return ResponseEntity.ok().body(ResponseDTO.res("야놀자 계정과 성공적으로 연동했습니다."));
     }
 
     @PatchMapping("/phone")
