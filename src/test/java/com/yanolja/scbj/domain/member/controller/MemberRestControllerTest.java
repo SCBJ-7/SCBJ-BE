@@ -3,6 +3,7 @@ package com.yanolja.scbj.domain.member.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -145,6 +146,17 @@ class MemberRestControllerTest {
             mockMvc.perform(patch("/v1/members/name")
                     .content(objectMapper.writeValueAsString(nameToUpdate))
                     .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        }
+
+        @Test
+        @DisplayName("회원정보 조회 시")
+        void getMemberInfo() throws Exception {
+            //given
+            given(memberService.getMemberInfo()).willReturn(memberResponse);
+            //when & then
+            mockMvc.perform(get("/v1/members"))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         }
