@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
+import org.springframework.validation.method.MethodValidationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -28,11 +29,19 @@ public class GlobalRestControllerAdvice {
 
     @ExceptionHandler
     public ResponseEntity<String> expiredJWTException(ExpiredJwtException e) {
-        return ResponseEntity.status(ErrorCode.EXPIRED_TOKEN.getHttpStatus()).body(ErrorCode.EXPIRED_TOKEN.getSimpleMessage());
+        return ResponseEntity.status(ErrorCode.EXPIRED_TOKEN.getHttpStatus())
+            .body(ErrorCode.EXPIRED_TOKEN.getSimpleMessage());
     }
 
-    @ExceptionHandler({MalformedJwtException.class, SignatureException.class, UnsupportedJwtException.class})
+    @ExceptionHandler({MalformedJwtException.class, SignatureException.class,
+        UnsupportedJwtException.class})
     public ResponseEntity<String> invalidJWTException(Exception e) {
-        return ResponseEntity.status(ErrorCode.INVALID_TOKEN.getHttpStatus()).body(ErrorCode.INVALID_TOKEN.getSimpleMessage());
+        return ResponseEntity.status(ErrorCode.INVALID_TOKEN.getHttpStatus())
+            .body(ErrorCode.INVALID_TOKEN.getSimpleMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> ValidationException(MethodValidationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

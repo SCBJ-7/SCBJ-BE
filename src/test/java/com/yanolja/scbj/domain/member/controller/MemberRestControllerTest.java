@@ -3,6 +3,7 @@ package com.yanolja.scbj.domain.member.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -156,13 +157,50 @@ class MemberRestControllerTest {
 
         @Test
         @DisplayName("이름 수정 시")
-        void updateMemberPassowrd() throws Exception {
+        void updateMemberName() throws Exception {
             //given
             String nameToUpdate = "이상해씨";
             //when & then
             mockMvc.perform(patch("/v1/members/name")
                     .content(objectMapper.writeValueAsString(nameToUpdate))
                     .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        }
+
+        @Test
+        @DisplayName("야놀자 계정 연동 시")
+        void linkUpYanolja() throws Exception {
+            //given
+            String yanoljaEmail = "test@gmail.com";
+            //when & then
+            mockMvc.perform(post("/v1/members/yanolja")
+                    .content(yanoljaEmail)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        }
+
+        @Test
+        @DisplayName("핸드폰 수정 시")
+        void updateMemberPhone() throws Exception {
+            //given
+            String phoneToUpdate = memberResponse.getPhone();
+            //when & then
+            mockMvc.perform(patch("/v1/members/phone")
+                    .content(phoneToUpdate)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        }
+
+        @Test
+        @DisplayName("회원정보 조회 시")
+        void getMemberInfo() throws Exception {
+            //given
+            given(memberService.getMemberInfo()).willReturn(memberResponse);
+            //when & then
+            mockMvc.perform(get("/v1/members"))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         }
