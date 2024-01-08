@@ -1,8 +1,7 @@
 package com.yanolja.scbj.domain.reservation.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.RefundPolicy;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.reservation.dto.response.ReservationFindResponse;
@@ -10,6 +9,8 @@ import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,26 +42,44 @@ class ReservationDtoConverterTest {
             Hotel hotel = Hotel.builder()
                 .id(1L)
                 .room(room)
+                .hotelRoomImageList(List.of(HotelRoomImage.builder()
+                    .url("image1")
+                    .build()))
+                .hotelRefundPolicyList(List.of(RefundPolicy.builder()
+                    .baseDate(3).percent(70).build(), RefundPolicy.builder()
+                    .baseDate(2).percent(50).build(), RefundPolicy.builder()
+                    .baseDate(1).percent(0).build()))
                 .build();
 
-            Reservation reservation = Reservation.builder()
+            List<Reservation> reservationList = new ArrayList<>();
+
+            Reservation reservation1 = Reservation.builder()
+                .id(1L)
                 .hotel(hotel)
                 .purchasePrice(5000000)
-                .startDate(LocalDate.now()).
-                endDate(LocalDate.now())
+                .startDate(LocalDate.of(2024, 1, 15))
+                .endDate(LocalDate.of(2024, 1, 18))
                 .build();
 
-            RefundPolicy refundPolicy = RefundPolicy.builder().hotel(hotel)
-                .baseDate(LocalDate.now()).percent(30).build();
+            Reservation reservation2 = Reservation.builder()
+                .id(2L)
+                .hotel(hotel)
+                .purchasePrice(4500000)
+                .startDate(LocalDate.of(2024, 1, 10))
+                .endDate(LocalDate.of(2024, 1, 11))
+                .build();
+
+            reservationList.add(reservation1);
+            reservationList.add(reservation2);
 
             // when
-            ReservationFindResponse reservationFindResponse = reservationDtoConverter.toFindResponse(
-                reservation, refundPolicy);
+            List<ReservationFindResponse> reservationFindResponse = reservationDtoConverter.toFindResponse(
+                reservationList);
 
             // then
             Assertions.assertThat(reservationFindResponse).isNotNull();
-            Assertions.assertThat(reservationFindResponse.getPurchasePrice()).isEqualTo(5000000);
+            Assertions.assertThat(reservationFindResponse.get(0).getPurchasePrice())
+                .isEqualTo(5000000);
         }
     }
-
 }

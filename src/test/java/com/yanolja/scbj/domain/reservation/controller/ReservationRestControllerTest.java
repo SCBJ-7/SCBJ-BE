@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.reservation.dto.response.ReservationFindResponse;
@@ -20,6 +21,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +33,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(
@@ -57,6 +59,7 @@ class ReservationRestControllerTest {
     private Room room;
     private Hotel hotel;
     private Reservation reservation;
+    private HotelRoomImage hotelRoomImage;
 
     @BeforeEach
     private void init() {
@@ -70,6 +73,10 @@ class ReservationRestControllerTest {
             .roomTheme(RoomTheme.builder().build())
             .build();
 
+        hotelRoomImage = HotelRoomImage.builder()
+            .url("image1")
+            .build();
+
         hotel = Hotel.builder()
             .id(1L)
             .hotelName("테스트 호텔")
@@ -77,9 +84,11 @@ class ReservationRestControllerTest {
             .hotelDetailAddress("서울광역시 강남구")
             .hotelInfoUrl("vasnoanwfowiamsfokm.jpg")
             .room(room)
+            .hotelRoomImageList(List.of(hotelRoomImage))
             .build();
 
         reservation = Reservation.builder()
+            .id(1L)
             .hotel(hotel)
             .startDate(LocalDate.now())
             .endDate(LocalDate.now())
@@ -95,17 +104,21 @@ class ReservationRestControllerTest {
         @DisplayName("예약 내역 조회에 성공했습니다.")
         void _willSuccess() throws Exception {
             // given
-            ReservationFindResponse findResponse = ReservationFindResponse.builder()
+            List<ReservationFindResponse> findResponse = new ArrayList<>();
+            ReservationFindResponse reservationFindResponse = ReservationFindResponse.builder()
+                .reservationId(reservation.getId())
                 .hotelName(hotel.getHotelName())
+                .imageUrl(hotel.getHotelRoomImageList().get(0).getUrl())
                 .roomName(room.getRoomName())
                 .startDate(reservation.getStartDate())
                 .endDate(reservation.getEndDate())
-                .refundPrice(3)
                 .purchasePrice(reservation.getPurchasePrice())
                 .remainingDays(
                     (int) ChronoUnit.DAYS.between(LocalDate.now(), reservation.getStartDate()))
                 .remainingTimes(LocalDateTime.now().getHour() - room.getCheckIn().getHour())
                 .build();
+
+            findResponse.add(reservationFindResponse);
 
             given(reservationService.findReservation(any(Long.TYPE))).willReturn(findResponse);
 
@@ -115,5 +128,4 @@ class ReservationRestControllerTest {
                 .andExpect(jsonPath("$.data").exists()).andDo(print());
         }
     }
-
 }
