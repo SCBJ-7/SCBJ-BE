@@ -9,7 +9,6 @@ import lombok.Setter;
 
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class ProductFindResponse {
 
@@ -28,7 +27,7 @@ public class ProductFindResponse {
     private boolean saleStatus;
 
     @Builder
-    private ProductFindResponse(String hotelName, String roomName, LocalDateTime checkIn,
+    public ProductFindResponse(String hotelName, String roomName, LocalDateTime checkIn,
         LocalDateTime checkOut, int originalPrice, int sellingPrice, int standardPeople,
         int maxPeople,
         String bedType, RoomThemeFindResponse roomTheme, String hotelAddress, String hotelInfoUrl,
