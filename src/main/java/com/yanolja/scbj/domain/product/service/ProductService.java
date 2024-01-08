@@ -1,9 +1,11 @@
 package com.yanolja.scbj.domain.product.service;
 
+import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
@@ -30,6 +32,7 @@ public class ProductService {
     private final ReservationRepository reservationRepository;
     private final ProductRepository productRepository;
     private final ProductDtoConverter productDtoConverter;
+    private final MemberService memberService;
 
     private static final int MIN_SECOND_GRANT_PERIOD = 3;
 
@@ -57,6 +60,14 @@ public class ProductService {
             if (productPostRequest.getSecondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
                 throw new SecondPricePeriodException(ErrorCode.INVALID_SECOND_PRICE_PERIOD);
             }
+        }
+
+        if (productPostRequest.getIsRegisterd()) {
+            MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
+                .accountNumber(productPostRequest.getAccountNumber())
+                .bank(productPostRequest.getBank())
+                .build();
+            memberService.updateMemberAccount(memberUpdateAccountRequest);
         }
 
         Product product = Product.builder()
