@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.product.service;
 
 import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
@@ -11,6 +12,8 @@ import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.util.SeasonValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -54,8 +57,15 @@ public class ProductDtoConverter {
             }
         }
 
+        List<HotelRoomImage> hotelRoomImageList = foundHotel.getHotelRoomImageList();
+        List<String> imageUrlList = new ArrayList<>();
+        for (HotelRoomImage hotelRoomImage : hotelRoomImageList) {
+            imageUrlList.add(hotelRoomImage.getUrl());
+        }
+
         return ProductFindResponse.builder()
             .hotelName(foundHotel.getHotelName())
+            .hotelImageUrlList(imageUrlList)
             .roomName(foundRoom.getRoomName())
             .checkIn(checkInDateTime)
             .checkOut(checkOutDateTime)

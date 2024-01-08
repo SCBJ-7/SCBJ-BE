@@ -17,6 +17,8 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "입력된 패스워드 형식이 맞지 않습니다."),
     NOT_FOUND_YANOLJA_MEMBER(HttpStatus.NOT_FOUND,"야놀자 계정을 찾을 수 없습니다."),
 
+    EMAIL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 서버가 연결되지 않습니다."),
+
     //PRODUCT
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 정보를 찾을 수 없습니다."),
 

@@ -7,6 +7,7 @@ import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
 import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
+import com.yanolja.scbj.domain.member.service.MailService;
 import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.member.validation.Phone;
 import com.yanolja.scbj.global.common.ResponseDTO;
@@ -30,8 +31,11 @@ public class MemberRestController {
 
     private final MemberService memberService;
 
-    MemberRestController(MemberService memberService) {
+    private final MailService mailService;
+
+    MemberRestController(MemberService memberService, MailService mailService) {
         this.memberService = memberService;
+        this.mailService = mailService;
     }
 
     @PostMapping("/signup")
@@ -88,6 +92,14 @@ public class MemberRestController {
         memberService.updateMemberName(nameToUpdate);
 
         return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));
+    }
+
+    @PostMapping("/email")
+    public ResponseEntity<ResponseDTO<String>> certifyEmail(
+        @Email
+        @RequestBody String email) {
+        return ResponseEntity.ok()
+            .body(ResponseDTO.res(mailService.certifyEmail(email), "이메일 인증번호를 성공적으로 발급했습니다."));
     }
 
     @PostMapping("/yanolja")
