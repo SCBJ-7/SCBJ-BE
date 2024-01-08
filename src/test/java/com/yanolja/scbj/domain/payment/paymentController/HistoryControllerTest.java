@@ -8,9 +8,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.yanolja.scbj.domain.payment.dto.PurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.hisotryService.PurchasedHistoryService;
-import com.yanolja.scbj.domain.payment.historycontroller.PurchasedHistoryController;
+import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
+import com.yanolja.scbj.domain.payment.service.HistoryService;
+import com.yanolja.scbj.domain.payment.controller.HistoryController;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.nio.charset.StandardCharsets;
@@ -41,18 +42,18 @@ import org.springframework.test.web.servlet.MvcResult;
 
 
 @WebMvcTest(
-    controllers = PurchasedHistoryController.class,
+    controllers = HistoryController.class,
     excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
     },
     excludeAutoConfiguration = SecurityAutoConfiguration.class
 )
-public class PurchasedHistoryControllerTest {
+public class HistoryControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private PurchasedHistoryService purchasedHistoryService;
+    private HistoryService historyService;
 
     @SpyBean
     private SecurityUtil securityUtil;
@@ -84,7 +85,7 @@ public class PurchasedHistoryControllerTest {
             Page<PurchasedHistoryResponse> response =
                 new PageImpl<>(responses, pageable, responses.size());
 
-            given(purchasedHistoryService.getUsersPurchasedHistory(any(Pageable.class),
+            given(historyService.getUsersPurchasedHistory(any(Pageable.class),
                 anyLong())).willReturn(response);
 
             // when
@@ -100,6 +101,55 @@ public class PurchasedHistoryControllerTest {
             assertThat(content).contains("조회에 성공하였습니다.");
             assertThat(content).contains("A 호텔");
             assertThat(content).contains("디럭스");
+        }
+    }
+
+    @Nested
+    @DisplayName("판매내역은")
+    class Context_saleHistory{
+
+        @Test
+        @DisplayName("성공시 구매내역 리스트를 보여준다")
+        void will_success() throws Exception {
+            //given
+            Pageable pageable = PageRequest.of(0, 10);
+            List<SaleHistoryResponse> responses = List.of(new SaleHistoryResponse(
+                1L,
+                "롯데 시그니엘 호텔",
+                "http://example.com/hotel-room-image1.jpg",
+                "더블 베드",
+                200000,
+                LocalDate.of(2024, 1, 1),
+                LocalDate.of(2024, 1, 2),
+                "판매중"
+            ), new SaleHistoryResponse(
+                    2L,
+                    "신라 호텔",
+                    "http://example.com/hotel-room-image2.jpg",
+                    "트윈 베드",
+                    150000,
+                    LocalDate.of(2024, 1, 3),
+                    LocalDate.of(2024, 1, 4),
+                    "거래완료"
+                ));
+
+            PageImpl<SaleHistoryResponse> saleHistoryResponses =
+                new PageImpl<>(responses, pageable, responses.size());
+
+            given(historyService.getUsersSaleHistory(any(Pageable.class), anyLong())).willReturn(
+                saleHistoryResponses);
+
+            //when
+            MvcResult result = mockMvc.perform(get("/v1/members/sale-history")
+                    .param("page", "0")
+                    .param("pageSize", "10"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+            String content = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+            assertThat(content).contains("조회에 성공하였습니다.");
+            assertThat(content).contains("신라 호텔");
+            assertThat(content).contains("판매중");
         }
     }
 }
