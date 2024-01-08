@@ -62,7 +62,7 @@ public class ProductService {
             }
         }
 
-        if (productPostRequest.getIsRegisterd()) {
+        if (productPostRequest.isRegisterd()) {
             MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
                 .accountNumber(productPostRequest.getAccountNumber())
                 .bank(productPostRequest.getBank())

@@ -18,11 +18,11 @@ public class ProductPostRequest {
     @NotBlank(message = "정산 계좌를 입력하세요.")
     private String accountNumber;
     private int secondGrantPeriod;
-    private Boolean isRegisterd;
+    private boolean isRegisterd;
 
     @Builder
     public ProductPostRequest(int firstPrice, int secondPrice, String bank,
-        String accountNumber, int secondGrantPeriod, Boolean isRegisterd) {
+        String accountNumber, int secondGrantPeriod, boolean isRegisterd) {
         this.firstPrice = firstPrice;
         this.secondPrice = secondPrice;
         this.bank = bank;
