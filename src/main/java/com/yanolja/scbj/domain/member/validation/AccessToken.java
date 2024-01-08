@@ -1,6 +1,6 @@
 package com.yanolja.scbj.domain.member.validation;
 
-import com.yanolja.scbj.domain.member.validation.validator.PhoneValidator;
+import com.yanolja.scbj.domain.member.validation.validator.TokenValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;
@@ -8,18 +8,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = PhoneValidator.class)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Constraint(validatedBy = TokenValidator.class)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Phone {
+public @interface AccessToken {
 
-    String message() default "입력된 핸드폰 번호 형식이 맞지 않습니다.";
+    String message() default "유효하지 않은 액세스 토큰입니다.";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
-    String regexp() default "^01([0|1|6|7|8|9])-?([0-9]{4})-?([0-9]{4})$";
 
 }
-

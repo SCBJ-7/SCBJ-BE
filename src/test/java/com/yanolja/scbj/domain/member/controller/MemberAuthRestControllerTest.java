@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
+import com.yanolja.scbj.domain.member.helper.TestConstants;
 import com.yanolja.scbj.domain.member.service.MemberAuthService;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
@@ -47,14 +48,21 @@ class MemberAuthRestControllerTest {
     @DisplayName("리프레쉬 토큰 재발급할 때")
     void refreshAccessToken() throws Exception {
         // given
-        TokenResponse tokenResponse = TokenResponse.builder().accessToken("").refreshToken("")
+        TokenResponse tokenResponse = TokenResponse.builder()
+            .accessToken(TestConstants.GRANT_TYPE.getValue())
+            .refreshToken(TestConstants.REFRESH_PREFIX.getValue())
             .build();
-        given(memberAuthService.refreshAccessToken(any(RefreshRequest.class))).willReturn(tokenResponse);
+        RefreshRequest refreshRequest = RefreshRequest.builder()
+            .accessToken(TestConstants.GRANT_TYPE.getValue())
+            .refreshToken(TestConstants.REFRESH_PREFIX.getValue())
+            .build();
+        given(memberAuthService.refreshAccessToken(any(RefreshRequest.class))).willReturn(
+            tokenResponse);
 
         // when & then
         mockMvc.perform(post("/v1/token/refresh")
-            .content(objectMapper.writeValueAsString(tokenResponse))
-            .contentType(MediaType.APPLICATION_JSON))
+                .content(objectMapper.writeValueAsString(refreshRequest))
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(print());
 

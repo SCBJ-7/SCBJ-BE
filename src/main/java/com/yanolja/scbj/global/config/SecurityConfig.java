@@ -65,7 +65,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .hasRole("USER"))
             .formLogin(AbstractHttpConfigurer::disable)
             .addFilter(corsConfig.corsFilter())
-            .addFilterBefore(new JwtRequestFilter(jwtUtil(), customUserDetailsService),
+            .addFilterBefore(new JwtRequestFilter(jwtUtil(), customUserDetailsService, redisTemplate),
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

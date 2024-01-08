@@ -4,17 +4,20 @@ import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
+import com.yanolja.scbj.domain.member.service.MailService;
 import com.yanolja.scbj.domain.member.service.MemberService;
+import com.yanolja.scbj.domain.member.validation.Phone;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,8 +31,11 @@ public class MemberRestController {
 
     private final MemberService memberService;
 
-    MemberRestController(MemberService memberService) {
+    private final MailService mailService;
+
+    MemberRestController(MemberService memberService, MailService mailService) {
         this.memberService = memberService;
+        this.mailService = mailService;
     }
 
     @PostMapping("/signup")
@@ -49,6 +55,14 @@ public class MemberRestController {
             memberSignInRequest.password());
         return ResponseEntity.ok()
             .body(ResponseDTO.res(memberService.signIn(memberSignInRequest), "성공적으로 로그인했습니다."));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ResponseDTO<String>> logout(
+        @Valid @RequestBody RefreshRequest refreshRequest) {
+        memberService.logout(refreshRequest);
+        return ResponseEntity.ok()
+            .body(ResponseDTO.res("성공적으로 로그아웃했습니다."));
     }
 
     @PatchMapping("/password")
@@ -74,11 +88,41 @@ public class MemberRestController {
     public ResponseEntity<ResponseDTO<String>> updateMemberName(
         @Size(min = 1, max = 20, message = "이름의 길이는 1 ~ 20 이어야 합니다.")
         @Pattern(regexp = "[^0-9]*", message = "이름에 숫자는 입력할 수 없습니다.")
-        @RequestBody  String nameToUpdate) {
+        @RequestBody String nameToUpdate) {
         memberService.updateMemberName(nameToUpdate);
 
         return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));
     }
 
+    @PostMapping("/email")
+    public ResponseEntity<ResponseDTO<String>> certifyEmail(
+        @Email
+        @RequestBody String email) {
+        return ResponseEntity.ok()
+            .body(ResponseDTO.res(mailService.certifyEmail(email), "이메일 인증번호를 성공적으로 발급했습니다."));
+    }
+
+    @PostMapping("/yanolja")
+    public ResponseEntity<ResponseDTO<String>> linkUpYanolja(
+        @Email
+        @RequestBody String yanoljaEmail
+    ) {
+        memberService.linkUpYanolja(yanoljaEmail);
+        return ResponseEntity.ok().body(ResponseDTO.res("야놀자 계정과 성공적으로 연동했습니다."));
+    }
+
+    @PatchMapping("/phone")
+    public ResponseEntity<ResponseDTO<String>> updateMemberPhone(
+        @Phone
+        @RequestBody String phoneToUpdate) {
+        memberService.updateMemberPhone(phoneToUpdate);
+        return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 핸드폰 번호를 변경했습니다."));
+    }
+
+    @GetMapping
+    public ResponseEntity<ResponseDTO<MemberResponse>> getMemberInfo() {
+        return ResponseEntity.ok()
+            .body(ResponseDTO.res(memberService.getMemberInfo(), "성공적으로 회원정보를 조회했습니다."));
+    }
 
 }
