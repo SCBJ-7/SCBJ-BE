@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.payment.entity;
 
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.product.entity.Product;
+import com.yanolja.scbj.global.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +21,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class PaymentHistory {
+public class PaymentHistory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,6 +66,7 @@ public class PaymentHistory {
     @Column(nullable = false)
     @Comment("정산 상태")
     private boolean settlement;
+
 
     @Builder
     private PaymentHistory(Long id, Member member, Product product,

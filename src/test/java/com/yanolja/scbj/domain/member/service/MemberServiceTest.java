@@ -1,9 +1,12 @@
 package com.yanolja.scbj.domain.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
@@ -13,7 +16,9 @@ import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
+import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import com.yanolja.scbj.global.util.SecurityUtil;
@@ -39,6 +44,9 @@ class MemberServiceTest {
     private JwtUtil jwtUtil;
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private YanoljaMemberRepository yanoljaMemberRepository;
     @InjectMocks
     private MemberService memberService;
 
@@ -154,6 +162,50 @@ class MemberServiceTest {
             //then
             assertEquals(testMember.getName(), nameToUpdate);
 
+        }
+
+        @Test
+        @DisplayName("야놀자 계정 연동 시")
+        void linkUpYanoljaMember() {
+            //given
+            String yanoljaEmail = "test@gmail.com";
+            YanoljaMember yanoljaMember = YanoljaMember.builder()
+                .id(1L)
+                .email("test@gmail.com")
+                .build();
+            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            given(yanoljaMemberRepository.findByEmail(yanoljaEmail)).willReturn(
+                Optional.of(yanoljaMember));
+            //when
+            memberService.linkUpYanolja(yanoljaEmail);
+            //then
+            assertEquals(testMember.getYanoljaMember(), yanoljaMember);
+            verify(yanoljaMemberRepository, times(1)).findByEmail(yanoljaEmail);
+        }
+
+        @Test
+        @DisplayName("핸드폰 번호 수정 시")
+        void updateMemberPhone() {
+            //given
+            String phoneToUpdate = "010-1234-5678";
+
+            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            //when
+            memberService.updateMemberPhone(phoneToUpdate);
+            //then
+            assertEquals(testMember.getPhone(), phoneToUpdate);
+        }
+
+        @Test
+        @DisplayName("회원정보 조회 시")
+        void getMemberInfo() {
+            //given
+            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            //when
+            MemberResponse resultMemberResponse = memberService.getMemberInfo();
+            //then
+            assertThat(MemberMapper.toMemberResponse(testMember)).usingRecursiveComparison()
+                .isEqualTo(resultMemberResponse);
         }
     }
 }

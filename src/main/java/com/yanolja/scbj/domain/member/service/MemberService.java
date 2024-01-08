@@ -7,16 +7,18 @@ import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.entity.Member;
+import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.AlreadyExistEmailException;
 import com.yanolja.scbj.domain.member.exception.InvalidPasswordException;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
+import com.yanolja.scbj.domain.member.exception.NotFoundYanoljaMember;
 import com.yanolja.scbj.domain.member.exception.NotMatchPasswordException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.SecurityUtil;
-import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,17 +28,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+
+    private final YanoljaMemberRepository yanoljaMemberRepository;
     private final PasswordEncoder passwordEncoder;
     private final SecurityUtil securityUtil;
     private final JwtUtil jwtUtil;
 
 
     MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder,
-        SecurityUtil securityUtil, JwtUtil jwtUtil) {
+        SecurityUtil securityUtil, JwtUtil jwtUtil,
+        YanoljaMemberRepository yanoljaMemberRepository) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.securityUtil = securityUtil;
         this.jwtUtil = jwtUtil;
+        this.yanoljaMemberRepository = yanoljaMemberRepository;
     }
 
     public MemberResponse signUp(final MemberSignUpRequest memberSignUpRequest) {
@@ -88,9 +94,27 @@ public class MemberService {
         getCurrentMember().updateName(nameToUpdate);
     }
 
+    public void linkUpYanolja(final String yanoljaEmail) {
+        YanoljaMember yanoljaMember = yanoljaMemberRepository.findByEmail(yanoljaEmail)
+            .orElseThrow(() -> new NotFoundYanoljaMember(ErrorCode.NOT_FOUND_YANOLJA_MEMBER));
+        getCurrentMember().setYanoljaMember(yanoljaMember);
+    }
+
+    public void updateMemberPhone(final String phoneToUpdate) {
+        getCurrentMember().updatePhone(phoneToUpdate);
+    }
+
+    public MemberResponse getMemberInfo() {
+        return MemberMapper.toMemberResponse(getCurrentMember());
+    }
+
     private Member getCurrentMember() {
         return memberRepository.findById(securityUtil.getCurrentMemberId())
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public Boolean isYanoljaLinkedUpMember() {
+        return getCurrentMember().getYanoljaMember() != null;
     }
 
 }

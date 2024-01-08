@@ -120,4 +120,8 @@ public class Member extends BaseEntity {
     public void updateName(final String nameToUpdate) {
         this.name = nameToUpdate;
     }
+
+    public void updatePhone(final String phoneToUpdate){
+        this.phone = phoneToUpdate;
+    }
 }

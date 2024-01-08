@@ -3,6 +3,7 @@ package com.yanolja.scbj.global.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
+import org.springframework.validation.method.MethodValidationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -19,5 +20,10 @@ public class GlobalRestControllerAdvice {
     public ResponseEntity<String> ApplicationException(ApplicationException e) {
         return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(e.getMessage());
 
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> ValidationException(MethodValidationException e){
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
