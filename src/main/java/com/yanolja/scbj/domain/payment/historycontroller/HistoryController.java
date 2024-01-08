@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("v1/members/")
+@RequestMapping("v1/members")
 public class HistoryController {
 
     private final HistoryService historyService;
     private final SecurityUtil securityUtil;
 
-    @GetMapping("purchased-history")
+    @GetMapping("/purchased-history")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<Page<PurchasedHistoryResponse>> getPurchasedHistories(
         @PageableDefault(page = 1) Pageable pageable
@@ -35,7 +35,7 @@ public class HistoryController {
     }
 
 
-    @GetMapping("sale-history")
+    @GetMapping("/sale-history")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<Page<SaleHistoryResponse>> getSaleHistories(
         @PageableDefault(page = 1) Pageable pageable
