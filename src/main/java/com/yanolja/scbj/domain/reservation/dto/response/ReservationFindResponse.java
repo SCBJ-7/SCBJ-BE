@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReservationFindResponse {
 
+    private long reservationId;
     private String hotelName;
+    private String imageUrl;
     private String roomName;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -19,10 +21,12 @@ public class ReservationFindResponse {
     private int remainingTimes;
 
     @Builder
-    public ReservationFindResponse(String hotelName, String roomName, LocalDate startDate,
-        LocalDate endDate, int refundPrice, int purchasePrice, int remainingDays,
-        int remainingTimes) {
+    public ReservationFindResponse(long reservationId, String hotelName, String imageUrl,
+        String roomName, LocalDate startDate, LocalDate endDate, int refundPrice, int purchasePrice,
+        int remainingDays, int remainingTimes) {
+        this.reservationId = reservationId;
         this.hotelName = hotelName;
+        this.imageUrl = imageUrl;
         this.roomName = roomName;
         this.startDate = startDate;
         this.endDate = endDate;
