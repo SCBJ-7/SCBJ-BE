@@ -157,6 +157,18 @@ class MemberServiceTest {
         }
 
         @Test
+        @DisplayName("핸드폰 번호 수정 시")
+        void updateMemberPhone() {
+            //given
+            String phoneToUpdate = "010-1234-5678";
+
+            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            //when
+            memberService.updateMemberPhone(phoneToUpdate);
+            //then
+            assertEquals(testMember.getPhone(), phoneToUpdate);
+        }
+
         @DisplayName("회원정보 조회 시")
         void getMemberInfo() {
             //given
@@ -164,7 +176,8 @@ class MemberServiceTest {
             //when
             MemberResponse resultMemberResponse = memberService.getMemberInfo();
             //then
-            assertThat(MemberMapper.toMemberResponse(testMember)).usingRecursiveComparison().isEqualTo(resultMemberResponse);
+            assertThat(MemberMapper.toMemberResponse(testMember)).usingRecursiveComparison()
+                .isEqualTo(resultMemberResponse);
 
         }
     }

@@ -7,6 +7,7 @@ import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.service.MemberService;
+import com.yanolja.scbj.domain.member.validation.Phone;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -79,6 +80,14 @@ public class MemberRestController {
         memberService.updateMemberName(nameToUpdate);
 
         return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));
+    }
+
+    @PatchMapping("/phone")
+    public ResponseEntity<ResponseDTO<String>> updateMemberPhone(
+        @Phone
+        @RequestBody String phoneToUpdate) {
+        memberService.updateMemberPhone(phoneToUpdate);
+        return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 핸드폰 번호를 변경했습니다."));
     }
 
     @GetMapping

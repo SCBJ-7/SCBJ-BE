@@ -88,6 +88,10 @@ public class MemberService {
         getCurrentMember().updateName(nameToUpdate);
     }
 
+    public void updateMemberPhone(final String phoneToUpdate) {
+        getCurrentMember().updatePhone(phoneToUpdate);
+    }
+
     public MemberResponse getMemberInfo() {
         return MemberMapper.toMemberResponse(getCurrentMember());
     }
