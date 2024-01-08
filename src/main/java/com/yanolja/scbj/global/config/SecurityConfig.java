@@ -1,5 +1,6 @@
 package com.yanolja.scbj.global.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.global.config.jwt.JwtRequestFilter;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -51,6 +52,11 @@ public class SecurityConfig implements WebMvcConfigurer {
         return new JwtUtil(redisTemplate);
     }
 
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -65,7 +71,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .hasRole("USER"))
             .formLogin(AbstractHttpConfigurer::disable)
             .addFilter(corsConfig.corsFilter())
-            .addFilterBefore(new JwtRequestFilter(jwtUtil(), customUserDetailsService, redisTemplate),
+            .addFilterBefore(
+                new JwtRequestFilter(jwtUtil(), customUserDetailsService, redisTemplate, objectMapper()),
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
