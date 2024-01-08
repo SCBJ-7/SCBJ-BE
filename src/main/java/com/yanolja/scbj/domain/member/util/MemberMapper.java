@@ -35,6 +35,8 @@ public class MemberMapper {
             .name(member.getName())
             .phone(member.getPhone())
             .linkedToYanolja(member.getYanoljaMember() != null)
+            .accountNumber(member.getAccountNumber())
+            .bank(member.getBank())
             .build();
     }
 

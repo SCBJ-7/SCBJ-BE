@@ -19,7 +19,6 @@ import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.SecurityUtil;
-import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,8 @@ public class MemberService {
 
 
     MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder,
-        SecurityUtil securityUtil, JwtUtil jwtUtil, YanoljaMemberRepository yanoljaMemberRepository) {
+        SecurityUtil securityUtil, JwtUtil jwtUtil,
+        YanoljaMemberRepository yanoljaMemberRepository) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.securityUtil = securityUtil;
@@ -95,8 +95,17 @@ public class MemberService {
     }
 
     public void linkUpYanolja(final String yanoljaEmail) {
-        YanoljaMember yanoljaMember = yanoljaMemberRepository.findByEmail(yanoljaEmail).orElseThrow(()-> new NotFoundYanoljaMember(ErrorCode.NOT_FOUND_YANOLJA_MEMBER));
+        YanoljaMember yanoljaMember = yanoljaMemberRepository.findByEmail(yanoljaEmail)
+            .orElseThrow(() -> new NotFoundYanoljaMember(ErrorCode.NOT_FOUND_YANOLJA_MEMBER));
         getCurrentMember().setYanoljaMember(yanoljaMember);
+    }
+
+    public void updateMemberPhone(final String phoneToUpdate) {
+        getCurrentMember().updatePhone(phoneToUpdate);
+    }
+
+    public MemberResponse getMemberInfo() {
+        return MemberMapper.toMemberResponse(getCurrentMember());
     }
 
     private Member getCurrentMember() {

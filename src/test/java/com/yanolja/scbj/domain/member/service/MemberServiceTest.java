@@ -169,17 +169,43 @@ class MemberServiceTest {
         void linkUpYanoljaMember() {
             //given
             String yanoljaEmail = "test@gmail.com";
-            YanoljaMember yanoljaMember= YanoljaMember.builder()
+            YanoljaMember yanoljaMember = YanoljaMember.builder()
                 .id(1L)
                 .email("test@gmail.com")
                 .build();
             given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
-            given(yanoljaMemberRepository.findByEmail(yanoljaEmail)).willReturn(Optional.of(yanoljaMember));
+            given(yanoljaMemberRepository.findByEmail(yanoljaEmail)).willReturn(
+                Optional.of(yanoljaMember));
             //when
             memberService.linkUpYanolja(yanoljaEmail);
             //then
-            assertEquals(testMember.getYanoljaMember(),yanoljaMember);
+            assertEquals(testMember.getYanoljaMember(), yanoljaMember);
             verify(yanoljaMemberRepository, times(1)).findByEmail(yanoljaEmail);
+        }
+
+        @Test
+        @DisplayName("핸드폰 번호 수정 시")
+        void updateMemberPhone() {
+            //given
+            String phoneToUpdate = "010-1234-5678";
+
+            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            //when
+            memberService.updateMemberPhone(phoneToUpdate);
+            //then
+            assertEquals(testMember.getPhone(), phoneToUpdate);
+        }
+
+        @Test
+        @DisplayName("회원정보 조회 시")
+        void getMemberInfo() {
+            //given
+            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            //when
+            MemberResponse resultMemberResponse = memberService.getMemberInfo();
+            //then
+            assertThat(MemberMapper.toMemberResponse(testMember)).usingRecursiveComparison()
+                .isEqualTo(resultMemberResponse);
         }
     }
 }
