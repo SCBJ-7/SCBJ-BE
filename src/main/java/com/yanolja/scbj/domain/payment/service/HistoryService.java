@@ -1,7 +1,7 @@
-package com.yanolja.scbj.domain.payment.hisotryService;
+package com.yanolja.scbj.domain.payment.service;
 
-import com.yanolja.scbj.domain.payment.dto.PurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.dto.SaleHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;

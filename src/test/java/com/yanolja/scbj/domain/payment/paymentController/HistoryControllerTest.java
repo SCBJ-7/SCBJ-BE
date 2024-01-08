@@ -8,10 +8,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.yanolja.scbj.domain.payment.dto.PurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.dto.SaleHistoryResponse;
-import com.yanolja.scbj.domain.payment.hisotryService.HistoryService;
-import com.yanolja.scbj.domain.payment.historycontroller.HistoryController;
+import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
+import com.yanolja.scbj.domain.payment.service.HistoryService;
+import com.yanolja.scbj.domain.payment.controller.HistoryController;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.nio.charset.StandardCharsets;

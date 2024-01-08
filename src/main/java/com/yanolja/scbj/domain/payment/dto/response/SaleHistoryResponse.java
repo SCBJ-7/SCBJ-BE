@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.payment.dto;
+package com.yanolja.scbj.domain.payment.dto.response;
 
 import java.time.LocalDate;
 

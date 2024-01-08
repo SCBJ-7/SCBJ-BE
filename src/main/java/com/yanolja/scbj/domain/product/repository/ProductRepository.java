@@ -1,6 +1,6 @@
 package com.yanolja.scbj.domain.product.repository;
 
-import com.yanolja.scbj.domain.payment.dto.SaleHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("""
-       SELECT new com.yanolja.scbj.domain.payment.dto.SaleHistoryResponse(
+       SELECT new com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse(
            p.id,  
            h.hotelName, 
            hImg.url, 

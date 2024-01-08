@@ -1,9 +1,8 @@
-package com.yanolja.scbj.domain.payment.dto;
+package com.yanolja.scbj.domain.payment.dto.response;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lombok.Getter;
 
 public record PurchasedHistoryResponse(
     @NotNull

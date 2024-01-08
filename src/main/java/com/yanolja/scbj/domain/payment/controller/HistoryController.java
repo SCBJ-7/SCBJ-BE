@@ -1,11 +1,10 @@
-package com.yanolja.scbj.domain.payment.historycontroller;
+package com.yanolja.scbj.domain.payment.controller;
 
-import com.yanolja.scbj.domain.payment.dto.PurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.dto.SaleHistoryResponse;
-import com.yanolja.scbj.domain.payment.hisotryService.HistoryService;
+import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
+import com.yanolja.scbj.domain.payment.service.HistoryService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -16,12 +15,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("v1/members")
 public class HistoryController {
 
     private final HistoryService historyService;
     private final SecurityUtil securityUtil;
+
+    public HistoryController(HistoryService historyService, SecurityUtil securityUtil) {
+        this.historyService = historyService;
+        this.securityUtil = securityUtil;
+    }
 
     @GetMapping("/purchased-history")
     @ResponseStatus(HttpStatus.OK)
