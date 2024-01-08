@@ -1,7 +1,6 @@
 package com.yanolja.scbj.domain.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -12,11 +11,13 @@ import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
+import com.yanolja.scbj.domain.member.helper.TestConstants;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
@@ -113,6 +114,20 @@ class MemberServiceTest {
             assertThat(memberSignInResponse).usingRecursiveComparison()
                 .isEqualTo(memberService.signIn(memberSignInRequest));
 
+        }
+
+        @Test
+        @DisplayName("로그아웃할 때")
+        void logout() {
+            //given
+            RefreshRequest refreshRequest = RefreshRequest.builder()
+                .accessToken(TestConstants.GRANT_TYPE.getValue())
+                .refreshToken(TestConstants.REFRESH_PREFIX.getValue()).build();
+
+            //when & then
+            memberService.logout(refreshRequest);
+            verify(jwtUtil, times(1)).setBlackList(refreshRequest.getAccessToken().substring(7),
+                refreshRequest.getRefreshToken());
         }
 
         @Test

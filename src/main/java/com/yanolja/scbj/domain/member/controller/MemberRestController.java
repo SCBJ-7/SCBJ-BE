@@ -4,6 +4,7 @@ import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.service.MailService;
@@ -54,6 +55,14 @@ public class MemberRestController {
             memberSignInRequest.password());
         return ResponseEntity.ok()
             .body(ResponseDTO.res(memberService.signIn(memberSignInRequest), "성공적으로 로그인했습니다."));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ResponseDTO<String>> logout(
+        @Valid @RequestBody RefreshRequest refreshRequest) {
+        memberService.logout(refreshRequest);
+        return ResponseEntity.ok()
+            .body(ResponseDTO.res("성공적으로 로그아웃했습니다."));
     }
 
     @PatchMapping("/password")

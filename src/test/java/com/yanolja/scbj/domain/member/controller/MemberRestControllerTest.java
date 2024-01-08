@@ -2,8 +2,8 @@ package com.yanolja.scbj.domain.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -12,9 +12,11 @@ import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
+import com.yanolja.scbj.domain.member.helper.TestConstants;
 import com.yanolja.scbj.domain.member.service.MailService;
 import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.global.config.SecurityConfig;
@@ -22,7 +24,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -109,6 +110,22 @@ class MemberRestControllerTest {
             //when & then
             mockMvc.perform(post("/v1/members/signin")
                     .content(objectMapper.writeValueAsString(memberSignInRequest))
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        }
+
+        @Test
+        @DisplayName("로그아웃 할 때")
+        void logout() throws Exception {
+            //given
+            RefreshRequest refreshRequest = RefreshRequest.builder()
+                .accessToken(TestConstants.GRANT_TYPE.getValue())
+                .refreshToken(TestConstants.REFRESH_PREFIX.getValue())
+                .build();
+            //when & then
+            mockMvc.perform(post("/v1/members/logout")
+                    .content(objectMapper.writeValueAsString(refreshRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
