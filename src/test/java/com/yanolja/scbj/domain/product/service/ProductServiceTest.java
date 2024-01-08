@@ -10,9 +10,11 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
+import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
@@ -43,6 +45,9 @@ class ProductServiceTest {
     private ProductService productService;
 
     @Mock
+    private MemberService memberService;
+
+    @Mock
     private MemberRepository memberRepository;
 
     @Mock
@@ -66,8 +71,13 @@ class ProductServiceTest {
             long yanoljaId = 1L;
             long reservationId = 1L;
             ProductPostRequest productPostRequest = ProductPostRequest.builder().firstPrice(350000)
-                .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330")
+                .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330").isRegisterd(true)
                 .secondGrantPeriod(48).build();
+
+            MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
+                .accountNumber("1000-4400-3330")
+                .bank("신한은행")
+                .build();
 
             YanoljaMember yanoljaMember = YanoljaMember.builder().id(yanoljaId)
                 .email("yang980329@naver.com").build();
@@ -86,6 +96,7 @@ class ProductServiceTest {
                 any(Long.TYPE))).willReturn(
                 java.util.Optional.ofNullable(reservation));
 
+
             Product product = Product.builder()
                 .id(1L)
                 .reservation(reservation)
@@ -101,6 +112,7 @@ class ProductServiceTest {
             // when
             ProductPostResponse result = productService.postProduct(1L, 1L, productPostRequest);
 
+
             // then
             assertThat(result).isNotNull();
             assertThat(result.getProductId()).isEqualTo(1L);
@@ -114,7 +126,7 @@ class ProductServiceTest {
             long yanoljaId = 1L;
             long reservationId = 1L;
             ProductPostRequest productPostRequest = ProductPostRequest.builder().firstPrice(350000)
-                .bank("신한은행").accountNumber("1000-4400-3330").build();
+                .bank("신한은행").accountNumber("1000-4400-3330").isRegisterd(false).build();
 
             YanoljaMember yanoljaMember = YanoljaMember.builder().id(yanoljaId)
                 .email("yang980329@naver.com").build();
