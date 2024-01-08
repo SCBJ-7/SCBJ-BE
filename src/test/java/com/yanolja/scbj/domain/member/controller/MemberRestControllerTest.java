@@ -15,12 +15,14 @@ import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
+import com.yanolja.scbj.domain.member.service.MailService;
 import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -47,6 +49,9 @@ class MemberRestControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private MemberService memberService;
+
+    @MockBean
+    private MailService mailService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -145,6 +150,20 @@ class MemberRestControllerTest {
             //when & then
             mockMvc.perform(patch("/v1/members/name")
                     .content(objectMapper.writeValueAsString(nameToUpdate))
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        }
+
+        @Test
+        @DisplayName("이메일 인증 시")
+        void certifyEmail() throws Exception {
+            //given
+            String emailToCertify = "wocjf0513@gmail.com";
+            given(mailService.certifyEmail(emailToCertify)).willReturn("123456");
+            //when & then
+            mockMvc.perform(post("/v1/members/email")
+                    .content(emailToCertify)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
