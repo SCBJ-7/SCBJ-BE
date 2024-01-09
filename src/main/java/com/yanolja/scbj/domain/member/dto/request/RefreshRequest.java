@@ -1,9 +1,9 @@
 package com.yanolja.scbj.domain.member.dto.request;
 
 import com.yanolja.scbj.domain.member.validation.AccessToken;
-import com.yanolja.scbj.global.config.jwt.JwtUtil;
+import com.yanolja.scbj.domain.member.validation.ValidationGroups.PatternGroup;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshRequest {
 
-    @AccessToken
+    @AccessToken(groups = PatternGroup.class)
     private String accessToken;
-    @NotBlank(message = "유효하지 않은 리프레쉬 토큰입니다.")
+    @NotBlank(groups = PatternGroup.class)
     private String refreshToken;
 
     @Builder
