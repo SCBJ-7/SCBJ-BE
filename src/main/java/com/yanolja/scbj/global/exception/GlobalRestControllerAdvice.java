@@ -1,5 +1,6 @@
 package com.yanolja.scbj.global.exception;
 
+import com.yanolja.scbj.global.common.ResponseDTO;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -16,32 +17,33 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalRestControllerAdvice {
 
     @ExceptionHandler
-    public ResponseEntity<String> bindException(BindException e) {
+    public ResponseEntity<ResponseDTO<String>> bindException(BindException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+            .body(ResponseDTO.res(e.getBindingResult().getAllErrors().get(0).getDefaultMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> applicationException(ApplicationException e) {
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(e.getMessage());
+    public ResponseEntity<ResponseDTO<String>> applicationException(ApplicationException e) {
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+            .body(ResponseDTO.res(e.getMessage()));
 
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> expiredJWTException(ExpiredJwtException e) {
+    public ResponseEntity<ResponseDTO<String>> expiredJWTException(ExpiredJwtException e) {
         return ResponseEntity.status(ErrorCode.EXPIRED_TOKEN.getHttpStatus())
-            .body(ErrorCode.EXPIRED_TOKEN.getSimpleMessage());
+            .body(ResponseDTO.res(ErrorCode.EXPIRED_TOKEN.getSimpleMessage()));
     }
 
     @ExceptionHandler({MalformedJwtException.class, SignatureException.class,
         UnsupportedJwtException.class})
-    public ResponseEntity<String> invalidJWTException(Exception e) {
+    public ResponseEntity<ResponseDTO<String>> invalidJWTException(Exception e) {
         return ResponseEntity.status(ErrorCode.INVALID_TOKEN.getHttpStatus())
-            .body(ErrorCode.INVALID_TOKEN.getSimpleMessage());
+            .body(ResponseDTO.res(ErrorCode.INVALID_TOKEN.getSimpleMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> ValidationException(MethodValidationException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ResponseDTO<String>> ValidationException(MethodValidationException e) {
+        return ResponseEntity.badRequest().body(ResponseDTO.res(e.getMessage()));
     }
 }

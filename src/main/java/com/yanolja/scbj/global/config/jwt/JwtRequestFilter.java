@@ -1,5 +1,7 @@
 package com.yanolja.scbj.global.config.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.config.jwt.exception.ExpiredTokenException;
 import com.yanolja.scbj.global.exception.ApplicationException;
 import com.yanolja.scbj.global.exception.ErrorCode;
@@ -13,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,12 +29,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final RedisTemplate<String, Object> redisTemplate;
     private final String AUTHORIZATION_HEADER = "Authorization";
 
+    private final ObjectMapper objectMapper;
+
 
     public JwtRequestFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService,
-        RedisTemplate<String, Object> redisTemplate) {
+        RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -82,6 +88,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         throws IOException {
         response.setStatus(status);
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(message);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(objectMapper.writeValueAsString(ResponseDTO.res(message)));
     }
 }
