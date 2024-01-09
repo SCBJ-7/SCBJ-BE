@@ -1,22 +1,24 @@
 package com.yanolja.scbj.domain.member.controller;
 
+import com.yanolja.scbj.domain.member.dto.request.MemberEmailRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
+import com.yanolja.scbj.domain.member.dto.request.MemberUpdateNameRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePhoneRequest;
 import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.service.MailService;
 import com.yanolja.scbj.domain.member.service.MemberService;
-import com.yanolja.scbj.domain.member.validation.Phone;
+import com.yanolja.scbj.domain.member.validation.ValidationGroups;
+import com.yanolja.scbj.domain.member.validation.ValidationSequence;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +42,7 @@ public class MemberRestController {
 
     @PostMapping("/signup")
     public ResponseEntity<ResponseDTO<MemberResponse>> signUp(
-        @Valid @RequestBody MemberSignUpRequest memberSignUpRequest) {
+        @Validated(ValidationSequence.class) @RequestBody MemberSignUpRequest memberSignUpRequest) {
         log.info("email:{}, password:{}, name:{}, phone:{}", memberSignUpRequest.email(),
             memberSignUpRequest.password(), memberSignUpRequest.name(),
             memberSignUpRequest.phone());
@@ -50,7 +52,7 @@ public class MemberRestController {
 
     @PostMapping("/signin")
     public ResponseEntity<ResponseDTO<MemberSignInResponse>> signIn(
-        @Valid @RequestBody MemberSignInRequest memberSignInRequest) {
+        @Validated(ValidationSequence.class) @RequestBody MemberSignInRequest memberSignInRequest) {
         log.info("email:{}, password:{}", memberSignInRequest.email(),
             memberSignInRequest.password());
         return ResponseEntity.ok()
@@ -59,7 +61,7 @@ public class MemberRestController {
 
     @PostMapping("/logout")
     public ResponseEntity<ResponseDTO<String>> logout(
-        @Valid @RequestBody RefreshRequest refreshRequest) {
+        @Validated(ValidationSequence.class) @RequestBody RefreshRequest refreshRequest) {
         memberService.logout(refreshRequest);
         return ResponseEntity.ok()
             .body(ResponseDTO.res("성공적으로 로그아웃했습니다."));
@@ -67,7 +69,7 @@ public class MemberRestController {
 
     @PatchMapping("/password")
     public ResponseEntity<ResponseDTO<String>> updateMemberPassword(
-        @Valid @RequestBody MemberUpdatePasswordRequest memberUpdatePasswordRequest) {
+        @Validated(ValidationSequence.class) @RequestBody MemberUpdatePasswordRequest memberUpdatePasswordRequest) {
         log.info("password:{}", memberUpdatePasswordRequest.password());
         memberService.updateMemberPassword(memberUpdatePasswordRequest);
 
@@ -76,7 +78,7 @@ public class MemberRestController {
 
     @PatchMapping("/account")
     public ResponseEntity<ResponseDTO<String>> updateMemberAccount(
-        @Valid @RequestBody MemberUpdateAccountRequest memberUpdateAccountRequest) {
+        @Validated(ValidationSequence.class) @RequestBody MemberUpdateAccountRequest memberUpdateAccountRequest) {
         log.info("accountNumber:{}, bank:{}", memberUpdateAccountRequest.accountNumber(),
             memberUpdateAccountRequest.bank());
         memberService.updateMemberAccount(memberUpdateAccountRequest);
@@ -86,36 +88,32 @@ public class MemberRestController {
 
     @PatchMapping("/name")
     public ResponseEntity<ResponseDTO<String>> updateMemberName(
-        @Size(min = 1, max = 20, message = "이름의 길이는 1 ~ 20 이어야 합니다.")
-        @Pattern(regexp = "[^0-9]*", message = "이름에 숫자는 입력할 수 없습니다.")
-        @RequestBody String nameToUpdate) {
-        memberService.updateMemberName(nameToUpdate);
+        @Validated(ValidationSequence.class) @RequestBody MemberUpdateNameRequest memberUpdateNameRequest) {
+        memberService.updateMemberName(memberUpdateNameRequest.name());
 
         return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));
     }
 
     @PostMapping("/email")
     public ResponseEntity<ResponseDTO<String>> certifyEmail(
-        @Email
-        @RequestBody String email) {
+        @Validated(ValidationSequence.class) @RequestBody MemberEmailRequest memberEmailRequest) {
         return ResponseEntity.ok()
-            .body(ResponseDTO.res(mailService.certifyEmail(email), "이메일 인증번호를 성공적으로 발급했습니다."));
+            .body(ResponseDTO.res(mailService.certifyEmail(memberEmailRequest.email()),
+                "이메일 인증번호를 성공적으로 발급했습니다."));
     }
 
     @PostMapping("/yanolja")
     public ResponseEntity<ResponseDTO<String>> linkUpYanolja(
-        @Email
-        @RequestBody String yanoljaEmail
+        @Validated(ValidationSequence.class) @RequestBody MemberEmailRequest memberEmailRequest
     ) {
-        memberService.linkUpYanolja(yanoljaEmail);
+        memberService.linkUpYanolja(memberEmailRequest.email());
         return ResponseEntity.ok().body(ResponseDTO.res("야놀자 계정과 성공적으로 연동했습니다."));
     }
 
     @PatchMapping("/phone")
     public ResponseEntity<ResponseDTO<String>> updateMemberPhone(
-        @Phone
-        @RequestBody String phoneToUpdate) {
-        memberService.updateMemberPhone(phoneToUpdate);
+        @Validated(ValidationSequence.class) @RequestBody MemberUpdatePhoneRequest memberUpdatePhoneRequest) {
+        memberService.updateMemberPhone(memberUpdatePhoneRequest.phone());
         return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 핸드폰 번호를 변경했습니다."));
     }
 

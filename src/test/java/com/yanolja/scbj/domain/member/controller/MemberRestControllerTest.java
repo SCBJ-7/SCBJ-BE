@@ -8,10 +8,13 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yanolja.scbj.domain.member.dto.request.MemberEmailRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
+import com.yanolja.scbj.domain.member.dto.request.MemberUpdateNameRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePasswordRequest;
+import com.yanolja.scbj.domain.member.dto.request.MemberUpdatePhoneRequest;
 import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
@@ -163,10 +166,11 @@ class MemberRestControllerTest {
         @DisplayName("이름 수정 시")
         void updateMemberName() throws Exception {
             //given
-            String nameToUpdate = "이상해씨";
+            MemberUpdateNameRequest memberUpdateNameRequest = MemberUpdateNameRequest.builder()
+                .name(memberResponse.getName()).build();
             //when & then
             mockMvc.perform(patch("/v1/members/name")
-                    .content(objectMapper.writeValueAsString(nameToUpdate))
+                    .content(objectMapper.writeValueAsString(memberUpdateNameRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
@@ -176,11 +180,12 @@ class MemberRestControllerTest {
         @DisplayName("이메일 인증 시")
         void certifyEmail() throws Exception {
             //given
-            String emailToCertify = "wocjf0513@gmail.com";
-            given(mailService.certifyEmail(emailToCertify)).willReturn("123456");
+            MemberEmailRequest memberEmailRequest = MemberEmailRequest.builder()
+                .email(memberResponse.getEmail()).build();
+            given(mailService.certifyEmail(memberEmailRequest.email())).willReturn("123456");
             //when & then
             mockMvc.perform(post("/v1/members/email")
-                    .content(emailToCertify)
+                    .content(objectMapper.writeValueAsString(memberEmailRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
@@ -190,10 +195,11 @@ class MemberRestControllerTest {
         @DisplayName("야놀자 계정 연동 시")
         void linkUpYanolja() throws Exception {
             //given
-            String yanoljaEmail = "test@gmail.com";
+            MemberEmailRequest memberEmailRequest = MemberEmailRequest.builder()
+                .email(memberResponse.getEmail()).build();
             //when & then
             mockMvc.perform(post("/v1/members/yanolja")
-                    .content(yanoljaEmail)
+                    .content(objectMapper.writeValueAsString(memberEmailRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
@@ -203,10 +209,12 @@ class MemberRestControllerTest {
         @DisplayName("핸드폰 수정 시")
         void updateMemberPhone() throws Exception {
             //given
-            String phoneToUpdate = memberResponse.getPhone();
+            MemberUpdatePhoneRequest memberUpdatePhoneRequest = MemberUpdatePhoneRequest.builder()
+                .phone(memberResponse.getPhone())
+                .build();
             //when & then
             mockMvc.perform(patch("/v1/members/phone")
-                    .content(phoneToUpdate)
+                    .content(objectMapper.writeValueAsString(memberUpdatePhoneRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());

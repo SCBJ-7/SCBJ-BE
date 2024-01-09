@@ -16,7 +16,6 @@ public class PhoneValidator implements ConstraintValidator<Phone, String> {
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        System.out.println("핸드폰 번호 검증 중: " + value);
-        return Pattern.matches(PHONE_REGEX, value);
+        return value != null && Pattern.matches(PHONE_REGEX, value);
     }
 }

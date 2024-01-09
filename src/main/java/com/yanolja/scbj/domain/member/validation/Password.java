@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.member.validation;
 
+import com.yanolja.scbj.domain.member.validation.ValidationGroups.PatternGroup;
 import com.yanolja.scbj.domain.member.validation.validator.PasswordValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -13,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Password {
 
-    String message() default "입력된 패스워드 형식이 맞지 않습니다.";
+    String message() default "유효하지 않은 패스워드입니다.";
 
     Class<?>[] groups() default {};
 
