@@ -6,6 +6,7 @@ import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
+import com.yanolja.scbj.domain.member.entity.MemberAgreement;
 import java.util.Collections;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,8 @@ public class MemberMapper {
             .password(encodePassword)
             .phone(signUpMemberRequest.phone())
             .name(signUpMemberRequest.name())
+            .memberAgreement(MemberAgreement.builder().termOfUse(signUpMemberRequest.termOfUse())
+                .privacyPolicy(signUpMemberRequest.privacyPolicy()).build())
             .authority(Authority.ROLE_USER)
             .build();
     }
