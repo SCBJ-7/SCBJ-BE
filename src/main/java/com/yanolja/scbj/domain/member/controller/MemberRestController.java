@@ -47,7 +47,7 @@ public class MemberRestController {
             memberSignUpRequest.password(), memberSignUpRequest.name(),
             memberSignUpRequest.phone());
         return ResponseEntity.ok()
-            .body(ResponseDTO.res(memberService.signUp(memberSignUpRequest), "성공적으로 회원가입했습니다."));
+            .body(ResponseDTO.res(memberService.signUp(memberSignUpRequest), "회원가입에 성공했습니다."));
     }
 
     @PostMapping("/signin")
@@ -56,7 +56,7 @@ public class MemberRestController {
         log.info("email:{}, password:{}", memberSignInRequest.email(),
             memberSignInRequest.password());
         return ResponseEntity.ok()
-            .body(ResponseDTO.res(memberService.signIn(memberSignInRequest), "성공적으로 로그인했습니다."));
+            .body(ResponseDTO.res(memberService.signIn(memberSignInRequest), "로그인에 성공했습니다."));
     }
 
     @PostMapping("/logout")
@@ -64,7 +64,7 @@ public class MemberRestController {
         @Validated(ValidationSequence.class) @RequestBody RefreshRequest refreshRequest) {
         memberService.logout(refreshRequest);
         return ResponseEntity.ok()
-            .body(ResponseDTO.res("성공적으로 로그아웃했습니다."));
+            .body(ResponseDTO.res("로그아웃에 성공했습니다."));
     }
 
     @PatchMapping("/password")
@@ -91,7 +91,7 @@ public class MemberRestController {
         @Validated(ValidationSequence.class) @RequestBody MemberUpdateNameRequest memberUpdateNameRequest) {
         memberService.updateMemberName(memberUpdateNameRequest.name());
 
-        return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 이름을 변경했습니다."));
     }
 
     @PostMapping("/email")
@@ -99,7 +99,7 @@ public class MemberRestController {
         @Validated(ValidationSequence.class) @RequestBody MemberEmailRequest memberEmailRequest) {
         return ResponseEntity.ok()
             .body(ResponseDTO.res(mailService.certifyEmail(memberEmailRequest.email()),
-                "이메일 인증번호를 성공적으로 발급했습니다."));
+                "성공적으로 이메일 인증번호를 발급했습니다."));
     }
 
     @PostMapping("/yanolja")
@@ -107,7 +107,7 @@ public class MemberRestController {
         @Validated(ValidationSequence.class) @RequestBody MemberEmailRequest memberEmailRequest
     ) {
         memberService.linkUpYanolja(memberEmailRequest.email());
-        return ResponseEntity.ok().body(ResponseDTO.res("야놀자 계정과 성공적으로 연동했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res("야놀자 계정 연동에 성공했습니다."));
     }
 
     @PatchMapping("/phone")
