@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Phone {
 
-    String message() default "입력된 핸드폰 번호 형식이 맞지 않습니다.";
+    String message() default "유효하지 않은 핸드폰 번호입니다.";
 
     Class<?>[] groups() default {};
 

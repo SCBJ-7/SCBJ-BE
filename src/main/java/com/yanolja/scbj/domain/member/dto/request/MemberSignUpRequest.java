@@ -14,7 +14,7 @@ import lombok.Builder;
 
 public record MemberSignUpRequest(
     @NotBlank(groups = NotBlankGroup.class)
-    @Email(message = "유효하지 않은 이메일 형식입니다.",
+    @Email(message = "유효하지 않은 이메일입니다.",
         regexp = EMAIL_REGEX, groups = PatternGroup.class)
     String email,
     @Password(groups = PatternGroup.class)
