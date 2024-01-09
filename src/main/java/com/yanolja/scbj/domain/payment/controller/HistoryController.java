@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.payment.controller;
 
 import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResponse;
 import com.yanolja.scbj.domain.payment.service.HistoryService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,5 +49,14 @@ public class HistoryController {
         Page<SaleHistoryResponse> response =
             historyService.getUsersSaleHistory(pageable, memberId);
         return ResponseDTO.res(response, "조회에 성공하였습니다.");
+    }
+
+    @GetMapping("/purchased-history/{paymentHistory_id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO<SpecificPurchasedHistoryResponse> getSpecificPurchasedHistory(
+        @PathVariable("paymentHistory_id") Long paymentHistoryId) {
+        return ResponseDTO.res(
+            historyService.getSpecificPurchasedHistory(securityUtil.getCurrentMemberId(),
+                paymentHistoryId), "구매 내역 상세 조회를 성공했습니다.");
     }
 }
