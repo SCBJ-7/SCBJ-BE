@@ -11,7 +11,7 @@ import lombok.Builder;
 public record MemberUpdateNameRequest(
     @NotBlank(message = "이름의 길이는 1~20자여야 합니다.", groups = NotBlankGroup.class)
     @Pattern(regexp = "[^0-9]*", message = "이름에 숫자는 입력할 수 없습니다.", groups = PatternGroup.class)
-    @Size(min = 1, max = 20, message = "이름의 길이는 1 ~ 20 이어야 합니다.", groups = SizeGroup.class)
+    @Size(min = 2, max = 20, message = "이름의 길이는 2 ~ 20자여야 합니다.", groups = SizeGroup.class)
     String name
 
 ) {
