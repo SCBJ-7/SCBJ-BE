@@ -39,7 +39,7 @@ public class Member extends BaseEntity {
     @Comment("야놀자 멤버 식별자")
     private YanoljaMember yanoljaMember;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "member_agreement_id")
     @Comment("회원 약관 식별자")
     private MemberAgreement memberAgreement;
