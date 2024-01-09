@@ -125,7 +125,7 @@ class ReservationServiceTest {
 
             // then
             Assertions.assertThat(reservationFindResponse).isNotNull();
-            Assertions.assertThat(reservationFindResponse.get(0).getPurchasePrice())
+            Assertions.assertThat(reservationFindResponse.get(0).purchasePrice())
                 .isEqualTo(5000000);
         }
     }
