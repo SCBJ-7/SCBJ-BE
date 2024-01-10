@@ -15,7 +15,9 @@ public record SpecificPurchasedHistoryResponse(
     String paymentType,
     int originalPrice,
     int price,
-    int remainingDays
+    int remainingDays,
+    String paymentHistoryDate,
+    String hotelImage
 ) {
 
     @Builder

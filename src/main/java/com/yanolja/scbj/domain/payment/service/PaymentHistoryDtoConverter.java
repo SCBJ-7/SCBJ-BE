@@ -6,6 +6,7 @@ import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResp
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.global.util.SeasonValidator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -22,7 +23,7 @@ public class PaymentHistoryDtoConverter {
         Hotel hotel = product.getReservation().getHotel();
         Room room = hotel.getRoom();
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yy.MM.dd (E)");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yy.MM.dd (E) ");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
         String checkIn =
@@ -31,6 +32,13 @@ public class PaymentHistoryDtoConverter {
         String checkOut =
             reservation.getEndDate().format(dateFormatter) + hotel.getRoom().getCheckOut()
                 .format(timeFormatter);
+
+        int originalPrice = hotel.getHotelRoomPrice().getOffPeakPrice();
+
+        if (SeasonValidator.isPeakTime(LocalDate.now())) {
+            originalPrice = hotel.getHotelRoomPrice().getPeakPrice();
+        }
+
         int remainingDays = (int) ChronoUnit.DAYS.between(LocalDate.now(),
             reservation.getStartDate());
 
@@ -44,9 +52,11 @@ public class PaymentHistoryDtoConverter {
             .customerName(paymentHistory.getCustomerName())
             .customerPhoneNumber(paymentHistory.getCustomerPhoneNumber())
             .paymentHistoryId(paymentHistory.getId())
-            .originalPrice(reservation.getPurchasePrice())
+            .originalPrice(originalPrice)
             .price(paymentHistory.getPrice())
             .remainingDays(remainingDays)
+            .paymentHistoryDate(paymentHistory.getCreatedAt().format(dateFormatter))
+            .hotelImage(hotel.getHotelRoomImageList().get(0).getUrl())
             .build();
     }
 }
