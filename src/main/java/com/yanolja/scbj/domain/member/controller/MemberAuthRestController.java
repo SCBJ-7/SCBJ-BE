@@ -4,6 +4,7 @@ import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.service.MemberAuthService;
 import com.yanolja.scbj.global.common.ResponseDTO;
+import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,7 @@ public class MemberAuthRestController {
 
     @PostMapping("/refresh")
     public ResponseEntity<ResponseDTO<TokenResponse>> refreshAccessToken(
-        @RequestBody RefreshRequest refreshRequest) {
+        @Valid @RequestBody RefreshRequest refreshRequest) {
         log.info("accessToken:{}, refreshToken:{}", refreshRequest.getAccessToken(),
             refreshRequest.getRefreshToken());
         return ResponseEntity.ok().body(ResponseDTO.res(memberAuthService.refreshAccessToken(refreshRequest),"토큰을 성공적으로 재발급했습니다."));

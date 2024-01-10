@@ -1,6 +1,7 @@
 package com.yanolja.scbj.domain.product.service;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
@@ -10,6 +11,7 @@ import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -51,6 +53,7 @@ class ProductDtoConverterTest {
             Hotel hotel = Hotel.builder()
                 .id(1L)
                 .room(room)
+                .hotelRoomImageList(List.of(HotelRoomImage.builder().build()))
                 .hotelRoomPrice(hotelRoomPrice)
                 .build();
 

@@ -52,10 +52,17 @@ public class Hotel {
     @Embedded
     private Room room;
 
+    @OneToMany(mappedBy = "hotel")
+    List<HotelRoomImage> hotelRoomImageList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "hotel")
+    List<RefundPolicy> hotelRefundPolicyList = new ArrayList<>();
+
     @Builder
     private Hotel(Long id, List<Reservation> reservationList, String hotelName,
         String hotelMainAddress,
-        String hotelDetailAddress, String hotelInfoUrl, HotelRoomPrice hotelRoomPrice, Room room) {
+        String hotelDetailAddress, String hotelInfoUrl, HotelRoomPrice hotelRoomPrice, Room room,
+        List<HotelRoomImage> hotelRoomImageList, List<RefundPolicy> hotelRefundPolicyList) {
         this.id = id;
         this.reservationList = reservationList;
         this.hotelName = hotelName;
@@ -64,5 +71,7 @@ public class Hotel {
         this.hotelInfoUrl = hotelInfoUrl;
         this.hotelRoomPrice = hotelRoomPrice;
         this.room = room;
+        this.hotelRoomImageList = hotelRoomImageList;
+        this.hotelRefundPolicyList = hotelRefundPolicyList;
     }
 }
