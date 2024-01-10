@@ -247,4 +247,33 @@ public class ProductSearchRepositoryTest {
         }
     }
 
+        @Test
+        @DisplayName("테마를 통해 상품을 조회한다")
+        public void will_success_testThemeSearch() {
+            //given
+            ProductSearchRequest searchParkingRequest = ProductSearchRequest.builder()
+                .parking(true)
+                .build();
+
+            ProductSearchRequest searchPoolRequest = ProductSearchRequest.builder()
+                .pool(true)
+                .build();
+
+            //when
+            Page<ProductSearchResponse> parkingResults =
+                productRepository.search(PageRequest.of(0, 10), searchParkingRequest);
+
+            Page<ProductSearchResponse> poolResults =
+                productRepository.search(PageRequest.of(0, 10), searchPoolRequest);
+
+            //then
+            assertThat(parkingResults).isNotEmpty();
+            assertThat(poolResults).isNotEmpty();
+            List<ProductSearchResponse> parkingProduct = parkingResults.getContent();
+            List<ProductSearchResponse> poolProduct = poolResults.getContent();
+            assertThat(parkingProduct.size()).isEqualTo(10);
+            assertThat(poolProduct.size()).isEqualTo(10);
+
+        }
+
 }
