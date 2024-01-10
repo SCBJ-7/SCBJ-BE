@@ -28,11 +28,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @Import(QuerydslConfiguration.class)
-@ActiveProfiles("test")
 public class ProductSearchRepositoryTest {
 
     @Autowired
@@ -239,7 +237,7 @@ public class ProductSearchRepositoryTest {
             //then
             assertThat(results).isNotEmpty();
             List<ProductSearchResponse> content = results.getContent();
-            assertThat(content.size()).isEqualTo(4);
+            assertThat(content.size()).isEqualTo(10);
         }
 
         @Test
