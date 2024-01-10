@@ -29,7 +29,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     NumberExpression<Integer> priceToUse = new CaseBuilder()
-        .when(product.secondPrice.isNull()).then(product.firstPrice)
+        .when(product.secondPrice.isNull().and(product.secondPrice.eq(0))).then(product.firstPrice)
         .otherwise(product.secondPrice);
 
     NumberExpression<Double> discountRate = Expressions.numberTemplate(Double.class,
@@ -45,7 +45,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 hotel.hotelName,
                 hotel.room.bedType,
                 hotelRoomImage.url,
-                reservation.purchasePrice,
+                priceToUse,
                 new CaseBuilder()
                     .when(product.secondPrice.isNull()).then(product.firstPrice)
                     .otherwise(product.secondPrice),
@@ -86,36 +86,28 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .and(eqBrunch(productSearchRequest.getBrunch()))
             .and(eqPool(productSearchRequest.getPool()))
             .and(eqOcean(productSearchRequest.getOceanView()))
-            .and(eqLocation(productSearchRequest.getLocation()))
-            .and(eqMaximumPeople(productSearchRequest.getQuantityPeople()))
-            .and(eqDate(productSearchRequest.getCheckIn(), productSearchRequest.getCheckOut()));
+            .and(containsLocation(productSearchRequest.getLocation()))
+            .and(goeMaximumPeople(productSearchRequest.getQuantityPeople()))
+            .and(betweenDate(productSearchRequest.getCheckIn(), productSearchRequest.getCheckOut()));
 
         return builder;
     }
 
-    private BooleanExpression eqDate(LocalDate checkIn, LocalDate checkOut) {
+    private BooleanExpression betweenDate(LocalDate checkIn, LocalDate checkOut) {
         if (checkIn != null && checkOut != null) {
-//            return reservation.startDate.between(checkIn, checkOut);
-//                and(reservation.endDate.between(checkIn, checkOut));
-//                and(reservation.endDate.lt(checkOut.minusDays(1)));
-            System.err.println("tlqkf");
-//            BooleanExpression in = reservation.startDate.in(checkIn, checkOut);
-//            return in;
-
-//            System.err.println(reservation.startDate);
             return reservation.startDate.between(checkIn, checkOut.minusDays(1));
         }
         return reservation.startDate.goe(LocalDate.now());
     }
 
-    private BooleanExpression eqMaximumPeople(Integer maximumPeople) {
+    private BooleanExpression goeMaximumPeople(Integer maximumPeople) {
         if (maximumPeople == null || maximumPeople == 0) {
             return null;
         }
         return hotel.room.maxPeople.goe(maximumPeople);
     }
 
-    private BooleanExpression eqLocation(String hotelMainAddress) {
+    private BooleanExpression containsLocation(String hotelMainAddress) {
         if (hotelMainAddress == null || hotelMainAddress.isEmpty()) {
             return null;
         }
@@ -153,8 +145,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private OrderSpecifier<?>[] orderType(String sorted) {
         if (sorted == null || sorted.isEmpty()) {
             return new OrderSpecifier[]{
-                reservation.startDate.asc(), // 체크인 임박날짜 순
-                discountRate.desc() // 높은 할인 순
+                reservation.startDate.asc(),
+                discountRate.desc()
             };
         }
         switch (sorted) {
