@@ -1,11 +1,9 @@
 package com.yanolja.scbj.domain.product.repository;
 
-import static org.assertj.core.api.AssertionsForClassTypes.linesOf;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
-import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.member.entity.Authority;
@@ -16,13 +14,10 @@ import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.config.QuerydslConfiguration;
-import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.IntStream;
-import javax.swing.text.html.parser.Entity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,7 +36,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class ProductSearchRepositoryTest {
 
     @Autowired
-    private EntityManager entityManager;
+    private TestEntityManager entityManager;
 
     @Autowired
     private ProductRepository productRepository;
@@ -58,25 +53,25 @@ public class ProductSearchRepositoryTest {
         return member;
     }
 
-    private RoomTheme createRoomTheme() {
+    private RoomTheme createRoomTheme(Boolean parking, Boolean pool) {
         RoomTheme roomTheme = RoomTheme.builder()
-            .parkingZone(true)
-            .breakfast(true)
-            .pool(true)
+            .parkingZone(parking)
+            .breakfast(false)
+            .pool(pool)
             .oceanView(false)
             .build();
         entityManager.persist(roomTheme);
         return roomTheme;
     }
 
-    private Hotel createHotel(RoomTheme roomTheme, String hotelAddress) {
+    private Hotel createHotel(RoomTheme roomTheme, String hotelAddress, Integer maxPeople) {
         Room room = Room.builder()
             .roomName("Deluxe Room")
             .checkIn(LocalTime.of(14, 0))
             .checkOut(LocalTime.of(11, 0))
             .bedType("Double Bed")
             .standardPeople(2)
-            .maxPeople(4)
+            .maxPeople(maxPeople)
             .roomTheme(roomTheme)
             .build();
 
@@ -91,6 +86,7 @@ public class ProductSearchRepositoryTest {
         entityManager.persist(hotel);
         return hotel;
     }
+
     private HotelRoomImage createHotelRoomImage(Hotel hotel) {
         HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
             .hotel(hotel)
@@ -101,8 +97,6 @@ public class ProductSearchRepositoryTest {
     }
 
 
-
-
     private YanoljaMember createYanoljaMember(String email) {
         YanoljaMember yanoljaMember = YanoljaMember.builder()
             .email(email)
@@ -111,26 +105,27 @@ public class ProductSearchRepositoryTest {
         return yanoljaMember;
     }
 
-    private Reservation createReservation(Hotel hotel, YanoljaMember yanoljaMember,LocalDate checkIn, LocalDate checkOut) {
+    private Reservation createReservation(Hotel hotel, YanoljaMember yanoljaMember,
+                                          LocalDate checkIn, LocalDate checkOut, int purchasePrice) {
         Reservation reservation = Reservation.builder()
             .hotel(hotel)
             .yanoljaMember(yanoljaMember)
-            .startDate(LocalDate.now().plusDays(10))
-            .endDate(LocalDate.now().plusDays(11))
-            .purchasePrice(150000)
+            .startDate(checkIn)
+            .endDate(checkOut)
+            .purchasePrice(purchasePrice)
             .build();
         entityManager.persist(reservation);
         return reservation;
     }
 
-    private Product createProduct(Member member, Reservation reservation) {
+    private Product createProduct(Member member, Reservation reservation, int firstPrice, int secondPrice) {
         Product product = Product.builder()
             .reservation(reservation)
             .member(member)
             .bank("하나 은행")
             .accountNumber("123123")
-            .firstPrice(130000)
-            .secondPrice(100000)
+            .firstPrice(firstPrice)
+            .secondPrice(secondPrice)
             .build();
         entityManager.persist(product);
         return product;
@@ -138,52 +133,53 @@ public class ProductSearchRepositoryTest {
 
     @BeforeEach
     void init() {
-        String[] addresses = {"서울", "강릉", "이천"};
-
         IntStream.rangeClosed(1, 10)
             .forEach(i -> {
                 String randomAddress = "서울";
-
                 Member member = createMember("user" + i + "@example.com", "홍길동" + i);
-                RoomTheme roomTheme = createRoomTheme();
-                Hotel hotel2 = createHotel(roomTheme, randomAddress);
+                RoomTheme roomTheme = createRoomTheme(true,true);
+                Hotel hotel2 = createHotel(roomTheme, randomAddress, 4);
                 createHotelRoomImage(hotel2);
                 YanoljaMember yanoljaMember = createYanoljaMember("yanolja" + i + "@example.com");
-                Reservation reservation = createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(1),LocalDate.now().plusDays(5));
-                Product product = createProduct(member, reservation);
+                Reservation reservation = createReservation(hotel2, yanoljaMember, LocalDate.now(),
+                    LocalDate.now().plusDays(5),200000);
+                Product product = createProduct(member, reservation, 100000,50000);
                 productRepository.save(product);
+                entityManager.clear();
             });
 
         IntStream.rangeClosed(1, 5)
             .forEach(i -> {
                 String randomAddress = "강릉";
-
                 Member member = createMember("user" + i + 20 + "@example.com", "홍길동" + i + 20);
-                RoomTheme roomTheme = createRoomTheme();
-                Hotel hotel2 = createHotel(roomTheme, randomAddress);
+                RoomTheme roomTheme = createRoomTheme(false,false);
+                Hotel hotel2 = createHotel(roomTheme, randomAddress, 2);
                 createHotelRoomImage(hotel2);
-                YanoljaMember yanoljaMember = createYanoljaMember("yanolja" + i + 20+ "@example.com");
-                Reservation reservation = createReservation(hotel2, yanoljaMember,LocalDate.now().plusDays(6),LocalDate.now().plusDays(8));
-                Product product = createProduct(member, reservation);
+                YanoljaMember yanoljaMember =
+                    createYanoljaMember("yanolja" + i + 20 + "@example.com");
+                Reservation reservation =
+                    createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(6),
+                        LocalDate.now().plusDays(8),300000);
+                Product product = createProduct(member, reservation,200000, 100000);
                 productRepository.save(product);
             });
 
         IntStream.rangeClosed(1, 5)
             .forEach(i -> {
                 String randomAddress = "이천";
-
                 Member member = createMember("user" + i + 30 + "@example.com", "홍길동" + i + 30);
-                RoomTheme roomTheme = createRoomTheme();
-                Hotel hotel2 = createHotel(roomTheme, randomAddress);
+                RoomTheme roomTheme = createRoomTheme(false,false);
+                Hotel hotel2 = createHotel(roomTheme, randomAddress, 2);
                 createHotelRoomImage(hotel2);
-                YanoljaMember yanoljaMember = createYanoljaMember("yanolja" + i + 30 + "@example.com");
-                Reservation reservation = createReservation(hotel2, yanoljaMember,LocalDate.now().plusDays(8),LocalDate.now().plusDays(13));
-                Product product = createProduct(member, reservation);
-                productRepository.save(product);
+                YanoljaMember yanoljaMember =
+                    createYanoljaMember("yanolja" + i + 30 + "@example.com");
+                Reservation reservation =
+                    createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(8),
+                        LocalDate.now().plusDays(13),400000);
+                createProduct(member, reservation,300000, 250000);
             });
-//        entityManager.clear();
+        entityManager.clear();
     }
-
 
 
     @Nested
@@ -193,14 +189,14 @@ public class ProductSearchRepositoryTest {
         @Test
         @DisplayName("서울을 선택하면 서울에 관한 숙박업소가 보인다")
         public void will_success_testAreaSearchProduct() {
-
             //given
             ProductSearchRequest searchRequest = ProductSearchRequest.builder()
                 .location("서울")
                 .build();
 
             // when
-            Page<ProductSearchResponse> results = productRepository.search(PageRequest.of(0, 1),searchRequest);
+            Page<ProductSearchResponse> results =
+                productRepository.search(PageRequest.of(0, 1), searchRequest);
 
             // then
             assertThat(results).isNotEmpty();
@@ -212,14 +208,14 @@ public class ProductSearchRepositoryTest {
         @DisplayName("날짜를 선택하면 체크인 날짜를 기준으로 숙박업소가 보인다")
         public void will_success_testDateSearchProduct() {
             //given
-            ProductSearchRequest searchRequest2 =
+            ProductSearchRequest searchRequest =
                 ProductSearchRequest.builder().checkIn(LocalDate.now())
-                    .checkOut(LocalDate.now().plusDays(5)).build();
+                    .checkOut(LocalDate.now().plusDays(3)).build();
 
             //when
 
             Page<ProductSearchResponse> results =
-                productRepository.search(PageRequest.of(0, 10), searchRequest2);
+                productRepository.search(PageRequest.of(0, 10), searchRequest);
 
             //then
             assertThat(results).isNotEmpty();
@@ -245,7 +241,6 @@ public class ProductSearchRepositoryTest {
             List<ProductSearchResponse> content = results.getContent();
             assertThat(content.size()).isEqualTo(4);
         }
-    }
 
         @Test
         @DisplayName("테마를 통해 상품을 조회한다")
