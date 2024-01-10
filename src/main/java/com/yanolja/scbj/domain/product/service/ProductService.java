@@ -1,9 +1,11 @@
 package com.yanolja.scbj.domain.product.service;
 
+import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
@@ -30,6 +32,7 @@ public class ProductService {
     private final ReservationRepository reservationRepository;
     private final ProductRepository productRepository;
     private final ProductDtoConverter productDtoConverter;
+    private final MemberService memberService;
 
     private static final int MIN_SECOND_GRANT_PERIOD = 3;
 
@@ -46,27 +49,35 @@ public class ProductService {
             yanoljaMember.getId()).orElseThrow(
             () -> new ReservationNotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
 
-        if (productPostRequest.getFirstPrice() > reservation.getPurchasePrice()) {
+        if (productPostRequest.firstPrice() > reservation.getPurchasePrice()) {
             throw new FirstPriceHigherException(ErrorCode.FIRST_PRICE_HIGHER);
         }
-        if (productPostRequest.getSecondPrice() != 0
-            && productPostRequest.getSecondGrantPeriod() != 0) {
-            if (productPostRequest.getSecondPrice() > productPostRequest.getFirstPrice()) {
+        if (productPostRequest.secondPrice() != 0
+            && productPostRequest.secondGrantPeriod() != 0) {
+            if (productPostRequest.secondPrice() > productPostRequest.firstPrice()) {
                 throw new SecondPriceHigherException(ErrorCode.SECOND_PRICE_HIGHER);
             }
-            if (productPostRequest.getSecondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
+            if (productPostRequest.secondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
                 throw new SecondPricePeriodException(ErrorCode.INVALID_SECOND_PRICE_PERIOD);
             }
+        }
+
+        if (productPostRequest.isRegisterd()) {
+            MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
+                .accountNumber(productPostRequest.accountNumber())
+                .bank(productPostRequest.bank())
+                .build();
+            memberService.updateMemberAccount(memberUpdateAccountRequest);
         }
 
         Product product = Product.builder()
             .reservation(reservation)
             .member(member)
-            .firstPrice(productPostRequest.getFirstPrice())
-            .secondPrice(productPostRequest.getSecondPrice())
-            .bank(productPostRequest.getBank())
-            .accountNumber(productPostRequest.getAccountNumber())
-            .secondGrantPeriod(productPostRequest.getSecondGrantPeriod()).build();
+            .firstPrice(productPostRequest.firstPrice())
+            .secondPrice(productPostRequest.secondPrice())
+            .bank(productPostRequest.bank())
+            .accountNumber(productPostRequest.accountNumber())
+            .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
 
         Product savedProduct = productRepository.save(product);
 

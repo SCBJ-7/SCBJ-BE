@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -31,5 +32,11 @@ public class MemberAgreement {
     @Comment("이용 약관")
     private Boolean termOfUse;
 
+    @Builder
+    private MemberAgreement (Long id, Boolean privacyPolicy, Boolean termOfUse){
+        this.id = id;
+        this.privacyPolicy = privacyPolicy;
+        this.termOfUse = termOfUse;
+    }
 
 }

@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,14 +29,14 @@ public class RefundPolicy {
 
     @Comment(value = "기준 날짜")
     @Column(nullable = false)
-    private LocalDate baseDate;
+    private int baseDate;
 
     @Comment(value = "퍼센트")
     @Column(nullable = false)
     private int percent;
 
     @Builder
-    private RefundPolicy(Long id, Hotel hotel, LocalDate baseDate, int percent) {
+    private RefundPolicy(Long id, Hotel hotel, int baseDate, int percent) {
         this.id = id;
         this.hotel = hotel;
         this.baseDate = baseDate;
