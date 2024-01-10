@@ -101,11 +101,11 @@ class ProductServiceTest {
                 .id(1L)
                 .reservation(reservation)
                 .member(member)
-                .firstPrice(productPostRequest.getFirstPrice())
-                .secondPrice(productPostRequest.getSecondPrice())
-                .bank(productPostRequest.getBank())
-                .accountNumber(productPostRequest.getAccountNumber())
-                .secondGrantPeriod(productPostRequest.getSecondGrantPeriod()).build();
+                .firstPrice(productPostRequest.firstPrice())
+                .secondPrice(productPostRequest.secondPrice())
+                .bank(productPostRequest.bank())
+                .accountNumber(productPostRequest.accountNumber())
+                .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
 
             given(productRepository.save(any(Product.class))).willReturn(product);
 
@@ -115,7 +115,7 @@ class ProductServiceTest {
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.getProductId()).isEqualTo(1L);
+            assertThat(result.productId()).isEqualTo(1L);
         }
 
         @Test
@@ -149,11 +149,11 @@ class ProductServiceTest {
                 .id(1L)
                 .reservation(reservation)
                 .member(member)
-                .firstPrice(productPostRequest.getFirstPrice())
-                .secondPrice(productPostRequest.getSecondPrice())
-                .bank(productPostRequest.getBank())
-                .accountNumber(productPostRequest.getAccountNumber())
-                .secondGrantPeriod(productPostRequest.getSecondGrantPeriod()).build();
+                .firstPrice(productPostRequest.firstPrice())
+                .secondPrice(productPostRequest.secondPrice())
+                .bank(productPostRequest.bank())
+                .accountNumber(productPostRequest.accountNumber())
+                .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
 
             given(productRepository.save(any(Product.class))).willReturn(product);
 
@@ -162,7 +162,7 @@ class ProductServiceTest {
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.getProductId()).isEqualTo(1L);
+            assertThat(result.productId()).isEqualTo(1L);
         }
     }
 
