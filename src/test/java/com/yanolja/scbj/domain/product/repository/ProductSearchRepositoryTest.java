@@ -276,4 +276,36 @@ public class ProductSearchRepositoryTest {
 
         }
 
+        @Test
+        @DisplayName("정렬을 통해서 조회한다")
+        public void will_success() {
+            //given
+            ProductSearchRequest highSaleSearchRequest = ProductSearchRequest.builder()
+                .sorted("높은 할인 순")
+                .build();
+
+            ProductSearchRequest lowPriceRequest = ProductSearchRequest.builder()
+                .sorted("낮은 가격 순")
+                .build();
+
+            //when
+            Page<ProductSearchResponse> highSearchResult =
+                productRepository.search(PageRequest.of(0, 10), highSaleSearchRequest);
+
+            Page<ProductSearchResponse> lowPriceResult =
+                productRepository.search(PageRequest.of(0, 10), lowPriceRequest);
+            //then
+            assertThat(highSearchResult).isNotEmpty();
+            List<ProductSearchResponse> content = highSearchResult.getContent();
+
+            for (int i = 0; i < 5; i++) {
+                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.75);
+            }
+
+            assertThat(lowPriceResult).isNotEmpty();
+            for (int i = 0; i < 10; i++) {
+                assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(50000);
+            }
+        }
+    }
 }
