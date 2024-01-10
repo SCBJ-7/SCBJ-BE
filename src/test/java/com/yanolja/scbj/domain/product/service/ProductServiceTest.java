@@ -45,9 +45,6 @@ class ProductServiceTest {
     private ProductService productService;
 
     @Mock
-    private MemberService memberService;
-
-    @Mock
     private MemberRepository memberRepository;
 
     @Mock
@@ -74,11 +71,6 @@ class ProductServiceTest {
                 .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330").isRegisterd(true)
                 .secondGrantPeriod(48).build();
 
-            MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
-                .accountNumber("1000-4400-3330")
-                .bank("신한은행")
-                .build();
-
             YanoljaMember yanoljaMember = YanoljaMember.builder().id(yanoljaId)
                 .email("yang980329@naver.com").build();
 
@@ -95,7 +87,6 @@ class ProductServiceTest {
             given(reservationRepository.findByIdAndYanoljaMemberId(any(Long.TYPE),
                 any(Long.TYPE))).willReturn(
                 java.util.Optional.ofNullable(reservation));
-
 
             Product product = Product.builder()
                 .id(1L)
