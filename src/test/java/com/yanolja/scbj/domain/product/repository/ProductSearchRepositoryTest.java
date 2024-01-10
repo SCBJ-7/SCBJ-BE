@@ -224,8 +224,26 @@ public class ProductSearchRepositoryTest {
             //then
             assertThat(results).isNotEmpty();
             List<ProductSearchResponse> content = results.getContent();
+            assertThat(content.size()).isEqualTo(10);
+        }
 
-            System.err.println(content.size());
+        @Test
+        @DisplayName("인원을 설정하면 해당 최대인원의 상품들이 조회되야한다")
+        public void will_success_testMaximumPeopleProduct() {
+            //given
+            ProductSearchRequest searchRequest = ProductSearchRequest.builder()
+                .quantityPeople(4)
+                .build();
+
+            //when
+            Page<ProductSearchResponse> results =
+                productRepository.search(PageRequest.of(0, 10), searchRequest);
+
+
+            //then
+            assertThat(results).isNotEmpty();
+            List<ProductSearchResponse> content = results.getContent();
+            assertThat(content.size()).isEqualTo(4);
         }
     }
 
