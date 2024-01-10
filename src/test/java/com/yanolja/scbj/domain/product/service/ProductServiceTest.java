@@ -65,7 +65,7 @@ class ProductServiceTest {
 
         @Test
         @DisplayName("2차 가격이 있는 양도글 작성을 성공했습니다.")
-        void saveProductwithSecond_willSuccess() {
+        void saveProductWithSecond_willSuccess() {
             // given
             long memberId = 1L;
             long yanoljaId = 1L;
