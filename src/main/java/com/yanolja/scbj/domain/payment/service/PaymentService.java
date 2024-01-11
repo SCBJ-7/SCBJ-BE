@@ -59,8 +59,8 @@ public class PaymentService {
             .roomName(targetRoom.getRoomName())
             .standardPeople(targetRoom.getStandardPeople())
             .maxPeople(targetRoom.getMaxPeople())
-            .checkInDate(checkInDateTime)
-            .checkOutDate(checkOutDateTime)
+            .checkInDateTime(checkInDateTime)
+            .checkOutDateTime(checkOutDateTime)
             .originalPrice(originalPrice)
             .salePrice(price)
             .build();
