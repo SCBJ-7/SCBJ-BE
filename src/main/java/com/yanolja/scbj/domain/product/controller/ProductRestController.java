@@ -49,7 +49,7 @@ public class ProductRestController {
     public ResponseDTO<Void> deleteProduct(
         @PathVariable("product_id") Long productId) {
         productService.deleteProduct(productId);
-        return ResponseDTO.res(null, "상품 삭제에 성공했습니다.");
+        return ResponseDTO.res("상품 삭제에 성공했습니다.");
     }
 
 }
