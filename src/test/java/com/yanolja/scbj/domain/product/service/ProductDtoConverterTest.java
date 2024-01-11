@@ -90,7 +90,7 @@ class ProductDtoConverterTest {
 
             // then
             Assertions.assertThat(response).isNotNull();
-            Assertions.assertThat(response.isSaleStatus()).isEqualTo(true);
+            Assertions.assertThat(response.saleStatus()).isEqualTo(true);
         }
     }
 }
