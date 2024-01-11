@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
-
+    private final int FIRST_IMAGE = 0;
     private final ProductRepository productRepository;
 
     public PaymentPageFindResponse getPaymentPage(Long productId){
@@ -54,7 +54,7 @@ public class PaymentService {
         }
 
         return PaymentPageFindResponse.builder()
-            .hotelImage(targetHotelRoomImageList.get(0).getUrl())
+            .hotelImage(targetHotelRoomImageList.get(FIRST_IMAGE).getUrl())
             .hotelName(targetHotel.getHotelName())
             .roomName(targetRoom.getRoomName())
             .standardPeople(targetRoom.getStandardPeople())
