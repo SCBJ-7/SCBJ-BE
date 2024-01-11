@@ -9,8 +9,8 @@ public record PaymentPageFindResponse(
     String roomName,
     int standardPeople,
     int maxPeople,
-    LocalDateTime checkInDate,
-    LocalDateTime checkOutDate,
+    LocalDateTime checkInDateTime,
+    LocalDateTime checkOutDateTime,
     int originalPrice,
     int salePrice
 ) {
