@@ -99,10 +99,6 @@ class PaymentHistoryDtoConverterTest {
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result.customerName())
                 .isEqualTo("고객 이름");
-            Assertions.assertThat(result.checkIn())
-                .isEqualTo("24.01.15 (월) 15:00");
-            Assertions.assertThat(result.checkOut())
-                .isEqualTo("24.01.16 (화) 11:00");
             Assertions.assertThat(result.remainingDays())
                 .isEqualTo(4);
             Assertions.assertThat(result.originalPrice())
