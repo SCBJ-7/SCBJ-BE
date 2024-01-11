@@ -1,18 +1,24 @@
-package com.yanolja.scbj.domain.crawling;
+package com.yanolja.scbj.domain.mockData;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
+import com.yanolja.scbj.domain.hotelRoom.entity.RefundPolicy;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomImageRepository;
 import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomPriceRepository;
 import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomRepository;
+import com.yanolja.scbj.domain.hotelRoom.repository.RefundPolicyRepository;
+import com.yanolja.scbj.domain.member.entity.YanoljaMember;
+import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
+import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -25,16 +31,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Transactional
-public class CrawlingYanolja {
+public class CreateMockData {
 
     private final String BASE_URL = "https://www.yanolja.com/hotel/r-";
     private final String SUFFIX_URL = "?advert=AREA&topAdvertiseMore=0";
     private final String CLASS_NAME = "class name";
     private final String CSS_SELECTOR = "css selector";
     private final String XPATH = "xpath";
-    private final HotelRoomRepository hotelRoomRepository;
-    private final HotelRoomPriceRepository hotelRoomPriceRepository;
-    private final HotelRoomImageRepository hotelRoomImageRepository;
     private final String[] localNumberArray = {
         "900582", "900583", "900584", "900585", "900586", "900587", "900588", "900589", "900590"
     };
@@ -44,9 +47,22 @@ public class CrawlingYanolja {
     private final String[] bedTypeArray = {
         "싱글 침대", "더블 침대", "퀸 침대", "킹 침대",
     };
+    private final HotelRoomRepository hotelRoomRepository;
+    private final HotelRoomPriceRepository hotelRoomPriceRepository;
+    private final RefundPolicyRepository refundPolicyRepository;
+    private final HotelRoomImageRepository hotelRoomImageRepository;
+    private final YanoljaMemberRepository yanoljaMemberRepository;
+    private final ReservationRepository reservationRepository;
 
-    @GetMapping("/crawling")
-    public void crawling() {
+    @GetMapping("/mockData")
+    public void createMockData(){
+        crawling();
+//        createYanoljaMember();
+//        createRefundPolicy();
+//        createReservation();
+    }
+
+    private void crawling() {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable--gpu");
@@ -60,6 +76,7 @@ public class CrawlingYanolja {
             String localNumber = localNumberArray[i];
             String url = BASE_URL + localNumber + SUFFIX_URL;
 
+            System.out.println(url);
             chromeDriver.get(url);
             chromeDriver.manage().timeouts().implicitlyWait(Duration.ofMillis(3000));
 
@@ -76,7 +93,6 @@ public class CrawlingYanolja {
 
                     ChromeDriver secondChromeDriver = new ChromeDriver();
                     secondChromeDriver.get(hotelUrl);
-
                     secondChromeDriver.manage().timeouts()
                         .implicitlyWait(Duration.ofMillis(3000));
 
@@ -194,7 +210,6 @@ public class CrawlingYanolja {
                     secondChromeDriver.quit();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    System.err.println("error");
                 }
             }
         }
@@ -214,9 +229,75 @@ public class CrawlingYanolja {
     }
 
     private void createYanoljaMember(){
-        String randomNumber = UUID.randomUUID().toString();
-        String randomEmail = "test" + randomNumber.substring(0,4)+"@example.com";
+        String email = "";
+        for(int i = 1; i <= 100; i++){
+            email = "test" + i + "@example.com";
+            yanoljaMemberRepository.save(YanoljaMember.builder()
+                .email(email)
+                .build());
+        }
     }
 
+    private void createRefundPolicy(){
+        List<Hotel> hotelList = hotelRoomRepository.findAll();
+
+        for (Hotel hotel : hotelList) {
+            Random random = new Random();
+            int randomBaseDate = random.nextInt(1,7);
+            int randomPercent = 0;
+
+            if(randomBaseDate == 1){
+                randomPercent = random.nextInt(0,10);
+            } else if (randomBaseDate == 2){
+                randomPercent = random.nextInt(10,20);
+            } else if (randomBaseDate == 3){
+                randomPercent = random.nextInt(20,30);
+            } else if (randomBaseDate == 4){
+                randomPercent = random.nextInt(30,40);
+            } else if (randomBaseDate == 5){
+                randomPercent = random.nextInt(40,50);
+            } else if (randomBaseDate == 6){
+                randomPercent = random.nextInt(60,70);
+            } else if (randomBaseDate == 7){
+                randomPercent = random.nextInt(80,90);
+            }
+
+            RefundPolicy refundPolicy = RefundPolicy.builder()
+                .hotel(hotel)
+                .baseDate(randomBaseDate)
+                .percent(randomPercent)
+                .build();
+
+            refundPolicyRepository.save(refundPolicy);
+        }
+    }
+
+
+    private void createReservation(){
+        List<Hotel> hotelList = hotelRoomRepository.findAll();
+        List<YanoljaMember> yanoljaMemberList = yanoljaMemberRepository.findAll();
+
+        Random random = new Random();
+
+        for (Hotel hotel : hotelList) {
+            YanoljaMember yanoljaMember = yanoljaMemberList.get(random.nextInt(yanoljaMemberList.size() - 1));
+            LocalDate startDate = LocalDate.of(2024, random.nextInt(1, 12), random.nextInt(1, 28));
+            LocalDate endDate = startDate.plusDays(random.nextInt(1, 5));
+
+            int price = hotel.getHotelRoomPrice().getPeakPrice();
+            price = (int)(price * random.nextDouble(0.5, 1));
+
+            Reservation reservation = Reservation.builder()
+                .hotel(hotel)
+                .yanoljaMember(yanoljaMember)
+                .startDate(startDate)
+                .endDate(endDate)
+                .purchasePrice(price)
+                .build();
+
+            reservationRepository.save(reservation);
+        }
+
+    }
 }
 
