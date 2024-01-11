@@ -41,7 +41,7 @@ public class HistoryService {
         return response.isEmpty() ? Page.empty() : response;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public SpecificPurchasedHistoryResponse getSpecificPurchasedHistory(Long memberId,
         Long purchaseHistoryId) {
 
