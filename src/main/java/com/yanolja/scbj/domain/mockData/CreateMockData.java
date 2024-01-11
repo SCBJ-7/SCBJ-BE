@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -210,6 +211,11 @@ public class CrawlingYanolja {
             default:
                 return null;
         }
+    }
+
+    private void createYanoljaMember(){
+        String randomNumber = UUID.randomUUID().toString();
+        String randomEmail = "test" + randomNumber.substring(0,4)+"@example.com";
     }
 
 }
