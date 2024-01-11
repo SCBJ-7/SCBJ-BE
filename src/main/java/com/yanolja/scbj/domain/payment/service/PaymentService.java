@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class PaymentService {
     private final int FIRST_IMAGE = 0;
     private final ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public PaymentPageFindResponse getPaymentPage(Long productId){
         Product targetProduct = productRepository.findProductById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
@@ -39,8 +41,6 @@ public class PaymentService {
         if(TimeValidator.isPeakTime(LocalDate.now())){
             originalPrice = targetHotelRoomPrice.getPeakPrice();
         }
-
-        // 수수료 포함? 기획 중
 
         LocalDateTime checkInDateTime = LocalDateTime.of(targetReservation.getStartDate(),
             targetRoom.getCheckIn());
