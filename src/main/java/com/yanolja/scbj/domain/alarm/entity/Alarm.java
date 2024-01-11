@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.alarm.entity;
 
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
+import com.yanolja.scbj.global.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +19,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Alarm {
+public class Alarm extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,11 +40,17 @@ public class Alarm {
     @Comment("제목")
     private String title;
 
+    @Column(nullable = false, length = 200)
+    @Comment("내용")
+    private String content;
+
+
     @Builder
-    private Alarm(Long id, Member member, PaymentHistory paymentHistory, String title) {
+    private Alarm(Long id, Member member, PaymentHistory paymentHistory, String title, String content) {
         this.id = id;
         this.member = member;
         this.paymentHistory = paymentHistory;
         this.title = title;
+        this.content = content;
     }
 }
