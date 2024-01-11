@@ -18,13 +18,11 @@ import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
 import com.yanolja.scbj.domain.payment.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
-import com.yanolja.scbj.domain.reservation.dto.response.ReservationFindResponse;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -154,14 +152,13 @@ class HistoryServiceTest {
                 .email("yang980329@naver.com").password("yang8126042").name("양유림")
                 .phone("010-3996-6042").build();
 
-
             RoomTheme roomTheme = RoomTheme.builder()
                 .id(1L)
                 .build();
 
             Room room = Room.builder()
-                .checkIn(LocalTime.of(15,0))
-                .checkOut(LocalTime.of(11,0))
+                .checkIn(LocalTime.of(15, 0))
+                .checkOut(LocalTime.of(11, 0))
                 .roomTheme(roomTheme)
                 .build();
 
@@ -184,8 +181,8 @@ class HistoryServiceTest {
             Reservation reservation = Reservation.builder()
                 .hotel(hotel)
                 .purchasePrice(50000000)
-                .startDate(LocalDate.of(2024,1,15))
-                .endDate(LocalDate.of(2024,1,16))
+                .startDate(LocalDate.of(2024, 1, 15))
+                .endDate(LocalDate.of(2024, 1, 16))
                 .build();
 
             Product product = Product.builder()
@@ -224,14 +221,16 @@ class HistoryServiceTest {
                 .originalPrice(50000000)
                 .price(paymentHistory.getPrice())
                 .remainingDays(4)
-                .paymentHistoryDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd (E) ")))
+                .paymentHistoryDate(
+                    LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd (E) ")))
                 .hotelImage(hotelRoomImage.getUrl())
                 .build();
 
             given(paymentHistoryRepository.findByIdAndMemberId(any(Long.TYPE),
                 any(Long.TYPE))).willReturn(Optional.ofNullable(paymentHistory));
             given(
-                paymentHistoryDtoConverter.toSpecificPurchasedHistoryResponse((any()))).willReturn(specificPurchasedHistoryResponse);
+                paymentHistoryDtoConverter.toSpecificPurchasedHistoryResponse((any()))).willReturn(
+                specificPurchasedHistoryResponse);
 
             // when
             SpecificPurchasedHistoryResponse result = historyService.getSpecificPurchasedHistory(
