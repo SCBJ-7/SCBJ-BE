@@ -13,17 +13,17 @@ public record ProductPostRequest(
     @NotBlank(message = "정산 계좌를 입력하세요.")
     String accountNumber,
     int secondGrantPeriod,
-    boolean isRegisterd
+    boolean isRegistered
 ) {
 
     @Builder
     public ProductPostRequest(int firstPrice, int secondPrice, String bank,
-        String accountNumber, int secondGrantPeriod, boolean isRegisterd) {
+        String accountNumber, int secondGrantPeriod, boolean isRegistered) {
         this.firstPrice = firstPrice;
         this.secondPrice = secondPrice;
         this.bank = bank;
         this.accountNumber = accountNumber;
         this.secondGrantPeriod = secondGrantPeriod;
-        this.isRegisterd = isRegisterd;
+        this.isRegistered = isRegistered;
     }
 }
