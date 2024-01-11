@@ -165,7 +165,7 @@ class ProductRestControllerTest {
             // then
             response.andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$.data.hotelName", is(findResponse.getHotelName())));
+                .andExpect(jsonPath("$.data.hotelName", is(findResponse.hotelName())));
 
         }
     }
