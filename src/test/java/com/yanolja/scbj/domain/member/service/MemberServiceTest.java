@@ -137,13 +137,15 @@ class MemberServiceTest {
             String changedPassword = "test1234!";
             String encodedPassword = passwordEncoder.encode("test1234!");
             MemberUpdatePasswordRequest memberUpdatePasswordRequest = MemberUpdatePasswordRequest.builder()
+                .email(testMember.getEmail())
                 .password(changedPassword).build();
-            given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
+            given(memberRepository.findByEmail(any())).willReturn(Optional.of(testMember));
             given(passwordEncoder.encode(changedPassword)).willReturn(
                 encodedPassword);
             //when
             memberService.updateMemberPassword(memberUpdatePasswordRequest);
             //then
+            assertEquals(testMember.getEmail(), memberUpdatePasswordRequest.email());
             assertEquals(testMember.getPassword(), encodedPassword);
         }
 

@@ -1,9 +1,16 @@
 package com.yanolja.scbj.domain.payment.controller;
 
+import com.yanolja.scbj.domain.payment.dto.response.PaymentPageFindResponse;
+import com.yanolja.scbj.global.common.ResponseDTO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import com.yanolja.scbj.domain.payment.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.payment.dto.response.PaymentApproveResponse;
 import com.yanolja.scbj.domain.payment.service.PaymentService;
-import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -22,12 +29,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-//@RequestMapping("")
+@RequestMapping("/v1/products/{product_id}/payments")
 public class PaymentRestController {
 
     private final PaymentService paymentService;
     private final SecurityUtil securityUtil;
 
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping
+    public ResponseDTO<PaymentPageFindResponse> findPaymentPage(@PathVariable("product_id") Long productId){
+        return ResponseDTO.res(paymentService.getPaymentPage(productId), "결제 페이지 조회에 성공했습니다.");
+    }
 
     @PostMapping("/v1/products/{product_id}/payments")
     @ResponseStatus(HttpStatus.OK)
