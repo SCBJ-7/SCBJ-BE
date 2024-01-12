@@ -6,6 +6,7 @@ import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.payment.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.payment.dto.response.PaymentApproveResponse;
+import com.yanolja.scbj.domain.payment.dto.response.PaymentCancelResponse;
 import com.yanolja.scbj.domain.payment.dto.response.PaymentReadyResponse;
 import com.yanolja.scbj.domain.payment.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
@@ -24,16 +25,15 @@ import com.yanolja.scbj.global.exception.ErrorCode;
 import jakarta.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -41,7 +41,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -51,7 +50,8 @@ import org.springframework.web.client.RestTemplate;
 public class PaymentService {
 
     private final String KEY_PREFIX = "kakaoPay";
-    private final String PAY_TYPE = "카카오페이";
+    private final String PAYMENT_TYPE = "카카오페이";
+    private final String BASE_URL = "http://localhost:8080/v1/products";
     private final int FIRST_IMAGE = 0;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
@@ -117,6 +117,7 @@ public class PaymentService {
             .build();
     }
 
+    @Transactional(readOnly = true)
     public String kakaoPayReady(Long memberId, Long productId,
         PaymentReadyRequest paymentReadyRequest) {
 
@@ -154,9 +155,9 @@ public class PaymentService {
         params.add("quantity", 1);
         params.add("total_amount", price);
         params.add("tax_free_amount", 0);
-        params.add("approval_url", "http://localhost:8080/kakaopay-success?memberId=" + memberId);
-        params.add("cancel_url", "http://localhost:8080/kakaoPayCancel");
-        params.add("fail_url", "http://localhost:8080/kakaoPaySuccessFail");
+        params.add("approval_url", BASE_URL + "/kakaopay-success?memberId=" + memberId);
+        params.add("cancel_url", BASE_URL + "/kakaopay-cancel?memberId=" + memberId);
+        params.add("fail_url", BASE_URL + "/kakaopay-fail");
 
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
         try {
@@ -183,9 +184,9 @@ public class PaymentService {
 
     }
   
-  // 결제 승인 요청
+    // 결제 승인 요청
     @Transactional
-    public PaymentApproveResponse KakaoPayInfo(String pgToken, Long memberId){
+    public void KakaoPayInfo(String pgToken, Long memberId){
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -207,7 +208,7 @@ public class PaymentService {
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
 
         try {
-            PaymentApproveResponse paymentApproveResponse = restTemplate.postForObject(new URI(baseUrl + "/approve"), body,
+            restTemplate.postForObject(new URI(baseUrl + "/approve"), body,
                 PaymentApproveResponse.class);
 
             Member member = memberRepository.findById(memberId)
@@ -227,19 +228,42 @@ public class PaymentService {
                 .customerPhoneNumber(customerPhoneNumber)
                 .paymentAgreement(agreement)
                 .price(Integer.parseInt(price))
-                .paymentType(PAY_TYPE)
+                .paymentType(PAYMENT_TYPE)
                 .build();
 
             paymentHistoryRepository.save(paymentHistory);
 
-            return paymentApproveResponse;
         } catch (RestClientException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-
-        return null;
     }
-  
+
+    public void kakaoPayCancel(Long memberId){
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        String key = KEY_PREFIX + memberId;
+        String tid = (String) redisTemplate.opsForHash().get(key, "tid");
+        String price = (String) redisTemplate.opsForHash().get(key, "price");
+
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("cid", "TC0ONETIME");
+        params.add("tid", tid);
+        params.add("cancel_amount", Integer.parseInt(price));
+        params.add("cancel_tax_free_amount", 0);
+
+        HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
+
+        try {
+            PaymentCancelResponse paymentCancelResponse = restTemplate.postForObject(
+                new URI(baseUrl + "/cancel"), body,
+                PaymentCancelResponse.class);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
