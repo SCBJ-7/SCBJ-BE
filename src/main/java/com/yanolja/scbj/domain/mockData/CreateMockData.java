@@ -10,12 +10,14 @@ import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomImageRepository;
 import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomPriceRepository;
 import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomRepository;
 import com.yanolja.scbj.domain.hotelRoom.repository.RefundPolicyRepository;
+import com.yanolja.scbj.domain.hotelRoom.repository.RoomThemeRepository;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
@@ -53,10 +55,12 @@ public class CreateMockData {
     private final HotelRoomImageRepository hotelRoomImageRepository;
     private final YanoljaMemberRepository yanoljaMemberRepository;
     private final ReservationRepository reservationRepository;
+    private final RoomThemeRepository roomThemeRepository;
+
 
     @GetMapping("/mockData")
     public void createMockData(){
-        crawling();
+//        crawling();
 //        createYanoljaMember();
 //        createRefundPolicy();
 //        createReservation();
@@ -202,6 +206,7 @@ public class CreateMockData {
                         .offPeakPrice((int) (price * 0.8))
                         .build();
 
+                    roomThemeRepository.save(roomTheme);
                     hotelRoomRepository.save(hotel);
                     hotelRoomPriceRepository.save(hotelRoomPrice);
                     hotelRoomImageRepository.save(hotelImage);
@@ -281,18 +286,25 @@ public class CreateMockData {
 
         for (Hotel hotel : hotelList) {
             YanoljaMember yanoljaMember = yanoljaMemberList.get(random.nextInt(yanoljaMemberList.size() - 1));
-            LocalDate startDate = LocalDate.of(2024, random.nextInt(1, 12), random.nextInt(1, 28));
-            LocalDate endDate = startDate.plusDays(random.nextInt(1, 5));
+
+            LocalDate startDate = LocalDate.of(2024, random.nextInt(2, 3), random.nextInt(1, 29));
+            LocalDateTime startDateTime = LocalDateTime.of(startDate, hotel.getRoom().getCheckIn());
+
+            LocalDateTime endDateTime = LocalDateTime.of(startDate.plusDays(random.nextInt(1, 5)),
+                hotel.getRoom().getCheckOut());
 
             int price = hotel.getHotelRoomPrice().getPeakPrice();
-            price = (int)(price * random.nextDouble(0.5, 1));
+            String splitPrice = String.valueOf(price).substring(0, 2);
+            int left = String.valueOf(price).substring(2).length();
+            int randomInt = random.nextInt(5,10);
+            int finalPrice = (int) ((Integer.parseInt(splitPrice) * (randomInt * 0.1)) * Math.pow(10, left));
 
             Reservation reservation = Reservation.builder()
                 .hotel(hotel)
                 .yanoljaMember(yanoljaMember)
-                .startDate(startDate)
-                .endDate(endDate)
-                .purchasePrice(price)
+                .startDate(startDateTime)
+                .endDate(endDateTime)
+                .purchasePrice(finalPrice)
                 .build();
 
             reservationRepository.save(reservation);
