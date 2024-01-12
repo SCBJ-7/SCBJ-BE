@@ -17,6 +17,7 @@ import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -120,8 +121,8 @@ class HistoryRepositoryTest {
         Reservation reservation = Reservation.builder()
             .hotel(hotel)
             .yanoljaMember(yanoljaMember)
-            .startDate(LocalDate.now())
-            .endDate(LocalDate.now().plusDays(1))
+            .startDate(LocalDateTime.now())
+            .endDate(LocalDateTime.now().plusDays(1))
             .build();
         entityManager.persist(reservation);
         return reservation;

@@ -25,6 +25,7 @@ import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -88,7 +89,7 @@ class ProductServiceTest {
 
             Reservation reservation = Reservation.builder().id(reservationId)
                 .yanoljaMember(yanoljaMember).purchasePrice(5000000).startDate(
-                    LocalDate.now()).endDate(LocalDate.now()).build();
+                    LocalDateTime.now()).endDate(LocalDateTime.now()).build();
 
             given(memberRepository.findById(any(Long.TYPE))).willReturn(
                 java.util.Optional.ofNullable(member));
@@ -137,7 +138,7 @@ class ProductServiceTest {
 
             Reservation reservation = Reservation.builder().id(reservationId)
                 .yanoljaMember(yanoljaMember).purchasePrice(5000000).startDate(
-                    LocalDate.now()).endDate(LocalDate.now()).build();
+                    LocalDateTime.now()).endDate(LocalDateTime.now()).build();
 
             given(memberRepository.findById(any(Long.TYPE))).willReturn(
                 java.util.Optional.ofNullable(member));
@@ -199,8 +200,8 @@ class ProductServiceTest {
             Reservation reservation = Reservation.builder()
                 .id(1L)
                 .hotel(hotel)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now())
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now())
                 .build();
 
             PaymentHistory paymentHistory = PaymentHistory.builder()
