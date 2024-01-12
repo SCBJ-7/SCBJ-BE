@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,19 +40,19 @@ public class Reservation extends BaseEntity {
 
     @Column(nullable = false)
     @Comment("시작일")
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
     @Column(nullable = false)
     @Comment("종료일")
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 
     @Column(nullable = false)
     @Comment("구매가")
     private int purchasePrice;
 
     @Builder
-    private Reservation(Long id, Hotel hotel, YanoljaMember yanoljaMember, LocalDate startDate,
-        LocalDate endDate, int purchasePrice) {
+    private Reservation(Long id, Hotel hotel, YanoljaMember yanoljaMember, LocalDateTime startDate,
+        LocalDateTime endDate, int purchasePrice) {
         this.id = id;
         this.hotel = hotel;
         this.yanoljaMember = yanoljaMember;

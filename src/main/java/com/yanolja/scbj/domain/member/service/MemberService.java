@@ -74,12 +74,15 @@ public class MemberService {
 
 
     public void logout(final RefreshRequest refreshRequest) {
-        jwtUtil.setBlackList(refreshRequest.getAccessToken().substring(JwtUtil.GRANT_TYPE.length()), refreshRequest.getRefreshToken());
+        jwtUtil.setBlackList(refreshRequest.getAccessToken().substring(JwtUtil.GRANT_TYPE.length()),
+            refreshRequest.getRefreshToken());
     }
 
     public void updateMemberPassword(
         final MemberUpdatePasswordRequest memberUpdatePasswordRequest) {
-        getCurrentMember().updatePassword(
+        Member retrivedMember = memberRepository.findByEmail(memberUpdatePasswordRequest.email())
+            .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        retrivedMember.updatePassword(
             passwordEncoder.encode(memberUpdatePasswordRequest.password()));
     }
 

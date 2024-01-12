@@ -47,7 +47,7 @@ public class MemberRestController {
             memberSignUpRequest.password(), memberSignUpRequest.name(),
             memberSignUpRequest.phone());
         return ResponseEntity.ok()
-            .body(ResponseDTO.res(memberService.signUp(memberSignUpRequest), "성공적으로 회원가입했습니다."));
+            .body(ResponseDTO.res(memberService.signUp(memberSignUpRequest), "회원가입에 성공했습니다."));
     }
 
     @PostMapping("/signin")
@@ -56,7 +56,7 @@ public class MemberRestController {
         log.info("email:{}, password:{}", memberSignInRequest.email(),
             memberSignInRequest.password());
         return ResponseEntity.ok()
-            .body(ResponseDTO.res(memberService.signIn(memberSignInRequest), "성공적으로 로그인했습니다."));
+            .body(ResponseDTO.res(memberService.signIn(memberSignInRequest), "로그인에 성공했습니다."));
     }
 
     @PostMapping("/logout")
@@ -64,7 +64,7 @@ public class MemberRestController {
         @Validated(ValidationSequence.class) @RequestBody RefreshRequest refreshRequest) {
         memberService.logout(refreshRequest);
         return ResponseEntity.ok()
-            .body(ResponseDTO.res("성공적으로 로그아웃했습니다."));
+            .body(ResponseDTO.res("로그아웃에 성공했습니다."));
     }
 
     @PatchMapping("/password")
@@ -73,7 +73,7 @@ public class MemberRestController {
         log.info("password:{}", memberUpdatePasswordRequest.password());
         memberService.updateMemberPassword(memberUpdatePasswordRequest);
 
-        return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 비밀번호를 변경했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res("비밀번호 변경에 성공했습니다."));
     }
 
     @PatchMapping("/account")
@@ -83,7 +83,7 @@ public class MemberRestController {
             memberUpdateAccountRequest.bank());
         memberService.updateMemberAccount(memberUpdateAccountRequest);
 
-        return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 계좌번호를 등록/수정했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res("계좌번호 등록/수정에 성공했습니다."));
     }
 
     @PatchMapping("/name")
@@ -91,7 +91,7 @@ public class MemberRestController {
         @Validated(ValidationSequence.class) @RequestBody MemberUpdateNameRequest memberUpdateNameRequest) {
         memberService.updateMemberName(memberUpdateNameRequest.name());
 
-        return ResponseEntity.ok().body(ResponseDTO.res("이름을 성공적으로 변경했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res("이름 변경에 성공했습니다."));
     }
 
     @PostMapping("/email")
@@ -99,7 +99,7 @@ public class MemberRestController {
         @Validated(ValidationSequence.class) @RequestBody MemberEmailRequest memberEmailRequest) {
         return ResponseEntity.ok()
             .body(ResponseDTO.res(mailService.certifyEmail(memberEmailRequest.email()),
-                "이메일 인증번호를 성공적으로 발급했습니다."));
+                "이메일 인증번호 발급에 성공했습니다."));
     }
 
     @PostMapping("/yanolja")
@@ -107,20 +107,20 @@ public class MemberRestController {
         @Validated(ValidationSequence.class) @RequestBody MemberEmailRequest memberEmailRequest
     ) {
         memberService.linkUpYanolja(memberEmailRequest.email());
-        return ResponseEntity.ok().body(ResponseDTO.res("야놀자 계정과 성공적으로 연동했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res("야놀자 계정 연동에 성공했습니다."));
     }
 
     @PatchMapping("/phone")
     public ResponseEntity<ResponseDTO<String>> updateMemberPhone(
         @Validated(ValidationSequence.class) @RequestBody MemberUpdatePhoneRequest memberUpdatePhoneRequest) {
         memberService.updateMemberPhone(memberUpdatePhoneRequest.phone());
-        return ResponseEntity.ok().body(ResponseDTO.res("성공적으로 핸드폰 번호를 변경했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res("핸드폰 번호 변경에 성공했습니다."));
     }
 
     @GetMapping
     public ResponseEntity<ResponseDTO<MemberResponse>> getMemberInfo() {
         return ResponseEntity.ok()
-            .body(ResponseDTO.res(memberService.getMemberInfo(), "성공적으로 회원정보를 조회했습니다."));
+            .body(ResponseDTO.res(memberService.getMemberInfo(), "회원정보 조회에 성공했습니다."));
     }
 
 }

@@ -10,6 +10,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -60,8 +61,8 @@ class ProductDtoConverterTest {
             Reservation reservation = Reservation.builder()
                 .id(1L)
                 .hotel(hotel)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now())
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now())
                 .build();
 
             PaymentHistory paymentHistory = PaymentHistory.builder()
@@ -90,7 +91,7 @@ class ProductDtoConverterTest {
 
             // then
             Assertions.assertThat(response).isNotNull();
-            Assertions.assertThat(response.isSaleStatus()).isEqualTo(true);
+            Assertions.assertThat(response.saleStatus()).isEqualTo(true);
         }
     }
 }

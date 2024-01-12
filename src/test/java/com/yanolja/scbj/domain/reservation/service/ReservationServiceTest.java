@@ -14,6 +14,7 @@ import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,15 +85,15 @@ class ReservationServiceTest {
             Reservation reservation1 = Reservation.builder()
                 .hotel(hotel)
                 .purchasePrice(5000000)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now())
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now())
                 .build();
 
             Reservation reservation2 = Reservation.builder()
                 .hotel(hotel)
                 .purchasePrice(4500000)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now())
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now())
                 .build();
 
             reservationList.add(reservation1);

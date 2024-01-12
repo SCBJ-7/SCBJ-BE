@@ -1,6 +1,6 @@
 package com.yanolja.scbj.domain.payment.dto.response;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record SaleHistoryResponse(
     Long id,
@@ -8,8 +8,8 @@ public record SaleHistoryResponse(
     String imageUrl,
     String roomType,
     Integer price,
-    LocalDate checkInDate,
-    LocalDate checkOutDate,
+    LocalDateTime checkInDate,
+    LocalDateTime checkOutDate,
     String saleStatus
 ) {
 }
