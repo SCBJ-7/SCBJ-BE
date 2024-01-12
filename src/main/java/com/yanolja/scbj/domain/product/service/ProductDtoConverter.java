@@ -9,7 +9,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.enums.SecondTransferExistence;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
-import com.yanolja.scbj.global.util.SeasonValidator;
+import com.yanolja.scbj.global.util.TimeValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class ProductDtoConverter {
 
         int originalPrice = foundHotel.getHotelRoomPrice().getOffPeakPrice();
 
-        if (SeasonValidator.isPeakTime(LocalDate.now())) {
+        if (TimeValidator.isPeakTime(LocalDate.now())) {
             originalPrice = foundHotel.getHotelRoomPrice().getPeakPrice();
         }
 
