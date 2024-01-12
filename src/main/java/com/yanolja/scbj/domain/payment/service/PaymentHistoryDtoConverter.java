@@ -6,7 +6,7 @@ import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResp
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
-import com.yanolja.scbj.global.util.SeasonValidator;
+import com.yanolja.scbj.global.util.TimeValidator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -35,7 +35,7 @@ public class PaymentHistoryDtoConverter {
 
         int originalPrice = hotel.getHotelRoomPrice().getOffPeakPrice();
 
-        if (SeasonValidator.isPeakTime(LocalDate.now())) {
+        if (TimeValidator.isPeakTime(LocalDate.now())) {
             originalPrice = hotel.getHotelRoomPrice().getPeakPrice();
         }
 
