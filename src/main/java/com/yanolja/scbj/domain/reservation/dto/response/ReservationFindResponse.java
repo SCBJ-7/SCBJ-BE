@@ -1,6 +1,7 @@
 package com.yanolja.scbj.domain.reservation.dto.response;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
 
 public record ReservationFindResponse(
@@ -8,8 +9,8 @@ public record ReservationFindResponse(
     String hotelName,
     String imageUrl,
     String roomName,
-    LocalDate startDate,
-    LocalDate endDate,
+    LocalDateTime startDate,
+    LocalDateTime endDate,
     int refundPrice,
     int purchasePrice,
     int remainingDays,

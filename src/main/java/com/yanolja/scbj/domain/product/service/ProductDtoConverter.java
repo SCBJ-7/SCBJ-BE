@@ -25,10 +25,8 @@ public class ProductDtoConverter {
         Hotel foundHotel = foundReservation.getHotel();
         Room foundRoom = foundHotel.getRoom();
 
-        LocalDateTime checkInDateTime = LocalDateTime.of(foundReservation.getStartDate(),
-            foundRoom.getCheckIn());
-        LocalDateTime checkOutDateTime = LocalDateTime.of(foundReservation.getEndDate(),
-            foundRoom.getCheckOut());
+        LocalDateTime checkInDateTime = foundReservation.getStartDate();
+        LocalDateTime checkOutDateTime = foundReservation.getEndDate();
 
         int originalPrice = foundHotel.getHotelRoomPrice().getOffPeakPrice();
 
