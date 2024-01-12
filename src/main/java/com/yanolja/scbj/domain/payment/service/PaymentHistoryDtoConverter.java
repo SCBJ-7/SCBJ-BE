@@ -10,6 +10,7 @@ import com.yanolja.scbj.global.util.TimeValidator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -55,8 +56,10 @@ public class PaymentHistoryDtoConverter {
             .originalPrice(originalPrice)
             .price(paymentHistory.getPrice())
             .remainingDays(remainingDays)
-            .paymentHistoryDate(paymentHistory.getCreatedAt().format(dateFormatter))
-            .hotelImage(hotel.getHotelRoomImageList().get(0).getUrl())
+            .paymentHistoryDate(Optional.ofNullable(paymentHistory.getCreatedAt())
+                .map(date -> date.format(dateFormatter))
+                .orElse(null))
+            .hotelImage(hotel.getHotelRoomImageList().isEmpty() ? null : hotel.getHotelRoomImageList().get(0).getUrl())
             .build();
     }
 }
