@@ -42,11 +42,9 @@ public class PaymentService {
             originalPrice = targetHotelRoomPrice.getPeakPrice();
         }
 
-        LocalDateTime checkInDateTime = LocalDateTime.of(targetReservation.getStartDate(),
-            targetRoom.getCheckIn());
+        LocalDateTime checkInDateTime = targetReservation.getStartDate();
 
-        LocalDateTime checkOutDateTime = LocalDateTime.of(targetReservation.getEndDate(),
-            targetRoom.getCheckOut());
+        LocalDateTime checkOutDateTime = targetReservation.getEndDate();
 
         int price = targetProduct.getFirstPrice();
         if (TimeValidator.isOverSecondGrantPeriod(targetProduct, checkInDateTime)) {
