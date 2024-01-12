@@ -60,6 +60,11 @@ dependencies {
 	//email - sender
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+	//crawling
+	implementation 'org.seleniumhq.selenium:selenium-java'
+	implementation 'org.seleniumhq.selenium:selenium-api'
+	implementation 'org.seleniumhq.selenium:selenium-chrome-driver'
+
 }
 
 tasks.named('test') {
