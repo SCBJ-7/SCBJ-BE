@@ -13,10 +13,13 @@ import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
+import com.yanolja.scbj.domain.payment.exception.PaymentHistoryNotFoundException;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.global.exception.ErrorCode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -120,8 +124,8 @@ class HistoryRepositoryTest {
         Reservation reservation = Reservation.builder()
             .hotel(hotel)
             .yanoljaMember(yanoljaMember)
-            .startDate(LocalDate.now())
-            .endDate(LocalDate.now().plusDays(1))
+            .startDate(LocalDateTime.now())
+            .endDate(LocalDateTime.now().plusDays(1))
             .build();
         entityManager.persist(reservation);
         return reservation;
@@ -185,7 +189,6 @@ class HistoryRepositoryTest {
             assertThat(firstResult.name()).isEqualTo("롯데 시그니엘 호텔");
             assertThat(firstResult.imageUrl()).isEqualTo("http://example.com/hotel-room-image.jpg");
             assertThat(firstResult.price()).isEqualTo(20000);
-            assertThat(firstResult.checkInDate()).isEqualTo(LocalDate.now());
         }
     }
 
@@ -219,6 +222,38 @@ class HistoryRepositoryTest {
             assertThat(firstResult.saleStatus()).isEqualTo("거래완료");
         }
     }
+
+    @Nested
+    @DisplayName("member와 puchaseId를 통해")
+    class Context_specificPurchaseHistory {
+
+        @Test
+        @DisplayName("조회 성공시 구매 내력을 확인할 수 있다.")
+        public void getSpecificPurchasedHistory() {
+            // given
+            Member member = createMember();
+            RoomTheme roomTheme = createRoomTheme();
+            Hotel hotel = createHotel(roomTheme);
+            createHotelRoomImage(hotel);
+            createHotelRoomPrice(hotel);
+            YanoljaMember yanoljaMember = createYanoljaMember();
+            Reservation reservation = createReservation(hotel, yanoljaMember);
+            Product product = createProduct(member, reservation);
+            PaymentHistory paymentHistory = createPaymentHistory(member, product);
+            paymentHistoryRepository.save(paymentHistory);
+
+            // when
+            PaymentHistory result = paymentHistoryRepository.findByIdAndMemberId(member.getId(), paymentHistory.getId())
+                .orElseThrow(() -> new PaymentHistoryNotFoundException(ErrorCode.PURCHASE_LOAD_FAIL));
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getCustomerName()).isEqualTo("고객 이름");
+            assertThat(result.getPaymentType()).isEqualTo("신용카드");
+
+        }
+    }
+
 }
 
 

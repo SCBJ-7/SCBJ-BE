@@ -8,6 +8,7 @@ import com.yanolja.scbj.domain.reservation.dto.response.ReservationFindResponse;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,16 +58,16 @@ class ReservationDtoConverterTest {
                 .id(1L)
                 .hotel(hotel)
                 .purchasePrice(5000000)
-                .startDate(LocalDate.of(2024, 1, 15))
-                .endDate(LocalDate.of(2024, 1, 18))
+                .startDate(LocalDateTime.of(2024, 1, 15, 15,0))
+                .endDate(LocalDateTime.of(2024, 1, 18, 11, 0))
                 .build();
 
             Reservation reservation2 = Reservation.builder()
                 .id(2L)
                 .hotel(hotel)
                 .purchasePrice(4500000)
-                .startDate(LocalDate.of(2024, 1, 10))
-                .endDate(LocalDate.of(2024, 1, 11))
+                .startDate(LocalDateTime.of(2024, 1, 10, 15, 0))
+                .endDate(LocalDateTime.of(2024, 1, 11, 11, 0))
                 .build();
 
             reservationList.add(reservation1);

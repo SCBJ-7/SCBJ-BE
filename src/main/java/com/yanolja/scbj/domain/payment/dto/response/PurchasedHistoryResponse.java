@@ -12,7 +12,7 @@ public record PurchasedHistoryResponse(
     String name,
     String roomType,
     Integer price,
-    LocalDate checkInDate,
-    LocalDate checkOutDate
+    LocalDateTime checkInDate,
+    LocalDateTime checkOutDate
 ) {
 }
