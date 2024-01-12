@@ -107,8 +107,8 @@ public class HistoryControllerTest {
         reservation = Reservation.builder()
             .id(1L)
             .hotel(hotel)
-            .startDate(LocalDate.now())
-            .endDate(LocalDate.now())
+            .startDate(LocalDateTime.now())
+            .endDate(LocalDateTime.now())
             .purchasePrice(2500000)
             .build();
 

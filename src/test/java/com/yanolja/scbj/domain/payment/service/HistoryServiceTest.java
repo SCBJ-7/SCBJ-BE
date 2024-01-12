@@ -181,8 +181,8 @@ class HistoryServiceTest {
             Reservation reservation = Reservation.builder()
                 .hotel(hotel)
                 .purchasePrice(50000000)
-                .startDate(LocalDate.of(2024, 1, 15))
-                .endDate(LocalDate.of(2024, 1, 16))
+                .startDate(LocalDateTime.of(2024, 1, 15,15,0))
+                .endDate(LocalDateTime.of(2024, 1, 16,11,0))
                 .build();
 
             Product product = Product.builder()
