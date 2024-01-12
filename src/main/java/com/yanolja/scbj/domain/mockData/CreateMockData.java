@@ -289,7 +289,6 @@ public class CreateMockData {
 
             LocalDate startDate = LocalDate.of(2024, random.nextInt(2, 3), random.nextInt(1, 29));
             LocalDateTime startDateTime = LocalDateTime.of(startDate, hotel.getRoom().getCheckIn());
-
             LocalDateTime endDateTime = LocalDateTime.of(startDate.plusDays(random.nextInt(1, 5)),
                 hotel.getRoom().getCheckOut());
 
