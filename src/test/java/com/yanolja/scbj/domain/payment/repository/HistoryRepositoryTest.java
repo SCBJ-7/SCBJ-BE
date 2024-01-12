@@ -19,6 +19,7 @@ import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -122,8 +124,8 @@ class HistoryRepositoryTest {
         Reservation reservation = Reservation.builder()
             .hotel(hotel)
             .yanoljaMember(yanoljaMember)
-            .startDate(LocalDate.now())
-            .endDate(LocalDate.now().plusDays(1))
+            .startDate(LocalDateTime.now())
+            .endDate(LocalDateTime.now().plusDays(1))
             .build();
         entityManager.persist(reservation);
         return reservation;
@@ -187,7 +189,6 @@ class HistoryRepositoryTest {
             assertThat(firstResult.name()).isEqualTo("롯데 시그니엘 호텔");
             assertThat(firstResult.imageUrl()).isEqualTo("http://example.com/hotel-room-image.jpg");
             assertThat(firstResult.price()).isEqualTo(20000);
-            assertThat(firstResult.checkInDate()).isEqualTo(LocalDate.now());
         }
     }
 

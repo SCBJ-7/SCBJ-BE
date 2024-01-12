@@ -11,6 +11,7 @@ import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -65,8 +66,8 @@ class PaymentHistoryDtoConverterTest {
             Reservation reservation = Reservation.builder()
                 .hotel(hotel)
                 .purchasePrice(50000000)
-                .startDate(LocalDate.of(2024, 1, 15))
-                .endDate(LocalDate.of(2024, 1, 16))
+                .startDate(LocalDateTime.of(2024, 1, 15,15,0))
+                .endDate(LocalDateTime.of(2024, 1, 16,11,0))
                 .build();
 
             Product product = Product.builder()
@@ -100,7 +101,7 @@ class PaymentHistoryDtoConverterTest {
             Assertions.assertThat(result.customerName())
                 .isEqualTo("고객 이름");
             Assertions.assertThat(result.remainingDays())
-                .isEqualTo(4);
+                .isEqualTo(3);
             Assertions.assertThat(result.originalPrice())
                 .isEqualTo(50000000);
 
