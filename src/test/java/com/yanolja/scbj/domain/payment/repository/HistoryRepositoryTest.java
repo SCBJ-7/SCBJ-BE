@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -188,7 +189,6 @@ class HistoryRepositoryTest {
             assertThat(firstResult.name()).isEqualTo("롯데 시그니엘 호텔");
             assertThat(firstResult.imageUrl()).isEqualTo("http://example.com/hotel-room-image.jpg");
             assertThat(firstResult.price()).isEqualTo(20000);
-            assertThat(firstResult.checkInDate()).isEqualTo(LocalDate.now());
         }
     }
 

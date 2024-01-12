@@ -76,8 +76,8 @@ class HistoryServiceTest {
                 "서울 호텔", // name
                 "디럭스", // roomType
                 1500000, // price
-                LocalDate.now().plusDays(3), // checkInDate
-                LocalDate.now().plusDays(5) // checkOutDate
+                LocalDateTime.now().plusDays(3), // checkInDate
+                LocalDateTime.now().plusDays(5) // checkOutDate
             );
             Page<PurchasedHistoryResponse> expectedPage =
                 new PageImpl<>(List.of(response), pageable, 1);
@@ -116,8 +116,8 @@ class HistoryServiceTest {
                 "http://example.com/hotel-room-image1.jpg",
                 "더블 베드",
                 200000,
-                LocalDate.of(2024, 1, 1),
-                LocalDate.of(2024, 1, 2),
+                LocalDateTime.of(2024, 1, 1,15,0),
+                LocalDateTime.of(2024, 1, 2,11,0),
                 "판매중");
 
             Page<SaleHistoryResponse> expectedPage =

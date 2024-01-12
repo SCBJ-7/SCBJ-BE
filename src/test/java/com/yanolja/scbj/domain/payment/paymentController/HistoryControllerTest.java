@@ -135,10 +135,10 @@ public class HistoryControllerTest {
             List<PurchasedHistoryResponse> responses = List.of(
                 new PurchasedHistoryResponse(1L, LocalDateTime.now(), "wwww.yanolja.com", "A 호텔",
                     "디럭스", 20000,
-                    LocalDate.now(), LocalDate.now().plusDays(2)),
+                    LocalDateTime.now(), LocalDateTime.now().plusDays(2)),
                 new PurchasedHistoryResponse(2L, LocalDateTime.now().minusDays(3),
                     "wwww.yanolja.com", "B 호텔", "스텐다드",
-                    15000, LocalDate.now().minusDays(1), LocalDate.now().plusDays(1))
+                    15000, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1))
             );
             Page<PurchasedHistoryResponse> response =
                 new PageImpl<>(responses, pageable, responses.size());
@@ -177,8 +177,8 @@ public class HistoryControllerTest {
                 "http://example.com/hotel-room-image1.jpg",
                 "더블 베드",
                 200000,
-                LocalDate.of(2024, 1, 1),
-                LocalDate.of(2024, 1, 2),
+                LocalDateTime.of(2024, 1, 1,15,0),
+                LocalDateTime.of(2024, 1, 2,1,0),
                 "판매중"
             ), new SaleHistoryResponse(
                 2L,
@@ -186,8 +186,8 @@ public class HistoryControllerTest {
                 "http://example.com/hotel-room-image2.jpg",
                 "트윈 베드",
                 150000,
-                LocalDate.of(2024, 1, 3),
-                LocalDate.of(2024, 1, 4),
+                LocalDateTime.of(2024, 1, 3,15,0),
+                LocalDateTime.of(2024, 1, 4,11,0),
                 "거래완료"
             ));
 
