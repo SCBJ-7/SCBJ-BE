@@ -40,10 +40,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
-class HistoryServiceTest {
+class PaymentHistoryServiceTest {
 
     @InjectMocks
-    HistoryService historyService;
+    PaymentHistoryService paymentHistoryService;
 
     @Mock
     private PaymentHistoryRepository paymentHistoryRepository;
@@ -87,7 +87,7 @@ class HistoryServiceTest {
 
             // when
             Page<PurchasedHistoryResponse> result =
-                historyService.getUsersPurchasedHistory(pageable, memberId);
+                paymentHistoryService.getUsersPurchasedHistory(pageable, memberId);
 
             //then
             assertThat(result.getContent()).containsExactly(response);
@@ -233,7 +233,7 @@ class HistoryServiceTest {
                 specificPurchasedHistoryResponse);
 
             // when
-            SpecificPurchasedHistoryResponse result = historyService.getSpecificPurchasedHistory(
+            SpecificPurchasedHistoryResponse result = paymentHistoryService.getSpecificPurchasedHistory(
                 member.getId(), paymentHistory.getId());
 
             // then

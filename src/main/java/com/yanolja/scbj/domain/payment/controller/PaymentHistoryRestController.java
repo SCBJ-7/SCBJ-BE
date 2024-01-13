@@ -3,7 +3,7 @@ package com.yanolja.scbj.domain.payment.controller;
 import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.service.HistoryService;
+import com.yanolja.scbj.domain.payment.service.PaymentHistoryService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import org.springframework.data.domain.Page;
@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("v1/members")
-public class HistoryController {
+public class PaymentHistoryRestController {
 
-    private final HistoryService historyService;
+    private final PaymentHistoryService paymentHistoryService;
     private final SecurityUtil securityUtil;
 
-    public HistoryController(HistoryService historyService, SecurityUtil securityUtil) {
-        this.historyService = historyService;
+    public PaymentHistoryRestController(PaymentHistoryService paymentHistoryService, SecurityUtil securityUtil) {
+        this.paymentHistoryService = paymentHistoryService;
         this.securityUtil = securityUtil;
     }
 
@@ -35,7 +35,7 @@ public class HistoryController {
     ) {
         Long memberId = securityUtil.getCurrentMemberId();
         Page<PurchasedHistoryResponse> response =
-            historyService.getUsersPurchasedHistory(pageable, memberId);
+            paymentHistoryService.getUsersPurchasedHistory(pageable, memberId);
         return ResponseDTO.res(response, "조회에 성공하였습니다.");
     }
 
@@ -47,7 +47,7 @@ public class HistoryController {
     ) {
         Long memberId = securityUtil.getCurrentMemberId();
         Page<SaleHistoryResponse> response =
-            historyService.getUsersSaleHistory(pageable, memberId);
+            paymentHistoryService.getUsersSaleHistory(pageable, memberId);
         return ResponseDTO.res(response, "조회에 성공하였습니다.");
     }
 
@@ -56,7 +56,7 @@ public class HistoryController {
     public ResponseDTO<SpecificPurchasedHistoryResponse> getSpecificPurchasedHistory(
         @PathVariable("paymentHistory_id") Long paymentHistoryId) {
         return ResponseDTO.res(
-            historyService.getSpecificPurchasedHistory(securityUtil.getCurrentMemberId(),
+            paymentHistoryService.getSpecificPurchasedHistory(securityUtil.getCurrentMemberId(),
                 paymentHistoryId), "구매 내역 상세 조회를 성공했습니다.");
     }
 }

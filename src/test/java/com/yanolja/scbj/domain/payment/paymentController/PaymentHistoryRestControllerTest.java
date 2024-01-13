@@ -13,17 +13,16 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
-import com.yanolja.scbj.domain.payment.controller.HistoryController;
+import com.yanolja.scbj.domain.payment.controller.PaymentHistoryRestController;
 import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResponse;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
-import com.yanolja.scbj.domain.payment.service.HistoryService;
+import com.yanolja.scbj.domain.payment.service.PaymentHistoryService;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
@@ -51,19 +50,19 @@ import org.springframework.test.web.servlet.MvcResult;
 
 
 @WebMvcTest(
-    controllers = HistoryController.class,
+    controllers = PaymentHistoryRestController.class,
     excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
     },
     excludeAutoConfiguration = SecurityAutoConfiguration.class
 )
-public class HistoryControllerTest {
+public class PaymentHistoryRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private HistoryService historyService;
+    private PaymentHistoryService paymentHistoryService;
 
     @SpyBean
     private SecurityUtil securityUtil;
@@ -143,7 +142,7 @@ public class HistoryControllerTest {
             Page<PurchasedHistoryResponse> response =
                 new PageImpl<>(responses, pageable, responses.size());
 
-            given(historyService.getUsersPurchasedHistory(any(Pageable.class),
+            given(paymentHistoryService.getUsersPurchasedHistory(any(Pageable.class),
                 anyLong())).willReturn(response);
 
             // when
@@ -194,7 +193,7 @@ public class HistoryControllerTest {
             PageImpl<SaleHistoryResponse> saleHistoryResponses =
                 new PageImpl<>(responses, pageable, responses.size());
 
-            given(historyService.getUsersSaleHistory(any(Pageable.class), anyLong())).willReturn(
+            given(paymentHistoryService.getUsersSaleHistory(any(Pageable.class), anyLong())).willReturn(
                 saleHistoryResponses);
 
             //when
@@ -237,7 +236,7 @@ public class HistoryControllerTest {
                 .hotelImage(hotelRoomImage.getUrl())
                 .build();
 
-            given(historyService.getSpecificPurchasedHistory(any(Long.TYPE),
+            given(paymentHistoryService.getSpecificPurchasedHistory(any(Long.TYPE),
                 any(Long.TYPE))).willReturn(specificPurchasedHistoryResponse);
 
             // when, then
