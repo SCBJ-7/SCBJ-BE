@@ -1,6 +1,8 @@
 package com.yanolja.scbj.domain.product.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +12,9 @@ import lombok.NoArgsConstructor;
 public class ProductSearchRequest {
 
     private String location;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate checkIn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate checkOut;
     private Integer quantityPeople;
     private String sorted;
