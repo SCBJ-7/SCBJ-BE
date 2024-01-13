@@ -74,7 +74,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             })
             .sorted(sort(productSearchRequest.getSorted()))
             .toList();
-        
+
         Long total = queryFactory
             .select(product.count())
             .from(product)
