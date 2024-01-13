@@ -1,6 +1,5 @@
 package com.yanolja.scbj.domain.payment.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
@@ -9,13 +8,10 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.payment.dto.response.PaymentPageFindResponse;
-import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
-import com.yanolja.scbj.domain.payment.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
-import com.yanolja.scbj.domain.product.service.ProductDtoConverter;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -77,18 +73,8 @@ class PaymentServiceTest {
             Reservation reservation = Reservation.builder()
                 .id(1L)
                 .hotel(hotel)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now())
-                .build();
-
-            PaymentHistory paymentHistory = PaymentHistory.builder()
-                .id(1L)
-                .price(100000)
-                .customerName("tester")
-                .customerEmail("qwe@nav.com")
-                .customerPhoneNumber("010-1122-3344")
-                .paymentType("카카오페이")
-                .settlement(true)
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now())
                 .build();
 
             Product product = Product.builder()
@@ -99,10 +85,10 @@ class PaymentServiceTest {
                 .accountNumber("12512-2131-12512")
                 .secondGrantPeriod(24)
                 .reservation(reservation)
-                .paymentHistory(paymentHistory)
                 .build();
 
-            given(productRepository.findProductById(targetProductId)).willReturn(Optional.of(product));
+            given(productRepository.findProductById(targetProductId)).willReturn(
+                Optional.of(product));
 
             // when
             PaymentPageFindResponse response = paymentService.getPaymentPage(targetProductId);
@@ -112,7 +98,6 @@ class PaymentServiceTest {
             Assertions.assertThat(response.hotelName()).isEqualTo(hotel.getHotelName());
         }
     }
-
 
 
 }
