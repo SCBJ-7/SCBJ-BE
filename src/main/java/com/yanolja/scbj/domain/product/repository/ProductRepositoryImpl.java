@@ -8,16 +8,15 @@ import static com.yanolja.scbj.domain.product.entity.QProduct.product;
 import static com.yanolja.scbj.domain.reservation.entity.QReservation.reservation;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
-import com.yanolja.scbj.domain.product.dto.response.QProductSearchResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,33 +25,28 @@ import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
+
     private final JPAQueryFactory queryFactory;
-
-    NumberExpression<Integer> priceToUse = new CaseBuilder()
-        .when(product.secondPrice.isNull().and(product.secondPrice.eq(0))).then(product.firstPrice)
-        .otherwise(product.secondPrice);
-
-    NumberExpression<Double> discountRate = Expressions.numberTemplate(Double.class,
-        " case when {0} = 0 then 0 else ({0} - {1}) / {0} end ", reservation.purchasePrice.doubleValue(), priceToUse.doubleValue());
 
     @Override
     public Page<ProductSearchResponse> search(Pageable pageable,
                                               ProductSearchRequest productSearchRequest) {
 
         List<ProductSearchResponse> response = queryFactory
-            .select(new QProductSearchResponse(
+            .select(
                 product.id,
                 hotel.hotelName,
                 hotel.room.bedType,
                 hotelRoomImage.url,
-                priceToUse,
-                new CaseBuilder()
-                    .when(product.secondPrice.isNull()).then(product.firstPrice)
-                    .otherwise(product.secondPrice),
-                discountRate,
+                product.firstPrice,
+                product.secondPrice,
+                reservation.hotel.room.maxPeople,
+                reservation.purchasePrice,
+                product.secondGrantPeriod,
                 reservation.startDate,
-                reservation.endDate
-            ))
+                reservation.endDate,
+                product.createdAt
+            )
             .from(product)
             .innerJoin(product.reservation, reservation)
             .innerJoin(reservation.hotel, hotel)
@@ -60,9 +54,27 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .join(roomTheme)
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
             .where(allFilter(productSearchRequest))
-            .orderBy(orderType(productSearchRequest.getSorted()))
-            .fetch();
-
+            .fetch()
+            .stream().map(tuple -> {
+                Integer purchasePrice = tuple.get(reservation.purchasePrice);
+                Integer salePrice = getSalePrice(tuple.get(reservation.startDate), tuple.get(product.secondGrantPeriod), tuple.get(product.firstPrice), tuple.get(product.secondPrice));
+                return new ProductSearchResponse(
+                    tuple.get(product.id),
+                    tuple.get(hotel.hotelName),
+                    tuple.get(hotel.room.bedType),
+                    tuple.get(hotelRoomImage.url),
+                    purchasePrice,
+                    isFirstPrice(salePrice, tuple.get(product.firstPrice)),
+                    salePrice,
+                    getSaleRate(purchasePrice, salePrice),
+                    tuple.get(reservation.startDate),
+                    tuple.get(reservation.endDate),
+                    tuple.get(product.createdAt)
+                );
+            })
+            .sorted(sort(productSearchRequest.getSorted()))
+            .toList();
+        
         Long total = queryFactory
             .select(product.count())
             .from(product)
@@ -72,9 +84,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
             .where(allFilter(productSearchRequest))
             .fetchOne();
-
-
-
 
         return new PageImpl<>(response, pageable, total != null ? total : 0);
     }
@@ -88,16 +97,18 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .and(eqOcean(productSearchRequest.getOceanView()))
             .and(containsLocation(productSearchRequest.getLocation()))
             .and(goeMaximumPeople(productSearchRequest.getQuantityPeople()))
-            .and(betweenDate(productSearchRequest.getCheckIn(), productSearchRequest.getCheckOut()));
+            .and(
+                betweenDate(productSearchRequest.getCheckIn(), productSearchRequest.getCheckOut()));
 
         return builder;
     }
 
     private BooleanExpression betweenDate(LocalDate checkIn, LocalDate checkOut) {
         if (checkIn != null && checkOut != null) {
-            return reservation.startDate.between(checkIn, checkOut.minusDays(1));
+            return reservation.startDate.between(checkIn.atStartOfDay(),
+                checkOut.minusDays(1).atStartOfDay());
         }
-        return reservation.startDate.goe(LocalDate.now());
+        return reservation.startDate.goe(LocalDateTime.now());
     }
 
     private BooleanExpression goeMaximumPeople(Integer maximumPeople) {
@@ -142,22 +153,39 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return roomTheme.oceanView.eq(hasOcean);
     }
 
-    private OrderSpecifier<?>[] orderType(String sorted) {
-        if (sorted == null || sorted.isEmpty()) {
-            return new OrderSpecifier[]{
-                reservation.startDate.asc(),
-                discountRate.desc()
-            };
-        }
-        switch (sorted) {
-            case "최신 등록 순":
-                return new OrderSpecifier[] {product.createdAt.desc()};
-            case "높은 할인 순":
-                return new OrderSpecifier[] {discountRate.desc()};
-            case "낮은 가격 순":
-                return new OrderSpecifier[] {priceToUse.asc()};
-            default:
-                return new OrderSpecifier[] {reservation.startDate.asc(), discountRate.desc()};
-        }
+    private Boolean isFirstPrice(Integer price, Integer firstPrice) {
+        return price == firstPrice;
     }
+
+    private Integer getSalePrice(LocalDateTime startDate, Integer secondPeriod, Integer firstPrice,
+                                 Integer secondPrice) {
+        return LocalDateTime.now().isBefore(startDate.minus(secondPeriod, ChronoUnit.HOURS)) ?
+            firstPrice : secondPrice;
+    }
+
+    private Double getSaleRate(Integer purchasePrice, Integer salePrice) {
+        return ((purchasePrice.doubleValue() - salePrice.doubleValue()) /
+            purchasePrice.doubleValue());
+    }
+
+    private Comparator<ProductSearchResponse> sort(String sortCondition) {
+        Comparator<ProductSearchResponse> comparator;
+        if (sortCondition == null || sortCondition.isEmpty()) {
+            return Comparator.comparing(ProductSearchResponse::getCheckIn)
+                .thenComparing(ProductSearchResponse::getSalePercentage, Comparator.reverseOrder());
+        }
+        switch (sortCondition) {
+            case "최신 등록 순" ->
+                comparator = Comparator.comparing(ProductSearchResponse::getCreatedAt).reversed();
+            case "높은 할인 순" -> comparator =
+                Comparator.comparing(ProductSearchResponse::getSalePercentage).reversed();
+            case "높은 가격 순"->
+                comparator = Comparator.comparing(ProductSearchResponse::getSalePrice); //낮은 가격순
+            default -> comparator = Comparator.comparing(ProductSearchResponse::getCheckIn)
+                .thenComparing(ProductSearchResponse::getSalePercentage, Comparator.reverseOrder());
+        }
+
+        return comparator;
+    }
+
 }

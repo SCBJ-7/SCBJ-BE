@@ -13,7 +13,8 @@ import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
-import com.yanolja.scbj.global.config.QuerydslConfiguration;
+import com.yanolja.scbj.global.config.QuerydslConfig;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -24,17 +25,18 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 @DataJpaTest
-@Import(QuerydslConfiguration.class)
+@Import(QuerydslConfig.class)
 public class ProductSearchRepositoryTest {
 
+
+
     @Autowired
-    private TestEntityManager entityManager;
+    private EntityManager entityManager;
 
     @Autowired
     private ProductRepository productRepository;
@@ -68,7 +70,7 @@ public class ProductSearchRepositoryTest {
             .checkIn(LocalTime.of(14, 0))
             .checkOut(LocalTime.of(11, 0))
             .bedType("Double Bed")
-            .standardPeople(2)
+            .standardPeople(100)
             .maxPeople(maxPeople)
             .roomTheme(roomTheme)
             .build();
@@ -108,15 +110,15 @@ public class ProductSearchRepositoryTest {
         Reservation reservation = Reservation.builder()
             .hotel(hotel)
             .yanoljaMember(yanoljaMember)
-            .startDate(checkIn)
-            .endDate(checkOut)
+            .startDate(checkIn.atStartOfDay())
+            .endDate(checkOut.atStartOfDay())
             .purchasePrice(purchasePrice)
             .build();
         entityManager.persist(reservation);
         return reservation;
     }
 
-    private Product createProduct(Member member, Reservation reservation, int firstPrice, int secondPrice) {
+    private Product createProduct(Member member, Reservation reservation, int firstPrice, int secondPrice, int time) {
         Product product = Product.builder()
             .reservation(reservation)
             .member(member)
@@ -124,6 +126,7 @@ public class ProductSearchRepositoryTest {
             .accountNumber("123123")
             .firstPrice(firstPrice)
             .secondPrice(secondPrice)
+            .secondGrantPeriod(time)
             .build();
         entityManager.persist(product);
         return product;
@@ -133,18 +136,18 @@ public class ProductSearchRepositoryTest {
     void init() {
         IntStream.rangeClosed(1, 10)
             .forEach(i -> {
-                String randomAddress = "서울";
+                String randomAddress = "이천";
                 Member member = createMember("user" + i + "@example.com", "홍길동" + i);
                 RoomTheme roomTheme = createRoomTheme(true,true);
-                Hotel hotel2 = createHotel(roomTheme, randomAddress, 4);
+                Hotel hotel2 = createHotel(roomTheme, randomAddress, 3);
                 createHotelRoomImage(hotel2);
                 YanoljaMember yanoljaMember = createYanoljaMember("yanolja" + i + "@example.com");
-                Reservation reservation = createReservation(hotel2, yanoljaMember, LocalDate.now(),
+                Reservation reservation = createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(1),
                     LocalDate.now().plusDays(5),200000);
-                Product product = createProduct(member, reservation, 100000,50000);
-                productRepository.save(product);
-                entityManager.clear();
+                Product product = createProduct(member, reservation, 100000,50000,0);
+               entityManager.flush();
             });
+
 
         IntStream.rangeClosed(1, 5)
             .forEach(i -> {
@@ -158,13 +161,13 @@ public class ProductSearchRepositoryTest {
                 Reservation reservation =
                     createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(6),
                         LocalDate.now().plusDays(8),300000);
-                Product product = createProduct(member, reservation,200000, 100000);
-                productRepository.save(product);
+                Product product = createProduct(member, reservation, 200000, 100000,1);
+                entityManager.flush();
             });
 
         IntStream.rangeClosed(1, 5)
             .forEach(i -> {
-                String randomAddress = "이천";
+                String randomAddress = "서울";
                 Member member = createMember("user" + i + 30 + "@example.com", "홍길동" + i + 30);
                 RoomTheme roomTheme = createRoomTheme(false,false);
                 Hotel hotel2 = createHotel(roomTheme, randomAddress, 2);
@@ -174,7 +177,8 @@ public class ProductSearchRepositoryTest {
                 Reservation reservation =
                     createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(8),
                         LocalDate.now().plusDays(13),400000);
-                createProduct(member, reservation,300000, 250000);
+                Product product = createProduct(member, reservation, 300000, 250000,0);
+                entityManager.flush();
             });
         entityManager.clear();
     }
@@ -199,7 +203,10 @@ public class ProductSearchRepositoryTest {
             // then
             assertThat(results).isNotEmpty();
             List<ProductSearchResponse> responses = results.getContent();
-            assertThat(responses.size()).isEqualTo(10);
+            for (ProductSearchResponse respons : responses) {
+                System.err.println(respons.getOriginalPrice());
+            }
+            assertThat(responses.size()).isEqualTo(5);
         }
 
         @Test
@@ -208,7 +215,7 @@ public class ProductSearchRepositoryTest {
             //given
             ProductSearchRequest searchRequest =
                 ProductSearchRequest.builder().checkIn(LocalDate.now())
-                    .checkOut(LocalDate.now().plusDays(3)).build();
+                    .checkOut(LocalDate.now().plusDays(5)).build();
 
             //when
 
@@ -218,6 +225,10 @@ public class ProductSearchRepositoryTest {
             //then
             assertThat(results).isNotEmpty();
             List<ProductSearchResponse> content = results.getContent();
+            for (ProductSearchResponse productSearchResponse : content) {
+                System.out.println(productSearchResponse.getOriginalPrice());
+            }
+
             assertThat(content.size()).isEqualTo(10);
         }
 
@@ -226,7 +237,7 @@ public class ProductSearchRepositoryTest {
         public void will_success_testMaximumPeopleProduct() {
             //given
             ProductSearchRequest searchRequest = ProductSearchRequest.builder()
-                .quantityPeople(4)
+                .quantityPeople(3)
                 .build();
 
             //when
@@ -236,6 +247,10 @@ public class ProductSearchRepositoryTest {
 
             //then
             assertThat(results).isNotEmpty();
+            for (ProductSearchResponse result : results) {
+                System.out.println(result.getOriginalPrice());
+
+            }
             List<ProductSearchResponse> content = results.getContent();
             assertThat(content.size()).isEqualTo(10);
         }
@@ -292,12 +307,12 @@ public class ProductSearchRepositoryTest {
             List<ProductSearchResponse> content = highSearchResult.getContent();
 
             for (int i = 0; i < 5; i++) {
-                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.75);
+                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.5);
             }
 
             assertThat(lowPriceResult).isNotEmpty();
             for (int i = 0; i < 10; i++) {
-                assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(50000);
+                assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(100000);
             }
         }
     }
