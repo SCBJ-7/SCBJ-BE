@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.payment.dto.response;
+package com.yanolja.scbj.domain.paymentHistory.dto.response;
 
 import lombok.Builder;
 

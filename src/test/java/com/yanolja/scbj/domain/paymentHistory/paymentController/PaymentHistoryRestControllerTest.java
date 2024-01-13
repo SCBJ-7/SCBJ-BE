@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.payment.paymentController;
+package com.yanolja.scbj.domain.paymentHistory.paymentController;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,12 +13,12 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
-import com.yanolja.scbj.domain.payment.controller.PaymentHistoryRestController;
-import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
-import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
-import com.yanolja.scbj.domain.payment.service.PaymentHistoryService;
+import com.yanolja.scbj.domain.paymentHistory.controller.PaymentHistoryRestController;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;

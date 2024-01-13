@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.payment.paymentController;
+package com.yanolja.scbj.domain.paymentHistory.paymentController;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;

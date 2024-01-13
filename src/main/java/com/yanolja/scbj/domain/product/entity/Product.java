@@ -2,7 +2,7 @@ package com.yanolja.scbj.domain.product.entity;
 
 import com.querydsl.core.annotations.QueryInit;
 import com.yanolja.scbj.domain.member.entity.Member;
-import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.common.BaseEntity;
 import jakarta.persistence.Column;
@@ -13,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;

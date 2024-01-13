@@ -1,7 +1,7 @@
-package com.yanolja.scbj.domain.payment.controller;
+package com.yanolja.scbj.domain.paymentHistory.controller;
 
-import com.yanolja.scbj.domain.payment.dto.response.PaymentPageFindResponse;
-import com.yanolja.scbj.domain.payment.service.PaymentService;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
+import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

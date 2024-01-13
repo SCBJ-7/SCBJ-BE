@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.payment.entity;
+package com.yanolja.scbj.domain.paymentHistory.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,9 +1,9 @@
-package com.yanolja.scbj.domain.payment.controller;
+package com.yanolja.scbj.domain.paymentHistory.controller;
 
-import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
-import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResponse;
-import com.yanolja.scbj.domain.payment.service.PaymentHistoryService;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import org.springframework.data.domain.Page;

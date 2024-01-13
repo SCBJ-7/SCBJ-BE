@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.payment.entity;
+package com.yanolja.scbj.domain.paymentHistory.entity;
 
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.product.entity.Product;
@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
