@@ -17,6 +17,7 @@ import com.yanolja.scbj.domain.payment.exception.PaymentHistoryNotFoundException
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.global.config.QuerydslConfiguration;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
+@Import(QuerydslConfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class HistoryRepositoryTest {
 

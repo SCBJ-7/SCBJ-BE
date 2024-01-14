@@ -7,8 +7,10 @@ import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.FirstPriceHigherException;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
@@ -21,6 +23,8 @@ import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +66,7 @@ public class ProductService {
             }
         }
 
-        if (productPostRequest.isRegisterd()) {
+        if (productPostRequest.isRegistered()) {
             MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
                 .accountNumber(productPostRequest.accountNumber())
                 .bank(productPostRequest.bank())
