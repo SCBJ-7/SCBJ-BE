@@ -1,9 +1,8 @@
 package com.yanolja.scbj.domain.payment.dto.response;
 
-import lombok.Data;
+public record PaymentApproveResponse(
+    String tid,
+    PaymentAmountResponse amount
+) {
 
-@Data
-public class PaymentApproveResponse {
-    private String tid;
-    private PaymentAmountResponse amount;
 }

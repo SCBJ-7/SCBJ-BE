@@ -1,8 +1,8 @@
 package com.yanolja.scbj.domain.payment.dto.response;
 
-import lombok.Data;
+public record PaymentAmountResponse(
+    int total
 
-@Data
-public class PaymentAmountResponse {
-    private int total;
+) {
+
 }
