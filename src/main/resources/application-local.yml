@@ -41,3 +41,9 @@ jwt:
   redisRefreshKeyPrefix: "Refresh-token:" # Replace with your desired Redis refresh key prefix
 
 
+fcm:
+  request-url: "https://fcm.googleapis.com/v1/projects/scbj-af2e3/messages:send"
+  credential-path: "/credential/fcm-service-key.json"
+  scope : "https://www.googleapis.com/auth/cloud-platform"
+
+g
