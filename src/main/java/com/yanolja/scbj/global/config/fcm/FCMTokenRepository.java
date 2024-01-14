@@ -26,10 +26,10 @@ public class FCMTokenRepository {
     }
 
     public void deleteToken(String email) {
-        redisTemplate.delete(email);
+        redisTemplate.delete(DEVICE_TOKEN_PREFIX + email);
     }
 
     public boolean hasKey(String email) {
-        return redisTemplate.hasKey(email);
+        return redisTemplate.hasKey(DEVICE_TOKEN_PREFIX + email);
     }
 }
