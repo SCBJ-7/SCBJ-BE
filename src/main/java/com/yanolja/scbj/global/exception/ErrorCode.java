@@ -28,7 +28,9 @@ public enum ErrorCode {
     FIRST_PRICE_HIGHER(HttpStatus.BAD_REQUEST, "양도 가격이 구매가보다 높습니다. 양도 가격을 확인해주세요."),
     SECOND_PRICE_HIGHER(HttpStatus.BAD_REQUEST, "2차 양도 가격이 1차 양도 가격보다 높습니다. 2차 가격을 확인해주세요."),
     INVALID_SECOND_PRICE_PERIOD(HttpStatus.BAD_REQUEST, "2차 양도 가격 변동 시기는 체크인 기준 12시간 이상이어야 합니다."),
-
+    KAKAO_PAY_READY_FAIL(HttpStatus.BAD_REQUEST, "카카오페이 결제 요청에 실패했습니다."),
+    KAKAO_PAY_INFO_FAIL(HttpStatus.PAYMENT_REQUIRED, "카카오페이 결제 승인에 실패했습니다."),
+    KAKAO_PAY_CANCEL_FAIL(HttpStatus.BAD_REQUEST, "카카오페이 걀제 취소에 실패했습니다."),
 
     //RESERVATION
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),
