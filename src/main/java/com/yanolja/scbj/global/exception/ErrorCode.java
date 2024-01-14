@@ -15,10 +15,12 @@ public enum ErrorCode {
     NOT_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 틀렸습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 리프레쉬 토큰입니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "입력된 패스워드 형식이 맞지 않습니다."),
-    NOT_FOUND_YANOLJA_MEMBER(HttpStatus.NOT_FOUND,"야놀자 계정을 찾을 수 없습니다."),
+    NOT_FOUND_YANOLJA_MEMBER(HttpStatus.NOT_FOUND, "야놀자 계정을 찾을 수 없습니다."),
+
+    //SERVER
 
     EMAIL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 서버가 연결되지 않습니다."),
-
+    FIREBASE_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파이어베이스 서버가 연결되지 않습니다."),
     //PRODUCT
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 정보를 찾을 수 없습니다."),
 
