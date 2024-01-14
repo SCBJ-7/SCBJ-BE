@@ -16,6 +16,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Comment;
 
 @Entity
@@ -40,6 +42,7 @@ public class PaymentHistory extends BaseEntity {
 
     @OneToOne
     @JoinColumn(name = "payment_agreement_id")
+    @Cascade(CascadeType.ALL)
     @Comment("결제 약관 식별자")
     private PaymentAgreement paymentAgreement;
 
