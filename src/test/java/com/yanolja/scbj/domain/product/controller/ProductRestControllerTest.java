@@ -2,8 +2,11 @@ package com.yanolja.scbj.domain.product.controller;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,13 +19,16 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,6 +39,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -190,4 +200,45 @@ class ProductRestControllerTest {
                 .andDo(print());
         }
     }
+
+    @Nested
+    @DisplayName("상품 검색은")
+    class Context_searchProduct {
+
+        @Test
+        @DisplayName("성공시 200이 반환된다")
+        void _will_success() throws Exception {
+            // given
+            ProductSearchRequest searchRequest =
+                ProductSearchRequest.builder()
+                    .location("서울")
+                    .build();
+
+            ProductSearchResponse response = ProductSearchResponse.builder()
+                .id(1L)
+                .checkIn(LocalDateTime.now().plusDays(1))
+                .checkOut(LocalDateTime.now().plusDays(2))
+                .salePrice(100000)
+                .name("시그니엘 레지던스 호텔")
+                .build();
+
+            Pageable pageable = PageRequest.of(1, 10);
+
+            Page<ProductSearchResponse> expectedResponse =
+                new PageImpl<>(List.of(response), pageable, 1);
+
+            when(productService.searchByRequest(any(ProductSearchRequest.class), eq(pageable)))
+                .thenReturn(expectedResponse);
+
+            // when & then
+            mvc.perform(get("/v1/products")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(searchRequest))
+                    .param("page", "1"))
+                .andExpect(status().isOk());
+
+        }
+
+    }
+
 }
