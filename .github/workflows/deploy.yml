@@ -26,6 +26,8 @@ jobs:
           echo "${{ secrets.PROPERTIES }}" | base64 --decode > src/main/resources/application.yml
           echo "${{ secrets.PROD_PROPERTIES }}" | base64 --decode > src/main/resources/application-prod.yml
           echo "${{ secrets.TEST_PROPERTIES }}" | base64 --decode > src/test/resources/application.yml
+          mkdir -p src/main/resources/credential
+          echo "${{ secrets.FCM_KEY }}" | base64 --decode > src/main/resources/credential/fcm-service-key.json
 
       - name: Grant execute permission for gradlew
         run: |
