@@ -1,7 +1,7 @@
 package com.yanolja.scbj.domain.alarm.entity;
 
 import com.yanolja.scbj.domain.member.entity.Member;
-import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
