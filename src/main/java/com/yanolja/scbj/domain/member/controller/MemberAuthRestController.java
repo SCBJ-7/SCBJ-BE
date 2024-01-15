@@ -28,7 +28,7 @@ public class MemberAuthRestController {
         @Valid @RequestBody RefreshRequest refreshRequest) {
         log.info("accessToken:{}, refreshToken:{}", refreshRequest.getAccessToken(),
             refreshRequest.getRefreshToken());
-        return ResponseEntity.ok().body(ResponseDTO.res(memberAuthService.refreshAccessToken(refreshRequest),"토큰을 성공적으로 재발급했습니다."));
+        return ResponseEntity.ok().body(ResponseDTO.res(memberAuthService.refreshAccessToken(refreshRequest),"토큰 재발급에 성공했습니다."));
     }
 
 }

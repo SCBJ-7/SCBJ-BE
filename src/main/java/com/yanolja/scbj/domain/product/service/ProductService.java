@@ -7,8 +7,10 @@ import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.FirstPriceHigherException;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
@@ -21,6 +23,8 @@ import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,23 +53,23 @@ public class ProductService {
             yanoljaMember.getId()).orElseThrow(
             () -> new ReservationNotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
 
-        if (productPostRequest.getFirstPrice() > reservation.getPurchasePrice()) {
+        if (productPostRequest.firstPrice() > reservation.getPurchasePrice()) {
             throw new FirstPriceHigherException(ErrorCode.FIRST_PRICE_HIGHER);
         }
-        if (productPostRequest.getSecondPrice() != 0
-            && productPostRequest.getSecondGrantPeriod() != 0) {
-            if (productPostRequest.getSecondPrice() > productPostRequest.getFirstPrice()) {
+        if (productPostRequest.secondPrice() != 0
+            && productPostRequest.secondGrantPeriod() != 0) {
+            if (productPostRequest.secondPrice() > productPostRequest.firstPrice()) {
                 throw new SecondPriceHigherException(ErrorCode.SECOND_PRICE_HIGHER);
             }
-            if (productPostRequest.getSecondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
+            if (productPostRequest.secondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
                 throw new SecondPricePeriodException(ErrorCode.INVALID_SECOND_PRICE_PERIOD);
             }
         }
 
-        if (productPostRequest.isRegisterd()) {
+        if (productPostRequest.isRegistered()) {
             MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
-                .accountNumber(productPostRequest.getAccountNumber())
-                .bank(productPostRequest.getBank())
+                .accountNumber(productPostRequest.accountNumber())
+                .bank(productPostRequest.bank())
                 .build();
             memberService.updateMemberAccount(memberUpdateAccountRequest);
         }
@@ -73,11 +77,11 @@ public class ProductService {
         Product product = Product.builder()
             .reservation(reservation)
             .member(member)
-            .firstPrice(productPostRequest.getFirstPrice())
-            .secondPrice(productPostRequest.getSecondPrice())
-            .bank(productPostRequest.getBank())
-            .accountNumber(productPostRequest.getAccountNumber())
-            .secondGrantPeriod(productPostRequest.getSecondGrantPeriod()).build();
+            .firstPrice(productPostRequest.firstPrice())
+            .secondPrice(productPostRequest.secondPrice())
+            .bank(productPostRequest.bank())
+            .accountNumber(productPostRequest.accountNumber())
+            .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
 
         Product savedProduct = productRepository.save(product);
 
