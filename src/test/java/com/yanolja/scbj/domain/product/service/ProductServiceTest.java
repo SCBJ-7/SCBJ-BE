@@ -15,18 +15,20 @@ import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.service.MemberService;
-import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +37,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 
 @Transactional
@@ -75,10 +82,11 @@ class ProductServiceTest {
                 .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330").isRegistered(true)
                 .secondGrantPeriod(48).build();
 
-            MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
-                .accountNumber("1000-4400-3330")
-                .bank("신한은행")
-                .build();
+            MemberUpdateAccountRequest memberUpdateAccountRequest =
+                MemberUpdateAccountRequest.builder()
+                    .accountNumber("1000-4400-3330")
+                    .bank("신한은행")
+                    .build();
 
             YanoljaMember yanoljaMember = YanoljaMember.builder().id(yanoljaId)
                 .email("yang980329@naver.com").build();
@@ -268,6 +276,48 @@ class ProductServiceTest {
             // then
             verify(productRepository, atLeastOnce()).findById(any());
             Assertions.assertThat(product.getDeletedAt()).isNotNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("상품 검색은")
+    class Context_searchProduct {
+
+        @Test
+        @DisplayName("성공시 원하는 결과값을 보여준다")
+        void will_success() {
+            //given
+            ProductSearchRequest request =
+                ProductSearchRequest.builder()
+                    .checkIn(LocalDate.now())
+                    .checkOut(LocalDate.now().plusDays(1))
+                    .build();
+
+            ProductSearchResponse response = ProductSearchResponse.builder()
+                .id(1L)
+                .checkIn(LocalDateTime.now().plusDays(1))
+                .checkOut(LocalDateTime.now().plusDays(2))
+
+                .salePrice(100000)
+                .name("시그니엘 레지던스 호텔")
+                .build();
+
+            Pageable pageable = PageRequest.of(1, 10);
+
+
+            PageImpl<ProductSearchResponse> expectedPage =
+                new PageImpl<>(List.of(response), pageable, 1);
+
+            given(productRepository.search(pageable, request)).willReturn(expectedPage);
+
+            //when
+            Page<ProductSearchResponse> result =
+                productService.searchByRequest(request, pageable);
+
+            //then
+            assertThat(result).isNotNull();
+            System.out.println(response.getCheckIn());
+            assertThat(result.getContent()).containsExactly(response);
         }
     }
 }
