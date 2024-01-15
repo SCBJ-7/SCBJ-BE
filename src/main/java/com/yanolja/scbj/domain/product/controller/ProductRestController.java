@@ -60,7 +60,7 @@ public class ProductRestController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<Page<ProductSearchResponse>> searchProducts(
-        @RequestBody ProductSearchRequest productSearchRequest,
+       @Valid @RequestBody ProductSearchRequest productSearchRequest,
         @PageableDefault(page = 1) Pageable pageable
         ) {
         Page<ProductSearchResponse> searchResponses =
