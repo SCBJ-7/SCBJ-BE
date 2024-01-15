@@ -12,8 +12,12 @@ import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.service.MailService;
 import com.yanolja.scbj.domain.member.service.MemberService;
+<<<<<<< Updated upstream
 import com.yanolja.scbj.domain.member.validation.ValidationGroups;
 import com.yanolja.scbj.domain.member.validation.ValidationSequence;
+=======
+import com.yanolja.scbj.domain.member.validation.Phone;
+>>>>>>> Stashed changes
 import com.yanolja.scbj.global.common.ResponseDTO;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
@@ -122,5 +126,6 @@ public class MemberRestController {
         return ResponseEntity.ok()
             .body(ResponseDTO.res(memberService.getMemberInfo(), "회원정보 조회에 성공했습니다."));
     }
+
 
 }
