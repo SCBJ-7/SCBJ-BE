@@ -49,4 +49,3 @@ fcm:
   credential-path: "/credential/fcm-service-key.json"
   scope : "https://www.googleapis.com/auth/cloud-platform"
 
-g

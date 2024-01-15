@@ -117,6 +117,10 @@ public class MemberService {
         return MemberMapper.toMemberResponse(getCurrentMember());
     }
 
+    public Member getMember(long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
     private Member getCurrentMember() {
         return memberRepository.findById(securityUtil.getCurrentMemberId())
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
