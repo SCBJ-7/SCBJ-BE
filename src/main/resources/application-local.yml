@@ -35,7 +35,6 @@ spring:
 
 kakao-api:
   api-key: ${API-KEY}
-  base-url: ${BASE-URL}
 
 
 jwt:

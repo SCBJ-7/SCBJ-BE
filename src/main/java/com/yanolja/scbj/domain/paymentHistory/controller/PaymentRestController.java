@@ -1,12 +1,14 @@
 package com.yanolja.scbj.domain.paymentHistory.controller;
 
-import com.yanolja.scbj.domain.payment.dto.request.PaymentReadyRequest;
+import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentCancelResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
+import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.PaymentApiService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +27,7 @@ public class PaymentRestController {
 
     private final PaymentService paymentService;
     private final SecurityUtil securityUtil;
+    private final Map<String, PaymentApiService> paymentApiServiceMap;
 
     @GetMapping("/{product_id}/payments")
     @ResponseStatus(HttpStatus.OK)
@@ -35,28 +38,37 @@ public class PaymentRestController {
 
     @PostMapping("/{product_id}/payments")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<Void> reqeustPayments(@PathVariable("product_id") long productId,
-                                             @Valid @RequestBody
-                                             PaymentReadyRequest paymentReadyRequest) {
-        String url = paymentService.kakaoPayReady(securityUtil.getCurrentMemberId(), productId,
+    public ResponseDTO<String> reqeustPayments(@PathVariable("product_id") long productId,
+        @RequestParam("paymentType") String paymentType,
+        @Valid @RequestBody PaymentReadyRequest paymentReadyRequest) {
+
+        PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
+
+        String url = paymentApiService.payReady(securityUtil.getCurrentMemberId(), productId,
             paymentReadyRequest);
-        System.out.println(url);
-        return ResponseDTO.res("결제에 성공했습니다.");
+        System.out.println(url); // Todo: 테스트에서만 필요
+        return ResponseDTO.res(url, "결제에 성공했습니다.");
     }
 
-    @GetMapping("/kakaopay-success")
+    @GetMapping("/pay-success")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<Void> successPayments(@RequestParam("pg_token") String pgToken,
-                                             @RequestParam("memberId") Long memberId) {
-        paymentService.KakaoPayInfo(pgToken, memberId);
+        @RequestParam("memberId") Long memberId, @RequestParam("paymentType") String paymentType) {
+
+        PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
+
+        paymentApiService.payInfo(pgToken, memberId);
         return ResponseDTO.res("결제에 성공했습니다.");
     }
 
-    @GetMapping("/kakaopay-cancel")
+    @GetMapping("/pay-cancel")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<PaymentCancelResponse> cancelPayments(
-        @RequestParam("memberId") Long memberId) {
-        paymentService.kakaoPayCancel(memberId);
+        @RequestParam("memberId") Long memberId, @RequestParam("paymentType") String paymentType) {
+
+        PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
+        paymentApiService.payCancel(memberId);
+
         return ResponseDTO.res("결제에 실패했습니다.");
     }
 

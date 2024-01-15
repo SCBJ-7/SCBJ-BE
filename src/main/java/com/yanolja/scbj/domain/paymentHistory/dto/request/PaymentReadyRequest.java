@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.payment.dto.request;
+package com.yanolja.scbj.domain.paymentHistory.dto.request;
 
 
 public record PaymentReadyRequest(
