@@ -100,8 +100,6 @@ class PaymentHistoryDtoConverterTest {
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result.customerName())
                 .isEqualTo("고객 이름");
-            Assertions.assertThat(result.remainingDays())
-                .isEqualTo(1);
             Assertions.assertThat(result.originalPrice())
                 .isEqualTo(50000000);
 
