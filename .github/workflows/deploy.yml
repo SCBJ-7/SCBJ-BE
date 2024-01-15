@@ -29,6 +29,9 @@ jobs:
           mkdir -p src/main/resources/credential
           echo "${{ secrets.FCM_KEY }}" | base64 --decode > src/main/resources/credential/fcm-service-key.json
 
+      - name: Set up Docker
+        uses: actions/setup-docker@v2
+
       - name: Grant execute permission for gradlew
         run: |
           chmod +x gradlew
