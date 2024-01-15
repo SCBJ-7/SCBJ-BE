@@ -4,7 +4,14 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
+import com.yanolja.scbj.domain.member.entity.Member;
+import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
+import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
+import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.KaKaoPaymentService;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
@@ -15,16 +22,29 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private final String KEY_PREFIX = "kakaoPay";
+    private final String PAYMENT_TYPE = "카카오페이";
+    private final String BASE_URL = "http://localhost:8080/v1/products";
+    private final String KAKAO_BASE_URL = "https://kapi.kakao.com/v1/payment";
+
+
     private final int FIRST_IMAGE = 0;
     private final ProductRepository productRepository;
+    private final KaKaoPaymentService kaKaoPaymentService;
+    private final RedisTemplate redisTemplate;
+    private final PaymentHistoryRepository paymentHistoryRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
     public PaymentPageFindResponse getPaymentPage(Long productId) {
@@ -57,5 +77,43 @@ public class PaymentService {
             .originalPrice(originalPrice)
             .salePrice(price)
             .build();
+    }
+
+    @Transactional
+    public void orderProduct(String pgToken, Long memberId){
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        String key = KEY_PREFIX + memberId;
+        String productId = (String) redisTemplate.opsForHash().get(key, "productId");
+        String customerName = (String) redisTemplate.opsForHash().get(key, "customerName");
+        String customerEmail = (String) redisTemplate.opsForHash().get(key, "customerEmail");
+        String customerPhoneNumber = (String) redisTemplate.opsForHash()
+            .get(key, "customerPhoneNumber");
+        String price = (String) redisTemplate.opsForHash().get(key, "price");
+        String tid = (String) redisTemplate.opsForHash().get(key, "tid");
+
+        Product product = productRepository.findByIdWithOptimistic(Long.valueOf(productId))
+            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        kaKaoPaymentService.payInfo(pgToken, memberId, Long.valueOf(productId), tid);
+
+        PaymentAgreement agreement = PaymentAgreement.builder()
+            .build();
+
+        PaymentHistory paymentHistory = PaymentHistory.builder()
+            .member(member)
+            .product(product)
+            .customerName(customerName)
+            .customerEmail(customerEmail)
+            .customerPhoneNumber(customerPhoneNumber)
+            .paymentAgreement(agreement)
+            .price(Integer.parseInt(price))
+            .paymentType(PAYMENT_TYPE)
+            .build();
+
+        paymentHistoryRepository.save(paymentHistory);
+        product.saleProduct();
     }
 }

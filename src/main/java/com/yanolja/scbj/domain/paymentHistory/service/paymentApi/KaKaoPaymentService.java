@@ -54,6 +54,8 @@ public class KaKaoPaymentService implements PaymentApiService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
+    private final RestTemplate restTemplate = new RestTemplate();
+
     private HttpHeaders headers;
 
     @Value("${kakao-api.api-key}")
@@ -72,11 +74,10 @@ public class KaKaoPaymentService implements PaymentApiService {
     public String payReady(Long memberId, Long productId,
         PaymentReadyRequest paymentReadyRequest) {
 
-        Product targetProduct = productRepository.findById(productId)
+        // 낙관적 락을 이용해 동시성 처리
+        Product targetProduct = productRepository.findByIdWithOptimistic(productId)
             .orElseThrow(() -> new ProductNotFoundException(
                 ErrorCode.PRODUCT_NOT_FOUND));
-
-        RestTemplate restTemplate = new RestTemplate();
 
         Hotel targetHotel = targetProduct.getReservation().getHotel();
         Reservation targetReservation = targetProduct.getReservation();
@@ -137,18 +138,7 @@ public class KaKaoPaymentService implements PaymentApiService {
 
     @Override
     @Transactional
-    public void payInfo(String pgToken, Long memberId) {
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        String key = KEY_PREFIX + memberId;
-        String productId = (String) redisTemplate.opsForHash().get(key, "productId");
-        String customerName = (String) redisTemplate.opsForHash().get(key, "customerName");
-        String customerEmail = (String) redisTemplate.opsForHash().get(key, "customerEmail");
-        String customerPhoneNumber = (String) redisTemplate.opsForHash()
-            .get(key, "customerPhoneNumber");
-        String price = (String) redisTemplate.opsForHash().get(key, "price");
-        String tid = (String) redisTemplate.opsForHash().get(key, "tid");
+    public void payInfo(String pgToken, Long memberId, Long productId, String tid) {
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
@@ -162,29 +152,6 @@ public class KaKaoPaymentService implements PaymentApiService {
         try {
             restTemplate.postForObject(new URI(KAKAO_BASE_URL + "/approve"), body,
                 PaymentApproveResponse.class);
-
-            Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-            Product product = productRepository.findById(Long.valueOf(productId))
-                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
-
-            PaymentAgreement agreement = PaymentAgreement.builder()
-                .build();
-
-            PaymentHistory paymentHistory = PaymentHistory.builder()
-                .member(member)
-                .product(product)
-                .customerName(customerName)
-                .customerEmail(customerEmail)
-                .customerPhoneNumber(customerPhoneNumber)
-                .paymentAgreement(agreement)
-                .price(Integer.parseInt(price))
-                .paymentType(PAYMENT_TYPE)
-                .build();
-
-            paymentHistoryRepository.save(paymentHistory);
-
         } catch (RestClientException | URISyntaxException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_INFO_FAIL);
         }
