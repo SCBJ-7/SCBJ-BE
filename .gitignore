@@ -78,6 +78,8 @@ replay_pid*
 # Icon must end with two \r
 Icon
 
+# credentials
+**/credential
 
 # Thumbnails
 ._*
