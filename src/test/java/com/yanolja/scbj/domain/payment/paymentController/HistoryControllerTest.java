@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -17,9 +18,11 @@ import com.yanolja.scbj.domain.payment.controller.HistoryController;
 import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.SpecificSaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
 import com.yanolja.scbj.domain.payment.service.HistoryService;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +46,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -177,8 +181,8 @@ public class HistoryControllerTest {
                 "http://example.com/hotel-room-image1.jpg",
                 "더블 베드",
                 200000,
-                LocalDateTime.of(2024, 1, 1,15,0),
-                LocalDateTime.of(2024, 1, 2,1,0),
+                LocalDateTime.of(2024, 1, 1, 15, 0),
+                LocalDateTime.of(2024, 1, 2, 1, 0),
                 "판매중"
             ), new SaleHistoryResponse(
                 2L,
@@ -186,8 +190,8 @@ public class HistoryControllerTest {
                 "http://example.com/hotel-room-image2.jpg",
                 "트윈 베드",
                 150000,
-                LocalDateTime.of(2024, 1, 3,15,0),
-                LocalDateTime.of(2024, 1, 4,11,0),
+                LocalDateTime.of(2024, 1, 3, 15, 0),
+                LocalDateTime.of(2024, 1, 4, 11, 0),
                 "거래완료"
             ));
 
@@ -219,23 +223,24 @@ public class HistoryControllerTest {
         @DisplayName("구매 내역 상세 조회를 성공했습니다.")
         void _willSuccess() throws Exception {
             // given
-            SpecificPurchasedHistoryResponse specificPurchasedHistoryResponse = SpecificPurchasedHistoryResponse.builder()
-                .hotelName(hotel.getHotelName())
-                .roomName(room.getRoomName())
-                .standardPeople(room.getStandardPeople())
-                .maxPeople(room.getMaxPeople())
-                .checkIn("23.12.24 (일) 15:00")
-                .checkOut("23.12.25 (월) 11:00")
-                .customerName(paymentHistory.getCustomerName())
-                .customerPhoneNumber(paymentHistory.getCustomerPhoneNumber())
-                .paymentHistoryId(paymentHistory.getId())
-                .paymentType(paymentHistory.getPaymentType())
-                .originalPrice(50000000)
-                .price(paymentHistory.getPrice())
-                .remainingDays(3)
-                .paymentHistoryDate("23.12.17 (월)")
-                .hotelImage(hotelRoomImage.getUrl())
-                .build();
+            SpecificPurchasedHistoryResponse specificPurchasedHistoryResponse =
+                SpecificPurchasedHistoryResponse.builder()
+                    .hotelName(hotel.getHotelName())
+                    .roomName(room.getRoomName())
+                    .standardPeople(room.getStandardPeople())
+                    .maxPeople(room.getMaxPeople())
+                    .checkIn("23.12.24 (일) 15:00")
+                    .checkOut("23.12.25 (월) 11:00")
+                    .customerName(paymentHistory.getCustomerName())
+                    .customerPhoneNumber(paymentHistory.getCustomerPhoneNumber())
+                    .paymentHistoryId(paymentHistory.getId())
+                    .paymentType(paymentHistory.getPaymentType())
+                    .originalPrice(50000000)
+                    .price(paymentHistory.getPrice())
+                    .remainingDays(3)
+                    .paymentHistoryDate("23.12.17 (월)")
+                    .hotelImage(hotelRoomImage.getUrl())
+                    .build();
 
             given(historyService.getSpecificPurchasedHistory(any(Long.TYPE),
                 any(Long.TYPE))).willReturn(specificPurchasedHistoryResponse);
@@ -246,6 +251,40 @@ public class HistoryControllerTest {
                 .andExpect(jsonPath("$.data.hotelName").exists()).andDo(print());
 
 
+        }
+    }
+
+    @Nested
+    @DisplayName("판매내역 상세 조회는")
+    class Context_getSpecificSaleHistory {
+
+
+        @Test
+        public void testGetSpecificSaleHistory() throws Exception {
+            //given
+            Long memberId = 1L;
+            Long saleHistoryId = 1L;
+
+            SpecificSaleHistoryResponse mockResponse = new SpecificSaleHistoryResponse(
+                "판매중", "24.01.15 (월) 15:00", "24.01.16 (화) 15:00",
+                "image.url", 2, 4, "호텔 인 나인 강남", "디럭스 킹 시티뷰",
+                "신한", "110472321",
+                new SpecificSaleHistoryResponse.firstPriceResponse(212000, 139000),
+                new SpecificSaleHistoryResponse.secondPriceResponse("2024-01-15 09:00", 60000)
+            );
+
+            given(securityUtil.getCurrentMemberId()).willReturn(memberId);
+            given(historyService.getSpecificSaleHistory(memberId, saleHistoryId)).willReturn(mockResponse);
+
+            // 실행 (When)
+            mockMvc.perform(get("/v1/members/sale-history/" + saleHistoryId))
+                .andExpect(status().isOk())
+                .andDo(print())
+
+                // 검증 (Then)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("판매 내역 상세 조회를 성공했습니다"))
+                .andExpect(jsonPath("$.data").isNotEmpty()); // 추가적인 jsonPath 검증이 필요할 수 있음
         }
     }
 }
