@@ -1,7 +1,6 @@
 package com.yanolja.scbj.domain.payment.controller;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -10,8 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.yanolja.scbj.domain.payment.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.payment.service.PaymentService;
-import com.yanolja.scbj.domain.product.controller.ProductRestController;
-import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +31,7 @@ import org.springframework.test.web.servlet.ResultActions;
     excludeAutoConfiguration = SecurityAutoConfiguration.class
 )
 class PaymentRestControllerTest {
+
     @Autowired
     private MockMvc mvc;
     @MockBean
@@ -45,7 +43,7 @@ class PaymentRestControllerTest {
 
         @Test
         @DisplayName("성공 시 결제할 상품의 정보를 반환한다.")
-        void _will_success() throws Exception{
+        void _will_success() throws Exception {
             // given
             Long targetProductId = 1L;
 
@@ -64,7 +62,8 @@ class PaymentRestControllerTest {
             given(paymentService.getPaymentPage(targetProductId)).willReturn(findResponse);
 
             // when
-            ResultActions result = mvc.perform(get("/v1/products/" + targetProductId + "/payments"));
+            ResultActions result = mvc.perform(
+                get("/v1/products/" + targetProductId + "/payments"));
 
             // then
             result.andExpect(status().isOk())
