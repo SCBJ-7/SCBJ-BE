@@ -66,13 +66,13 @@ class ProductServiceTest {
 
         @Test
         @DisplayName("2차 가격이 있는 양도글 작성을 성공했습니다.")
-        void saveProductwithSecond_willSuccess() {
+        void saveProductWithSecond_willSuccess() {
             // given
             long memberId = 1L;
             long yanoljaId = 1L;
             long reservationId = 1L;
             ProductPostRequest productPostRequest = ProductPostRequest.builder().firstPrice(350000)
-                .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330").isRegisterd(true)
+                .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330").isRegistered(true)
                 .secondGrantPeriod(48).build();
 
             MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
@@ -127,7 +127,7 @@ class ProductServiceTest {
             long yanoljaId = 1L;
             long reservationId = 1L;
             ProductPostRequest productPostRequest = ProductPostRequest.builder().firstPrice(350000)
-                .bank("신한은행").accountNumber("1000-4400-3330").isRegisterd(false).build();
+                .bank("신한은행").accountNumber("1000-4400-3330").isRegistered(false).build();
 
             YanoljaMember yanoljaMember = YanoljaMember.builder().id(yanoljaId)
                 .email("yang980329@naver.com").build();
