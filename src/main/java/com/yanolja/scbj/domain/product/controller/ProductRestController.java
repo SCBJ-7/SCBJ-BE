@@ -1,13 +1,18 @@
 package com.yanolja.scbj.domain.product.controller;
 
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,4 +57,15 @@ public class ProductRestController {
         return ResponseDTO.res("상품 삭제에 성공했습니다.");
     }
 
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO<Page<ProductSearchResponse>> searchProducts(
+       @Valid @RequestBody ProductSearchRequest productSearchRequest,
+        @PageableDefault(page = 1) Pageable pageable
+        ) {
+        Page<ProductSearchResponse> searchResponses =
+            productService.searchByRequest(productSearchRequest, pageable);
+
+        return ResponseDTO.res(searchResponses, "조회에 성공하였습니다");
+    }
 }
