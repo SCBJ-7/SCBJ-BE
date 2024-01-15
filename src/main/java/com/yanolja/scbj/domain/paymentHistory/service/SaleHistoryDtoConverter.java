@@ -27,6 +27,7 @@ public class SaleHistoryDtoConverter {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yy.MM.dd (E) ");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime createdAt = product.getCreatedAt();
 
         String status = calculateStatus(paymentHistory, reservation);
         String hotelUrl = getHotelUrl(hotel);
@@ -70,9 +71,9 @@ public class SaleHistoryDtoConverter {
             .accountNumber(accountNumber)
             .firstPrice(firstPriceObject)
             .secondPrice(secondPriceObject)
+            .createdAt(createdAt)
             .build();
     }
-
     private String calculateStatus(PaymentHistory paymentHistory, Reservation reservation) {
         return Optional.ofNullable(paymentHistory)
             .map(ph -> paymentHistory.isSettlement() ? "정산완료" : "거래완료")
@@ -98,7 +99,6 @@ public class SaleHistoryDtoConverter {
                                   Hotel hotel, DateTimeFormatter timeFormatter) {
         return reservation.getEndDate().format(dateFormatter) + hotel.getRoom().getCheckOut()
             .format(timeFormatter);
-
     }
 
     private int checkPeakPrice(Hotel hotel) {

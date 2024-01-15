@@ -268,6 +268,7 @@ public class PaymentHistoryRestControllerTest {
                 "신한", "110472321",
                 new SpecificSaleHistoryResponse.firstPriceResponse(212000, 139000),
                 new SpecificSaleHistoryResponse.secondPriceResponse("2024-01-15 09:00", 60000)
+                ,LocalDateTime.now().minusDays(6)
             );
 
             given(securityUtil.getCurrentMemberId()).willReturn(memberId);
