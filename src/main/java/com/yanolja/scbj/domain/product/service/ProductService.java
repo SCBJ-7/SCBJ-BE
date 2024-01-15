@@ -104,4 +104,12 @@ public class ProductService {
 
         targetProduct.delete(LocalDateTime.now());
     }
+
+    public Page<ProductSearchResponse> searchByRequest(ProductSearchRequest productSearchRequest,
+                                              Pageable pageable) {
+        Page<ProductSearchResponse> responses =
+            productRepository.search(pageable, productSearchRequest);
+
+        return responses.isEmpty() ? Page.empty() : responses;
+    }
 }
