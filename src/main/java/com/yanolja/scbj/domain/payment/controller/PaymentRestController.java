@@ -3,8 +3,8 @@ package com.yanolja.scbj.domain.payment.controller;
 import com.yanolja.scbj.domain.payment.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.payment.dto.response.PaymentCancelResponse;
 import com.yanolja.scbj.domain.payment.dto.response.PaymentPageFindResponse;
-import com.yanolja.scbj.domain.payment.service.paymentApi.PaymentApiService;
 import com.yanolja.scbj.domain.payment.service.PaymentService;
+import com.yanolja.scbj.domain.payment.service.paymentApi.PaymentApiService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.validation.Valid;
@@ -31,7 +31,8 @@ public class PaymentRestController {
 
     @GetMapping("/{product_id}/payments")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<PaymentPageFindResponse> findPaymentPage(@PathVariable("product_id") Long productId){
+    public ResponseDTO<PaymentPageFindResponse> findPaymentPage(
+        @PathVariable("product_id") Long productId) {
         return ResponseDTO.res(paymentService.getPaymentPage(productId), "결제 페이지 조회에 성공했습니다.");
     }
 
@@ -46,7 +47,7 @@ public class PaymentRestController {
         String url = paymentApiService.payReady(securityUtil.getCurrentMemberId(), productId,
             paymentReadyRequest);
         System.out.println(url); // Todo: 테스트에서만 필요
-        return ResponseDTO.res("결제에 성공했습니다.", url);
+        return ResponseDTO.res(url, "결제에 성공했습니다.");
     }
 
     @GetMapping("/pay-success")
