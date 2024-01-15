@@ -36,6 +36,8 @@ class PaymentRestControllerTest {
     private MockMvc mvc;
     @MockBean
     private PaymentService paymentService;
+    @MockBean
+    private SecurityUtil securityUtil;
 
     @Nested
     @DisplayName("결제 페이지 조회는 ")
