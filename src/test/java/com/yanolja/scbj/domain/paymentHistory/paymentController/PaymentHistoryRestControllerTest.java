@@ -262,18 +262,38 @@ public class PaymentHistoryRestControllerTest {
             Long memberId = 1L;
             Long saleHistoryId = 1L;
 
-            SpecificSaleHistoryResponse mockResponse = new SpecificSaleHistoryResponse(
-                "판매중", "24.01.15 (월) 15:00", "24.01.16 (화) 15:00",
-                "image.url", 2, 4, "호텔 인 나인 강남", "디럭스 킹 시티뷰",
-                "신한", "110472321",
-                new SpecificSaleHistoryResponse.firstPriceResponse(212000, 139000),
-                new SpecificSaleHistoryResponse.secondPriceResponse("2024-01-15 09:00", 60000)
-                ,LocalDateTime.now().minusDays(6)
-            );
+            SpecificSaleHistoryResponse.firstPriceResponse firstPriceObject =
+                SpecificSaleHistoryResponse.firstPriceResponse.builder()
+                    .originalPrice(212000)
+                    .firstSalePrice(139000)
+                    .build();
+
+
+            SpecificSaleHistoryResponse.secondPriceResponse secondPriceObject =
+                SpecificSaleHistoryResponse.secondPriceResponse.builder()
+                    .secondPrice(20000)
+                    .secondPriceStartDate("20203")
+                    .build();
+
+            SpecificSaleHistoryResponse response = SpecificSaleHistoryResponse.builder()
+                .saleStatus("판매중")
+                .checkIn("24.01.15 (월) 15:00")
+                .checkOut("24.01.16 (화) 15:00")
+                .hotelImage("image.url")
+                .standardPeople(2)
+                .maxPeople(4)
+                .hotelName("호텔 인 나인 강남")
+                .roomName("디럭스 킹 시티뷰")
+                .bank("신한")
+                .accountNumber("110472321")
+                .firstPrice(firstPriceObject)
+                .secondPrice(secondPriceObject)
+                .createdAt(LocalDateTime.now().minusDays(6))
+                .build();
 
             given(securityUtil.getCurrentMemberId()).willReturn(memberId);
             given(paymentHistoryService.getSpecificSaleHistory(memberId, saleHistoryId)).willReturn(
-                mockResponse);
+                response);
 
             // 실행 (When)
             mockMvc.perform(get("/v1/members/sale-history/" + saleHistoryId))
