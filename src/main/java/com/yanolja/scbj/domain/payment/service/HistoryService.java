@@ -6,8 +6,10 @@ import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.SpecificSaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
 import com.yanolja.scbj.domain.payment.exception.PaymentHistoryNotFoundException;
+import com.yanolja.scbj.domain.payment.exception.SaleHistoryNotFoundException;
 import com.yanolja.scbj.domain.payment.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
@@ -26,6 +28,7 @@ public class HistoryService {
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final PaymentHistoryDtoConverter paymentHistoryDtoConverter;
+    private final SaleHistoryDtoConverter saleHistoryDtoConverter;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final ProductRepository productRepository;
 
@@ -50,5 +53,15 @@ public class HistoryService {
             .orElseThrow(() -> new PaymentHistoryNotFoundException(ErrorCode.PURCHASE_LOAD_FAIL));
 
         return paymentHistoryDtoConverter.toSpecificPurchasedHistoryResponse(paymentHistory);
+    }
+
+
+    public SpecificSaleHistoryResponse getSpecificSaleHistory(Long memberId, Long saleHistoryId) {
+
+        PaymentHistory saleHistoryDetail =
+            paymentHistoryRepository.findByIdAndMemberId(saleHistoryId, memberId).orElseThrow(
+                () -> new SaleHistoryNotFoundException(ErrorCode.SALE_DETAIL_LOAD_FAIL));
+
+        return saleHistoryDtoConverter.toSpecificSaleHistoryResponse(saleHistoryDetail);
     }
 }

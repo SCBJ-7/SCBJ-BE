@@ -3,6 +3,7 @@ package com.yanolja.scbj.domain.payment.controller;
 import com.yanolja.scbj.domain.payment.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.dto.response.SpecificPurchasedHistoryResponse;
+import com.yanolja.scbj.domain.payment.dto.response.SpecificSaleHistoryResponse;
 import com.yanolja.scbj.domain.payment.service.HistoryService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
@@ -58,5 +59,16 @@ public class HistoryController {
         return ResponseDTO.res(
             historyService.getSpecificPurchasedHistory(securityUtil.getCurrentMemberId(),
                 paymentHistoryId), "구매 내역 상세 조회를 성공했습니다.");
+    }
+
+
+    @GetMapping("/sale-history/{saleHistory_id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO<SpecificSaleHistoryResponse> getSpecificSaleHistory(
+        @PathVariable("saleHistory_id") Long saleHistoryId
+    ) {
+        return ResponseDTO.res(
+            historyService.getSpecificSaleHistory(securityUtil.getCurrentMemberId(),
+                saleHistoryId), "판매 내역 상세 조회를 성공했습니다");
     }
 }
