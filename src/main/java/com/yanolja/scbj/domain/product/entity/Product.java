@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.product.entity;
 
+import com.querydsl.core.annotations.QueryInit;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
@@ -34,6 +35,7 @@ public class Product extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "reservation_id", nullable = false)
     @Comment("예약 식별자")
+    @QueryInit("hotel.room.checkIn")
     private Reservation reservation;
 
     @ManyToOne

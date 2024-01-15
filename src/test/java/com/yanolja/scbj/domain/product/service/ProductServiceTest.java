@@ -25,6 +25,7 @@ import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -65,13 +66,13 @@ class ProductServiceTest {
 
         @Test
         @DisplayName("2차 가격이 있는 양도글 작성을 성공했습니다.")
-        void saveProductwithSecond_willSuccess() {
+        void saveProductWithSecond_willSuccess() {
             // given
             long memberId = 1L;
             long yanoljaId = 1L;
             long reservationId = 1L;
             ProductPostRequest productPostRequest = ProductPostRequest.builder().firstPrice(350000)
-                .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330").isRegisterd(true)
+                .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330").isRegistered(true)
                 .secondGrantPeriod(48).build();
 
             MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
@@ -88,7 +89,7 @@ class ProductServiceTest {
 
             Reservation reservation = Reservation.builder().id(reservationId)
                 .yanoljaMember(yanoljaMember).purchasePrice(5000000).startDate(
-                    LocalDate.now()).endDate(LocalDate.now()).build();
+                    LocalDateTime.now()).endDate(LocalDateTime.now()).build();
 
             given(memberRepository.findById(any(Long.TYPE))).willReturn(
                 java.util.Optional.ofNullable(member));
@@ -101,11 +102,11 @@ class ProductServiceTest {
                 .id(1L)
                 .reservation(reservation)
                 .member(member)
-                .firstPrice(productPostRequest.getFirstPrice())
-                .secondPrice(productPostRequest.getSecondPrice())
-                .bank(productPostRequest.getBank())
-                .accountNumber(productPostRequest.getAccountNumber())
-                .secondGrantPeriod(productPostRequest.getSecondGrantPeriod()).build();
+                .firstPrice(productPostRequest.firstPrice())
+                .secondPrice(productPostRequest.secondPrice())
+                .bank(productPostRequest.bank())
+                .accountNumber(productPostRequest.accountNumber())
+                .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
 
             given(productRepository.save(any(Product.class))).willReturn(product);
 
@@ -115,7 +116,7 @@ class ProductServiceTest {
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.getProductId()).isEqualTo(1L);
+            assertThat(result.productId()).isEqualTo(1L);
         }
 
         @Test
@@ -126,7 +127,7 @@ class ProductServiceTest {
             long yanoljaId = 1L;
             long reservationId = 1L;
             ProductPostRequest productPostRequest = ProductPostRequest.builder().firstPrice(350000)
-                .bank("신한은행").accountNumber("1000-4400-3330").isRegisterd(false).build();
+                .bank("신한은행").accountNumber("1000-4400-3330").isRegistered(false).build();
 
             YanoljaMember yanoljaMember = YanoljaMember.builder().id(yanoljaId)
                 .email("yang980329@naver.com").build();
@@ -137,7 +138,7 @@ class ProductServiceTest {
 
             Reservation reservation = Reservation.builder().id(reservationId)
                 .yanoljaMember(yanoljaMember).purchasePrice(5000000).startDate(
-                    LocalDate.now()).endDate(LocalDate.now()).build();
+                    LocalDateTime.now()).endDate(LocalDateTime.now()).build();
 
             given(memberRepository.findById(any(Long.TYPE))).willReturn(
                 java.util.Optional.ofNullable(member));
@@ -149,11 +150,11 @@ class ProductServiceTest {
                 .id(1L)
                 .reservation(reservation)
                 .member(member)
-                .firstPrice(productPostRequest.getFirstPrice())
-                .secondPrice(productPostRequest.getSecondPrice())
-                .bank(productPostRequest.getBank())
-                .accountNumber(productPostRequest.getAccountNumber())
-                .secondGrantPeriod(productPostRequest.getSecondGrantPeriod()).build();
+                .firstPrice(productPostRequest.firstPrice())
+                .secondPrice(productPostRequest.secondPrice())
+                .bank(productPostRequest.bank())
+                .accountNumber(productPostRequest.accountNumber())
+                .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
 
             given(productRepository.save(any(Product.class))).willReturn(product);
 
@@ -162,7 +163,7 @@ class ProductServiceTest {
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.getProductId()).isEqualTo(1L);
+            assertThat(result.productId()).isEqualTo(1L);
         }
     }
 
@@ -199,8 +200,8 @@ class ProductServiceTest {
             Reservation reservation = Reservation.builder()
                 .id(1L)
                 .hotel(hotel)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now())
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now())
                 .build();
 
             PaymentHistory paymentHistory = PaymentHistory.builder()
@@ -237,7 +238,7 @@ class ProductServiceTest {
 
             // then
             Assertions.assertThat(response).isNotNull();
-            Assertions.assertThat(response.isSaleStatus()).isEqualTo(true);
+            Assertions.assertThat(response.saleStatus()).isEqualTo(true);
         }
     }
 
