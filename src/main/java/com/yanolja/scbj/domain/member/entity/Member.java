@@ -1,6 +1,6 @@
 package com.yanolja.scbj.domain.member.entity;
 
-import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.global.common.BaseEntity;
 import jakarta.persistence.CascadeType;

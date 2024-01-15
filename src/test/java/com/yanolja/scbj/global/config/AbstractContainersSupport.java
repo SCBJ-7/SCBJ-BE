@@ -15,8 +15,7 @@ public abstract class AbstractContainersSupport {
 
     static {
         REDIS_CONTAINER = new GenericContainer<>(REDIS_IMAGE)
-            .withExposedPorts(6379)
-            .withReuse(true);
+            .withExposedPorts(6379);
         REDIS_CONTAINER.start();
     }
 

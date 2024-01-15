@@ -72,10 +72,10 @@ dependencies {
 	implementation 'org.seleniumhq.selenium:selenium-api'
 	implementation 'org.seleniumhq.selenium:selenium-chrome-driver'
 
-
-
-
+	//fcm
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
+
 def querydslDir = "src/main/generated"
 
 clean.doLast {
