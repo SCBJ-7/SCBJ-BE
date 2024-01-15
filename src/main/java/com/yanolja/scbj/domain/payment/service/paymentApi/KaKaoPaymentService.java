@@ -46,6 +46,7 @@ public class KaKaoPaymentService implements PaymentApiService {
     private final String KEY_PREFIX = "kakaoPay";
     private final String PAYMENT_TYPE = "카카오페이";
     private final String BASE_URL = "http://localhost:8080/v1/products";
+    private final String KAKAO_BASE_URL = "https://kapi.kakao.com/v1/payment";
 
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
@@ -53,10 +54,7 @@ public class KaKaoPaymentService implements PaymentApiService {
     private final RedisTemplate<String, String> redisTemplate;
 
     private HttpHeaders headers;
-
-    @Value("${kakao-api.base-url}")
-    private String baseUrl;
-
+    
     @Value("${kakao-api.api-key}")
     private String key;
 
@@ -115,7 +113,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
         try {
             PaymentReadyResponse paymentReadyResponse = restTemplate.postForObject(
-                new URI("https://kapi.kakao.com/v1/payment/ready"), body,
+                new URI(KAKAO_BASE_URL + "/ready"), body,
                 PaymentReadyResponse.class);
 
             Map<String, String> redisMap = new HashMap<>();
@@ -161,7 +159,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
 
         try {
-            restTemplate.postForObject(new URI(baseUrl + "/approve"), body,
+            restTemplate.postForObject(new URI(KAKAO_BASE_URL + "/approve"), body,
                 PaymentApproveResponse.class);
 
             Member member = memberRepository.findById(memberId)
@@ -209,7 +207,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
 
         try {
-            restTemplate.postForObject(new URI(baseUrl + "/cancel"), body,
+            restTemplate.postForObject(new URI(KAKAO_BASE_URL + "/cancel"), body,
                 PaymentCancelResponse.class);
         } catch (URISyntaxException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_CANCEL_FAIL);
