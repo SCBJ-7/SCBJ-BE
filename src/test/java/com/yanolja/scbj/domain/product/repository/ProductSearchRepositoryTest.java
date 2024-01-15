@@ -334,5 +334,23 @@ public class ProductSearchRepositoryTest {
                 assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(200000);
             }
         }
+
+        @Test
+        @DisplayName("판매중인것만 조회가 된다")
+        public  void will_success_get_on_sale() {
+            //given
+            ProductSearchRequest productSearchRequest = ProductSearchRequest.builder().build();
+
+            //when
+            Page<ProductSearchResponse> responses =
+                productRepository.search(PageRequest.of(0, 10), productSearchRequest);
+
+
+            //then
+            assertThat(responses).isNotEmpty();
+            List<ProductSearchResponse> content = responses.getContent();
+            assertThat(content.size()).isEqualTo(10);
+
+        }
     }
 }
