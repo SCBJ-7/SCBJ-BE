@@ -1,27 +1,27 @@
 package com.yanolja.scbj.domain.paymentHistory.service;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
+import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.payment.dto.request.PaymentReadyRequest;
-import com.yanolja.scbj.domain.payment.dto.response.PaymentApproveResponse;
-import com.yanolja.scbj.domain.payment.dto.response.PaymentCancelResponse;
-import com.yanolja.scbj.domain.payment.dto.response.PaymentReadyResponse;
-import com.yanolja.scbj.domain.payment.entity.PaymentAgreement;
-import com.yanolja.scbj.domain.payment.entity.PaymentHistory;
-import com.yanolja.scbj.domain.payment.repository.PaymentHistoryRepository;
-import com.yanolja.scbj.domain.product.enums.SecondTransferExistence;
-import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
-import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
-import com.yanolja.scbj.domain.hotelRoom.entity.Room;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentApproveResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentCancelResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentReadyResponse;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.product.entity.Product;
+import com.yanolja.scbj.domain.product.enums.SecondTransferExistence;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
-import com.yanolja.scbj.global.util.TimeValidator;
 import com.yanolja.scbj.global.exception.ErrorCode;
+import com.yanolja.scbj.global.util.TimeValidator;
 import jakarta.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -76,7 +76,7 @@ public class PaymentService {
     }
 
     @Transactional(readOnly = true)
-    public PaymentPageFindResponse getPaymentPage(Long productId){
+    public PaymentPageFindResponse getPaymentPage(Long productId) {
         Product targetProduct = productRepository.findProductById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
                 ErrorCode.PRODUCT_NOT_FOUND));
@@ -86,7 +86,7 @@ public class PaymentService {
         HotelRoomPrice targetHotelRoomPrice = targetHotel.getHotelRoomPrice();
         List<HotelRoomImage> targetHotelRoomImageList = targetHotel.getHotelRoomImageList();
         int originalPrice = targetHotelRoomPrice.getOffPeakPrice();
-        if(TimeValidator.isPeakTime(LocalDate.now())){
+        if (TimeValidator.isPeakTime(LocalDate.now())) {
             originalPrice = targetHotelRoomPrice.getPeakPrice();
         }
         LocalDateTime checkInDateTime = targetReservation.getStartDate();
@@ -110,7 +110,7 @@ public class PaymentService {
 
     @Transactional(readOnly = true)
     public String kakaoPayReady(Long memberId, Long productId,
-        PaymentReadyRequest paymentReadyRequest) {
+                                PaymentReadyRequest paymentReadyRequest) {
 
         Product targetProduct = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
@@ -176,15 +176,16 @@ public class PaymentService {
 
     // 결제 승인 요청
     @Transactional
-    public void KakaoPayInfo(String pgToken, Long memberId){
+    public void KakaoPayInfo(String pgToken, Long memberId) {
 
         RestTemplate restTemplate = new RestTemplate();
 
         String key = KEY_PREFIX + memberId;
-        String productId = (String) redisTemplate.opsForHash().get(key,"productId");
+        String productId = (String) redisTemplate.opsForHash().get(key, "productId");
         String customerName = (String) redisTemplate.opsForHash().get(key, "customerName");
         String customerEmail = (String) redisTemplate.opsForHash().get(key, "customerEmail");
-        String customerPhoneNumber = (String) redisTemplate.opsForHash().get(key, "customerPhoneNumber");
+        String customerPhoneNumber =
+            (String) redisTemplate.opsForHash().get(key, "customerPhoneNumber");
         String price = (String) redisTemplate.opsForHash().get(key, "price");
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");
 
@@ -230,7 +231,7 @@ public class PaymentService {
         }
     }
 
-    public void kakaoPayCancel(Long memberId){
+    public void kakaoPayCancel(Long memberId) {
 
         RestTemplate restTemplate = new RestTemplate();
 
