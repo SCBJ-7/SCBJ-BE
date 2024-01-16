@@ -40,17 +40,6 @@ jwt:
   refreshExpiration: 604800000 # Replace with your desired refresh expiration time in milliseconds
   redisRefreshKeyPrefix: "Refresh-token:" # Replace with your desired Redis refresh key prefix
 
-
-kakao-api:
-  api-key: ${API-KEY}
-  base-url: ${BASE-URL}
-
-
-iamport:
-  apikey: ${IAMPORT_API_KEY}
-  secretkey: ${IAMPORT_SECRET_KEY}
-
-
 fcm:
   request-url: "https://fcm.googleapis.com/v1/projects/scbj-af2e3/messages:send"
   credential-path: "/credential/fcm-service-key.json"
