@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Password {
 
-    String message() default "유효하지 않은 패스워드입니다.";
+    String message() default "이메일 혹은 비밀번호를 확인해주세요.";
 
     Class<?>[] groups() default {};
 

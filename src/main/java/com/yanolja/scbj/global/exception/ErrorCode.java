@@ -8,13 +8,12 @@ public enum ErrorCode {
 
     //JWT
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 액세스 토큰입니다"),
-    EXPIRED_TOKEN(HttpStatus.BAD_REQUEST, "만료된 액세스 토큰입니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 액세스 토큰입니다."),
     //MEMBER
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
-    ALREADY_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다."),
-    NOT_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 틀렸습니다."),
+    ALREADY_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "이미 사용중인 이메일입니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 리프레쉬 토큰입니다."),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "입력된 패스워드 형식이 맞지 않습니다."),
+    INVALID_EMAIL_AND_PASSWORD(HttpStatus.BAD_REQUEST, "아이디 혹은 비밀번호를 확인해주세요."),
     NOT_FOUND_YANOLJA_MEMBER(HttpStatus.NOT_FOUND, "야놀자 계정을 찾을 수 없습니다."),
 
     //SERVER

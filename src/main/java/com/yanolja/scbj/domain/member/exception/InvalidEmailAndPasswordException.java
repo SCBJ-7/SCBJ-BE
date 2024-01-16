@@ -4,10 +4,9 @@ package com.yanolja.scbj.domain.member.exception;
 import com.yanolja.scbj.global.exception.ApplicationException;
 import com.yanolja.scbj.global.exception.ErrorCode;
 
-public class NotMatchPasswordException extends ApplicationException {
+public class InvalidEmailAndPasswordException extends ApplicationException {
 
-
-    public NotMatchPasswordException(ErrorCode errorCode) {
+    public InvalidEmailAndPasswordException(ErrorCode errorCode) {
         super(errorCode);
     }
 }

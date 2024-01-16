@@ -1,12 +1,11 @@
 package com.yanolja.scbj.domain.member.exception;
 
-
 import com.yanolja.scbj.global.exception.ApplicationException;
 import com.yanolja.scbj.global.exception.ErrorCode;
 
-public class InvalidPasswordException extends ApplicationException {
+public class EmailServerException extends ApplicationException {
 
-    public InvalidPasswordException(ErrorCode errorCode) {
+    public EmailServerException(ErrorCode errorCode) {
         super(errorCode);
     }
 }

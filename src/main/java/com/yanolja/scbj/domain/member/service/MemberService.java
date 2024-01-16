@@ -10,10 +10,9 @@ import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.AlreadyExistEmailException;
-import com.yanolja.scbj.domain.member.exception.InvalidPasswordException;
+import com.yanolja.scbj.domain.member.exception.InvalidEmailAndPasswordException;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.exception.NotFoundYanoljaMember;
-import com.yanolja.scbj.domain.member.exception.NotMatchPasswordException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
@@ -59,7 +58,7 @@ public class MemberService {
 
     public MemberSignInResponse signIn(final MemberSignInRequest memberSignInRequest) {
         Member retrivedMember = memberRepository.findByEmail(memberSignInRequest.email())
-            .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new InvalidEmailAndPasswordException(ErrorCode.INVALID_EMAIL_AND_PASSWORD));
 
         if (passwordEncoder.matches(memberSignInRequest.password(), retrivedMember.getPassword())) {
             String accessToken = jwtUtil.generateToken(MemberMapper.toUserDetails(retrivedMember));
@@ -68,7 +67,7 @@ public class MemberService {
             return MemberMapper.toSignInResponse(MemberMapper.toMemberResponse(retrivedMember),
                 MemberMapper.toTokenResponse(accessToken, refreshToken));
         } else {
-            throw new NotMatchPasswordException(ErrorCode.NOT_MATCH_PASSWORD);
+            throw new InvalidEmailAndPasswordException(ErrorCode.INVALID_EMAIL_AND_PASSWORD);
         }
     }
 
@@ -90,7 +89,7 @@ public class MemberService {
         String[] splitedEmail = email.split("@");
         if (email.equals(password) || splitedEmail[0].equals(password) || splitedEmail[1].equals(
             password) || email.replaceAll("@", "").equals(password)) {
-            throw new InvalidPasswordException(ErrorCode.INVALID_PASSWORD);
+            throw new InvalidEmailAndPasswordException(ErrorCode.INVALID_EMAIL_AND_PASSWORD);
         }
     }
 
