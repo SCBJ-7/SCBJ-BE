@@ -46,7 +46,7 @@ public class Alarm extends BaseEntity {
 
     @Column(nullable = false)
     @Comment("읽음 여부")
-    private boolean Read;
+    private boolean read;
 
     @Builder
     private Alarm(Long id, Member member, PaymentHistory paymentHistory, String title,
@@ -59,6 +59,6 @@ public class Alarm extends BaseEntity {
     }
 
     public void read() {
-        Read = true;
+        read = true;
     }
 }
