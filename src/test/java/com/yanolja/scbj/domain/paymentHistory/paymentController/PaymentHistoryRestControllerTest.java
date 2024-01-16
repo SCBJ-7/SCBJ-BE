@@ -17,6 +17,7 @@ import com.yanolja.scbj.domain.paymentHistory.controller.PaymentHistoryRestContr
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificSaleHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
@@ -176,8 +177,8 @@ public class PaymentHistoryRestControllerTest {
                 "http://example.com/hotel-room-image1.jpg",
                 "더블 베드",
                 200000,
-                LocalDateTime.of(2024, 1, 1,15,0),
-                LocalDateTime.of(2024, 1, 2,1,0),
+                LocalDateTime.of(2024, 1, 1, 15, 0),
+                LocalDateTime.of(2024, 1, 2, 1, 0),
                 "판매중"
             ), new SaleHistoryResponse(
                 2L,
@@ -185,15 +186,16 @@ public class PaymentHistoryRestControllerTest {
                 "http://example.com/hotel-room-image2.jpg",
                 "트윈 베드",
                 150000,
-                LocalDateTime.of(2024, 1, 3,15,0),
-                LocalDateTime.of(2024, 1, 4,11,0),
+                LocalDateTime.of(2024, 1, 3, 15, 0),
+                LocalDateTime.of(2024, 1, 4, 11, 0),
                 "거래완료"
             ));
 
             PageImpl<SaleHistoryResponse> saleHistoryResponses =
                 new PageImpl<>(responses, pageable, responses.size());
 
-            given(paymentHistoryService.getUsersSaleHistory(any(Pageable.class), anyLong())).willReturn(
+            given(paymentHistoryService.getUsersSaleHistory(any(Pageable.class),
+                anyLong())).willReturn(
                 saleHistoryResponses);
 
             //when
@@ -218,23 +220,24 @@ public class PaymentHistoryRestControllerTest {
         @DisplayName("구매 내역 상세 조회를 성공했습니다.")
         void _willSuccess() throws Exception {
             // given
-            SpecificPurchasedHistoryResponse specificPurchasedHistoryResponse = SpecificPurchasedHistoryResponse.builder()
-                .hotelName(hotel.getHotelName())
-                .roomName(room.getRoomName())
-                .standardPeople(room.getStandardPeople())
-                .maxPeople(room.getMaxPeople())
-                .checkIn("23.12.24 (일) 15:00")
-                .checkOut("23.12.25 (월) 11:00")
-                .customerName(paymentHistory.getCustomerName())
-                .customerPhoneNumber(paymentHistory.getCustomerPhoneNumber())
-                .paymentHistoryId(paymentHistory.getId())
-                .paymentType(paymentHistory.getPaymentType())
-                .originalPrice(50000000)
-                .price(paymentHistory.getPrice())
-                .remainingDays(3)
-                .paymentHistoryDate("23.12.17 (월)")
-                .hotelImage(hotelRoomImage.getUrl())
-                .build();
+            SpecificPurchasedHistoryResponse specificPurchasedHistoryResponse =
+                SpecificPurchasedHistoryResponse.builder()
+                    .hotelName(hotel.getHotelName())
+                    .roomName(room.getRoomName())
+                    .standardPeople(room.getStandardPeople())
+                    .maxPeople(room.getMaxPeople())
+                    .checkIn("23.12.24 (일) 15:00")
+                    .checkOut("23.12.25 (월) 11:00")
+                    .customerName(paymentHistory.getCustomerName())
+                    .customerPhoneNumber(paymentHistory.getCustomerPhoneNumber())
+                    .paymentHistoryId(paymentHistory.getId())
+                    .paymentType(paymentHistory.getPaymentType())
+                    .originalPrice(50000000)
+                    .price(paymentHistory.getPrice())
+                    .remainingDays(3)
+                    .paymentHistoryDate("23.12.17 (월)")
+                    .hotelImage(hotelRoomImage.getUrl())
+                    .build();
 
             given(paymentHistoryService.getSpecificPurchasedHistory(any(Long.TYPE),
                 any(Long.TYPE))).willReturn(specificPurchasedHistoryResponse);
@@ -245,6 +248,62 @@ public class PaymentHistoryRestControllerTest {
                 .andExpect(jsonPath("$.data.hotelName").exists()).andDo(print());
 
 
+        }
+    }
+
+    @Nested
+    @DisplayName("판매내역 상세 조회는")
+    class Context_getSpecificSaleHistory {
+
+
+        @Test
+        public void testGetSpecificSaleHistory() throws Exception {
+            //given
+            Long memberId = 1L;
+            Long saleHistoryId = 1L;
+
+            SpecificSaleHistoryResponse.firstPriceResponse firstPriceObject =
+                SpecificSaleHistoryResponse.firstPriceResponse.builder()
+                    .originalPrice(212000)
+                    .firstSalePrice(139000)
+                    .build();
+
+
+            SpecificSaleHistoryResponse.secondPriceResponse secondPriceObject =
+                SpecificSaleHistoryResponse.secondPriceResponse.builder()
+                    .secondPrice(20000)
+                    .secondPriceStartDate("20203")
+                    .build();
+
+            SpecificSaleHistoryResponse response = SpecificSaleHistoryResponse.builder()
+                .saleStatus("판매중")
+                .checkIn("24.01.15 (월) 15:00")
+                .checkOut("24.01.16 (화) 15:00")
+                .hotelImage("image.url")
+                .standardPeople(2)
+                .maxPeople(4)
+                .hotelName("호텔 인 나인 강남")
+                .roomName("디럭스 킹 시티뷰")
+                .bank("신한")
+                .accountNumber("110472321")
+                .firstPrice(firstPriceObject)
+                .secondPrice(secondPriceObject)
+                .createdAt(LocalDateTime.now().minusDays(6))
+                .build();
+
+            given(securityUtil.getCurrentMemberId()).willReturn(memberId);
+            given(paymentHistoryService.getSpecificSaleHistory(memberId, saleHistoryId)).willReturn(
+                response);
+
+            // 실행 (When)
+            mockMvc.perform(get("/v1/members/sale-history/" + saleHistoryId))
+                .andExpect(status().isOk())
+                .andDo(print())
+
+                // 검증 (Then)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("판매 내역 상세 조회를 성공했습니다"))
+                .andExpect(jsonPath("$.data").isNotEmpty()); // 추가적인 jsonPath 검증이 필요할 수 있음
         }
     }
 }

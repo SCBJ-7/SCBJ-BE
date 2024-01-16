@@ -1,5 +1,9 @@
 package com.yanolja.scbj.domain.reservation.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.global.common.BaseEntity;
@@ -38,10 +42,14 @@ public class Reservation extends BaseEntity {
     @Comment("야놀자 회원 식별자")
     private YanoljaMember yanoljaMember;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Column(nullable = false)
     @Comment("시작일")
     private LocalDateTime startDate;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Column(nullable = false)
     @Comment("종료일")
     private LocalDateTime endDate;

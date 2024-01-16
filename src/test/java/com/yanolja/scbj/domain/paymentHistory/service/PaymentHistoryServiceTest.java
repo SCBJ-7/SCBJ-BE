@@ -14,6 +14,7 @@ import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificSaleHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.product.entity.Product;
@@ -53,6 +54,9 @@ class PaymentHistoryServiceTest {
 
     @Mock
     private PaymentHistoryDtoConverter paymentHistoryDtoConverter;
+
+    @Mock
+    private SaleHistoryDtoConverter saleHistoryDtoConverter;
 
     @BeforeEach
     void setUp() {
@@ -242,4 +246,89 @@ class PaymentHistoryServiceTest {
                 .isEqualTo("고객 이름");
         }
     }
+
+    @Nested
+    @DisplayName("판매내역 상세조회는")
+    class Context_getSpecificSaleHistory {
+
+        @Test
+        @DisplayName("성공시 상세 판매내역을 반환")
+        void will_success() {
+            // given
+            Long memberId = 1L;
+            Long saleHistoryId = 1L;
+
+
+            Member member = Member.builder()
+                .id(1L)
+                .name("홍길동")
+                .email("hong@example.com")
+                .build();
+
+            Room room = Room.builder()
+                .roomName("디럭스룸")
+                .standardPeople(2)
+                .maxPeople(4)
+                .build();
+
+            Hotel hotel = Hotel.builder()
+                .id(1L)
+                .hotelName("호텔 인 나인 강남")
+                .room(room)
+                .build();
+
+            Reservation reservation = Reservation.builder()
+                .id(1L)
+                .hotel(hotel)
+                .startDate(LocalDateTime.of(2024, 1, 15, 15, 0))
+                .endDate(LocalDateTime.of(2024, 1, 16, 11, 0))
+                .build();
+
+            Product product = Product.builder()
+                .id(1L)
+                .reservation(reservation)
+                .member(member)
+                .firstPrice(200000)
+                .secondPrice(180000)
+                .bank("신한은행")
+                .accountNumber("123-456-7890")
+                .secondGrantPeriod(6)
+                .build();
+
+            PaymentHistory paymentHistory = PaymentHistory.builder()
+                .id(saleHistoryId)
+                .member(member)
+                .product(product)
+                .build();
+
+            SpecificSaleHistoryResponse specificSaleHistoryResponse = SpecificSaleHistoryResponse.builder()
+                .saleStatus("판매중")
+                .checkIn("2024.01.15 15:00")
+                .checkOut("2024.01.16 11:00")
+                .hotelImage("image.url")
+                .standardPeople(2)
+                .maxPeople(4)
+                .hotelName("호텔 인 나인 강남")
+                .roomName("디럭스룸")
+                .bank("신한은행")
+                .accountNumber("123-456-7890")
+                .firstPrice(new SpecificSaleHistoryResponse.firstPriceResponse(200000, 180000))
+                .secondPrice(new SpecificSaleHistoryResponse.secondPriceResponse("2024-01-15 09:00", 180000))
+                .build();
+
+            given(paymentHistoryRepository.findByIdAndMemberId(saleHistoryId, memberId))
+                .willReturn(Optional.of(paymentHistory));
+            given(saleHistoryDtoConverter.toSpecificSaleHistoryResponse(paymentHistory))
+                .willReturn(specificSaleHistoryResponse);
+
+            // when
+            SpecificSaleHistoryResponse result = paymentHistoryService.getSpecificSaleHistory(memberId, saleHistoryId);
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result).isEqualTo(specificSaleHistoryResponse);
+        }
+    }
+
+
 }
