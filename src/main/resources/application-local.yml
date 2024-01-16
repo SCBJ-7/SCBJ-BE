@@ -33,9 +33,6 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-kakao-api:
-  api-key: ${API-KEY}
-
 
 jwt:
   secret: KF81YSUjd3Q3KCFfaXd6cHlwMyNAKitkamFtYj02OXh2X3JfN2sqZShyamQrZysoXzVhJSN3dDcoIV9pd3pweXAzI0AqK2RqYW1iPTY5eHZfcl83ayplKHJqZCtnKw==   # Replace with your actual secret key
@@ -43,10 +40,7 @@ jwt:
   refreshExpiration: 604800000 # Replace with your desired refresh expiration time in milliseconds
   redisRefreshKeyPrefix: "Refresh-token:" # Replace with your desired Redis refresh key prefix
 
-
 fcm:
   request-url: "https://fcm.googleapis.com/v1/projects/scbj-af2e3/messages:send"
   credential-path: "/credential/fcm-service-key.json"
   scope : "https://www.googleapis.com/auth/cloud-platform"
-
-g
