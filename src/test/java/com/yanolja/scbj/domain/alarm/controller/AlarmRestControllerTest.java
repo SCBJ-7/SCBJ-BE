@@ -51,7 +51,8 @@ class AlarmRestControllerTest {
         AlarmResponse alarmResponse = AlarmResponse.builder()
             .title("알림 TEST 제목입니다.")
             .content("알림 TEST 내용입니다.")
-            .date(AlarmMapper.toStringDate(LocalDateTime.now()))
+            .date(LocalDateTime.now())
+            .isRead(false)
             .build();
 
         @Test
@@ -61,13 +62,15 @@ class AlarmRestControllerTest {
             List<AlarmResponse> alarmResponses = new ArrayList<>();
             alarmResponses.add(alarmResponse);
             given(alarmService.getAlarms()).willReturn(alarmResponses);
+            String stringAlarmDate = alarmResponse.date().toString();
 
             // when & then
             mockMvc.perform(get("/v1/alarms"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title").value(alarmResponse.title()))
                 .andExpect(jsonPath("$.data[0].content").value(alarmResponse.content()))
-                .andExpect(jsonPath("$.data[0].date").value(alarmResponse.date()))
+                .andExpect(jsonPath("$.data[0].date").value(stringAlarmDate.substring(0,stringAlarmDate.length()-2)))
+                .andExpect(jsonPath("$.data[0].isRead").value(false))
                 .andDo(print());
         }
     }
