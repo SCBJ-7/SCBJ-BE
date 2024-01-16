@@ -1,6 +1,6 @@
 package com.yanolja.scbj.domain.member.service;
 
-import com.yanolja.scbj.domain.member.exception.EmailServcerException;
+import com.yanolja.scbj.domain.member.exception.EmailServerException;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,7 +36,7 @@ public class MailService {
         try {
             emailSender.send(email);
         } catch (RuntimeException e) {
-            throw new EmailServcerException(ErrorCode.EMAIL_SERVER_ERROR);
+            throw new EmailServerException(ErrorCode.EMAIL_SERVER_ERROR);
         }
     }
 
