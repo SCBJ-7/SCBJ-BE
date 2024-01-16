@@ -80,7 +80,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void orderProduct(String pgToken, Long memberId){
+    public int orderProduct(String pgToken, Long memberId){
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -97,7 +97,7 @@ public class PaymentService {
         Product product = productRepository.findByIdWithOptimistic(Long.valueOf(productId))
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        kaKaoPaymentService.payInfo(pgToken, memberId, Long.valueOf(productId), tid);
+//        kaKaoPaymentService.payInfo(pgToken, memberId, Long.valueOf(productId), tid);
 
         PaymentAgreement agreement = PaymentAgreement.builder()
             .build();
@@ -111,9 +111,12 @@ public class PaymentService {
             .paymentAgreement(agreement)
             .price(Integer.parseInt(price))
             .paymentType(PAYMENT_TYPE)
+            .settlement(true)
             .build();
 
-        paymentHistoryRepository.save(paymentHistory);
-        product.saleProduct();
+        product.saleProduct(); //쿼리 2
+        paymentHistoryRepository.save(paymentHistory); //쿼리 1
+        return product.getStock();
+        //트랜잭션.커밋
     }
 }

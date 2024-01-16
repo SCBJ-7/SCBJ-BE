@@ -1,197 +1,182 @@
 package com.yanolja.scbj.domain.paymentHistory.service.paymentApi;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-
+import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.Room;
+import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
+import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomRepository;
+import com.yanolja.scbj.domain.hotelRoom.repository.RoomThemeRepository;
+import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
 import com.yanolja.scbj.domain.member.entity.Member;
-import com.yanolja.scbj.domain.member.repository.MemberRepository;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentAmountResponse;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentApproveResponse;
-import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import com.yanolja.scbj.domain.member.entity.YanoljaMember;
+import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
+import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
-import java.util.Optional;
+import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 
-@ExtendWith(MockitoExtension.class)
+
+@SpringBootTest
+//@Commit
+//@Rollback(value = false)
 class KaKaoPaymentServiceTest {
 
 
-    @InjectMocks
+    @Autowired
     private PaymentService paymentService;
 
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @Mock
-    private RedisTemplate redisTemplate;
-
-    @Mock
-    private KaKaoPaymentService kaKaoPaymentService;
-
-    @Mock
+    @Autowired
     private ProductRepository productRepository;
 
-    @Spy
-    private MemberRepository memberRepository;
+    @Autowired
+    private HotelRoomRepository hotelRoomRepository;
 
-    @Mock
+    @Autowired
+    private MemberService memberService;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
+
+    @Autowired
+    private RoomThemeRepository roomThemeRepository;
+
+    @Autowired
+    private YanoljaMemberRepository yanoljaMemberRepository;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+
+    @Autowired
     private PaymentHistoryRepository paymentHistoryRepository;
 
-//    @DisplayName("낙관적 락을 이용해 동시성을 제어한다")
-//    @Test
-//    void _will_success_with_optimisticLock() throws Exception {
-//        // given
-//        int threadCount = 3;
-//        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-//        CountDownLatch latch = new CountDownLatch(threadCount);
-//
-//        Member member = Member.builder()
-//            .id(1L)
-//            .email("qweqqwe@navrer.com")
-//            .password("agasdagasd")
-//            .build();
-//        Product product = Product.builder()
-//            .id(1L)
-//            .stock(1)
-//            .member(member)
-//            .version(1L)
-//            .build();
-//
-//
-//        // opsForHash()를 대신하여 사용할 HashOperations 목(Mock) 생성
-//        HashOperations<String, Object, Object> hashOperations = mock(HashOperations.class);
-//        given(redisTemplate.opsForHash()).willReturn(hashOperations);
-//        given(hashOperations.get(any(), any())).willReturn("1");
-//
-//        given(restTemplate.postForObject(any(), any(), any()))
-//            .willReturn(new PaymentApproveResponse("ASdas", new PaymentAmountResponse(15000)));
-//        given(memberRepository.findById(any(Long.TYPE))).willReturn(Optional.of(member));
-//        given(productRepository.findByIdWithOptimistic((any(Long.TYPE)))).willReturn(
-//            Optional.of(product));
-//
-//        productRepository.save(product);
-//
-//        PaymentHistory paymentHistory = PaymentHistory.builder()
-//            .id(1L)
-//            .customerName("박아무개")
-//            .customerEmail("yang980329@naver.com")
-//            .customerPhoneNumber("010-0000-0000")
-//            .price(15000)
-//            .product(product)
-//            .paymentType("카카오페이")
-//            .build();
-//
-//        given(paymentHistoryRepository.save(any())).willReturn(paymentHistory);
-//
-//
-//        for (int i = 0; i < threadCount; i++) {
-//            try {
-//                executorService.execute(
-//                    () -> kaKaoPaymentService.payInfo("fff", member.getId())
-//                );
-//                System.out.println(product.getVersion());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }finally {
-//                latch.countDown();
-//            }
-//        }
-//        latch.await();
-//        executorService.shutdown();
-//
-//        Assertions.assertThat(product.getStock()).isEqualTo(0L);
-//    }
+
 
     @DisplayName("낙관적 락을 이용해 동시성을 제어한다")
     @Test
     void _will_success_with_optimisticLock2() throws Exception {
-        // given
+        YanoljaMember yanoljaMember = YanoljaMember.builder().id(1L)
+            .email("yang980329@naver.com").build();
+
+        yanoljaMemberRepository.save(yanoljaMember);
+
+        Member member = Member.builder().id(1L).yanoljaMember(yanoljaMember)
+            .email("yang980329@naver.com").password("yang8126042").name("양유림")
+            .phone("010-3996-6042").build();
+
+        memberService.signUp(
+            new MemberSignUpRequest("yang980329@naver.com", "yang8126042", "양유림",
+                "010-3996-6042", true, true));
+
+        RoomTheme roomTheme = RoomTheme.builder()
+            .breakfast(true)
+            .build();
+
+        roomThemeRepository.save(roomTheme);
+
+        Room room = Room.builder()
+            .roomName("페밀리")
+            .checkIn(LocalTime.now())
+            .checkOut(LocalTime.now())
+            .bedType("싱글")
+            .standardPeople(2)
+            .maxPeople(4)
+            .roomTheme(roomTheme)
+            .build();
+
+        Hotel hotel = Hotel.builder()
+            .id(1L)
+            .hotelName("테스트 호텔")
+            .hotelMainAddress("서울")
+            .hotelDetailAddress("서울광역시 강남구")
+            .hotelInfoUrl("vasnoanwfowiamsfokm.jpg")
+            .room(room)
+            .build();
+
+        hotelRoomRepository.save(hotel);
+
+        Reservation reservation = Reservation.builder()
+            .id(1L)
+            .hotel(hotel)
+            .startDate(LocalDateTime.now())
+            .endDate(LocalDateTime.now())
+            .purchasePrice(2500000)
+            .yanoljaMember(yanoljaMember)
+            .build();
+
+        reservationRepository.save(reservation);
+
+
+        String key = "kakaoPay" + member.getId();
+
+        Map<String, String> map = new HashMap<>();
+        map.put("productId", "1");
+        map.put("customerName", "asdasd");
+        map.put("customerEmail", "email.com");
+        map.put("customerPhoneNumber", "gasdas");
+        map.put("price", "3400");
+        map.put("tid", "gasda");
+
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+        hashOperations.putAll(key, map);
+
+        Product product = Product.builder()
+            .reservation(reservation)
+            .member(member)
+            .bank("하나 은행")
+            .accountNumber("123123")
+            .firstPrice(30000000)
+            .secondPrice(25000000)
+            .secondGrantPeriod(3)
+            .stock(1)
+            .version(1L)
+            .build();
+        productRepository.save(product);
+
+        // 동시성 테스트 시작 ====================================================================
+
         int threadCount = 3;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(threadCount);
 
-        Member member = Member.builder()
-            .id(1L)
-            .email("qweqqwe@navrer.com")
-            .password("agasdagasd")
-            .build();
-
-        Product product = Product.builder()
-            .id(1L)
-            .stock(1)
-            .member(member)
-            .version(1L)
-            .build();
-
-
-        HashOperations<String, Object, Object> hashOperations = mock(HashOperations.class);
-        given(redisTemplate.opsForHash()).willReturn(hashOperations);
-        given(hashOperations.get(any(), any())).willReturn("1");
-
-        String pgToken = "@22";
-        String tid = "@22";
-
-        doNothing().when(kaKaoPaymentService).payInfo(any(), any(), any(), any());
-        given(memberRepository.findById(any(Long.TYPE))).willReturn(Optional.of(member));
-        given(productRepository.findByIdWithOptimistic((any(Long.TYPE)))).willReturn(
-            Optional.of(product));
-
-
-        PaymentHistory paymentHistory = PaymentHistory.builder()
-            .id(1L)
-            .member(member)
-            .customerName("박아무개")
-            .customerEmail("yang980329@naver.com")
-            .customerPhoneNumber("010-0000-0000")
-            .price(15000)
-            .product(product)
-            .paymentType("카카오페이")
-            .build();
-
-        given(paymentHistoryRepository.save(any())).willReturn(paymentHistory);
-
+        List<Exception> exceptionList = new ArrayList<>();
 
         for (int i = 0; i < threadCount; i++) {
-            try {
-                executorService.execute(
-                    () -> paymentService.orderProduct(pgToken, member.getId())
-                );
-                System.out.println(product.getVersion());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }finally {
-                latch.countDown();
-            }
+                executorService.submit(() ->{
+                try {
+                    paymentService.orderProduct("asg", member.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    exceptionList.add(e);
+                } finally {
+                    latch.countDown();
+                }
+            });
         }
-        latch.await();
-        executorService.shutdown();
 
-        Assertions.assertThat(product.getStock()).isEqualTo(0L);
+        latch.await();
+        Assertions.assertThat(exceptionList.get(0) instanceof OptimisticLockingFailureException);
+
     }
 
 }
