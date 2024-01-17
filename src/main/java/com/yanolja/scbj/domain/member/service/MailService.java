@@ -31,7 +31,7 @@ public class MailService {
         return String.valueOf(ThreadLocalRandom.current().nextInt(minCode, maxCode));
     }
 
-    private void sendEmail(String to, String title, String text) {
+    public void sendEmail(String to, String title, String text) {
         SimpleMailMessage email = createEmail(to, title, text);
         try {
             emailSender.send(email);
