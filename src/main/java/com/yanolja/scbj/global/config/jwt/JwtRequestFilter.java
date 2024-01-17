@@ -8,11 +8,13 @@ import com.yanolja.scbj.global.exception.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.io.DecodingException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.websocket.DecodeException;
 import java.io.IOException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
@@ -76,7 +78,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 ErrorCode.EXPIRED_TOKEN.getSimpleMessage());
             return;
         } catch (MalformedJwtException | SignatureException | UnsupportedJwtException |
-                 SecurityException ex) {
+                 SecurityException | DecodingException ex) {
             sendErrorResponse(response, ErrorCode.INVALID_TOKEN.getHttpStatus().value(),
                 ErrorCode.INVALID_TOKEN.getSimpleMessage());
             return;
