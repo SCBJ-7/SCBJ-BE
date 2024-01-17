@@ -32,11 +32,16 @@ public class AlarmService {
     private final MemberService memberService;
     private final PaymentHistoryRepository paymentHistoryRepository;
 
+    @Transactional
     public List<AlarmResponse> getAlarms() {
-        return alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(
+        List<Alarm> alarmsToRead = alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(
                 securityUtil.getCurrentMemberId())
-            .orElseThrow(() -> new AlarmNotFoundException(ErrorCode.ALARM_NOT_FOUND))
-            .stream().map(AlarmMapper::toAlarmResponse).toList();
+            .orElseThrow(() -> new AlarmNotFoundException(ErrorCode.ALARM_NOT_FOUND));
+        List<AlarmResponse> alarmResponses = alarmsToRead.stream().map(AlarmMapper::toAlarmResponse)
+            .toList();
+        alarmsToRead.forEach(Alarm::read);
+
+        return alarmResponses;
     }
 
     /**

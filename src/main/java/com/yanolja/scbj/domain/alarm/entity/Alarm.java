@@ -44,13 +44,21 @@ public class Alarm extends BaseEntity {
     @Comment("내용")
     private String content;
 
+    @Column(nullable = false)
+    @Comment("읽음 여부")
+    private boolean read;
 
     @Builder
-    private Alarm(Long id, Member member, PaymentHistory paymentHistory, String title, String content) {
+    private Alarm(Long id, Member member, PaymentHistory paymentHistory, String title,
+        String content) {
         this.id = id;
         this.member = member;
         this.paymentHistory = paymentHistory;
         this.title = title;
         this.content = content;
+    }
+
+    public void read() {
+        read = true;
     }
 }

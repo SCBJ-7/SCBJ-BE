@@ -51,7 +51,8 @@ class AlarmRestControllerTest {
         AlarmResponse alarmResponse = AlarmResponse.builder()
             .title("알림 TEST 제목입니다.")
             .content("알림 TEST 내용입니다.")
-            .date(AlarmMapper.toStringDate(LocalDateTime.now()))
+            .date(LocalDateTime.now())
+            .isRead(false)
             .build();
 
         @Test
@@ -67,7 +68,7 @@ class AlarmRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title").value(alarmResponse.title()))
                 .andExpect(jsonPath("$.data[0].content").value(alarmResponse.content()))
-                .andExpect(jsonPath("$.data[0].date").value(alarmResponse.date()))
+                .andExpect(jsonPath("$.data[0].isRead").value(false))
                 .andDo(print());
         }
     }
