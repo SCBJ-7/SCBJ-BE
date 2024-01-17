@@ -54,6 +54,7 @@ public class FCMIntegrationTest extends AbstractContainersSupport {
         assertTrue(fcmTokenRepository.hasKey(TEST_EMAIL));
         assertDoesNotThrow(() -> fcmService.sendMessageTo(TEST_EMAIL,
             test_date));
+        Thread.sleep(1500);
     }
 
 
