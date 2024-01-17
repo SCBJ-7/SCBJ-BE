@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     //JWT
-    INVALID_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 액세스 토큰입니다"),
+    INVALID_TOKEN(HttpStatus.PAYMENT_REQUIRED, "유효하지 않은 액세스 토큰입니다"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 액세스 토큰입니다."),
     //MEMBER
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
