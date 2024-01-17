@@ -15,13 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class FCMServiceTest extends AbstractContainersSupport {
+public class FCMIntegrationTest extends AbstractContainersSupport {
 
     @Autowired
     private FCMService fcmService;
 
     @Autowired
     private FCMTokenRepository fcmTokenRepository;
+
 
     @Test
     @DisplayName("FCM을 이용해 알림을 보낼 때")
@@ -32,9 +33,11 @@ public class FCMServiceTest extends AbstractContainersSupport {
         fcmService.saveToken(TEST_EMAIL, FCM_TOKEN);
 
         //when & then
-//        assertTrue(fcmTokenRepository.hasKey(TEST_EMAIL));
+        assertTrue(fcmTokenRepository.hasKey(TEST_EMAIL));
         assertDoesNotThrow(() -> fcmService.sendMessageTo(TEST_EMAIL,
             new Data("TEST용 제목", "TEST용 내용",
                 LocalDateTimeUtil.convertToString(LocalDateTime.now()))));
     }
+
+
 }
