@@ -3,6 +3,8 @@ package com.yanolja.scbj.global.config.fcm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.yanolja.scbj.domain.member.service.MailService;
+import com.yanolja.scbj.global.config.RetryConfig;
 import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
 import com.yanolja.scbj.global.config.fcm.FCMRequest.Message;
 import com.yanolja.scbj.global.exception.ErrorCode;
@@ -15,6 +17,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class FCMService {
 
+    private final MailService mailService;
     private final FCMTokenRepository fcmTokenRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -36,13 +43,19 @@ public class FCMService {
     private String scope;
 
     public FCMService(FCMTokenRepository fcmTokenRepository,
-        RestTemplate restTemplate, ObjectMapper objectMapper) {
+        RestTemplate restTemplate, ObjectMapper objectMapper, MailService mailService) {
         this.fcmTokenRepository = fcmTokenRepository;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.mailService = mailService;
     }
 
     @Async
+    @Retryable(
+        retryFor = FirebaseServerException.class,
+        maxAttempts = RetryConfig.MAX_ATTEMPTS,
+        backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
+    )
     public void sendMessageTo(final String email, final Data data) {
 
         if (!hasKey(email)) {
@@ -66,6 +79,10 @@ public class FCMService {
             throw new FirebaseServerException(ErrorCode.FIREBASE_SERVER_ERROR);
         }
 
+    }
+    @Recover
+    public void sendEmailForFailureToSendAlarm(final FirebaseServerException e, final String email, final Data data) {
+        mailService.sendEmail(email, data.getTitle(), data.getMessage());
     }
 
     private String makeMessage(final String targetToken, final Data data) {
@@ -95,6 +112,7 @@ public class FCMService {
             throw new RuntimeException(e);
         }
     }
+
     @Async
     public void saveToken(String email, String token) {
         fcmTokenRepository.saveToken(email, token);

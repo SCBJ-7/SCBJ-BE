@@ -78,6 +78,9 @@ dependencies {
 
 	//fcm
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+	//retry
+	implementation 'org.springframework.retry:spring-retry'
 }
 
 def querydslDir = "src/main/generated"
