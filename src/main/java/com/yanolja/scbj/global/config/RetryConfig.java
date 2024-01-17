@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 
 @Configuration
-@EnableRetry
+@EnableRetry(proxyTargetClass = true)
 public class RetryConfig {
 
     public static final int MAX_ATTEMPTS = 1;
