@@ -58,7 +58,7 @@ public class PaymentRestController {
         PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
 
         paymentService
-            .orderProductWithLock(pgToken, memberId);
+            .orderProductWithLettuceLock(pgToken, memberId);
         return ResponseDTO.res("결제에 성공했습니다.");
     }
 

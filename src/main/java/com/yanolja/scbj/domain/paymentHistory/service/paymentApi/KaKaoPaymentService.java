@@ -44,7 +44,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class KaKaoPaymentService implements PaymentApiService {
 
-    private final String KEY_PREFIX = "kakaoPay";
+    private final String REDIS_CACHE_KEY_PREFIX = "kakaoPay:memberId";
     private final String PAYMENT_TYPE = "카카오페이";
     private final String BASE_URL = "http://localhost:8080/v1/products";
     private final String KAKAO_BASE_URL = "https://kapi.kakao.com/v1/payment";
@@ -127,7 +127,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             redisMap.put("customerPhoneNumber", paymentReadyRequest.customerPhoneNumber());
 
             HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
-            String key = KEY_PREFIX + memberId;
+            String key = REDIS_CACHE_KEY_PREFIX + memberId;
             hashOperations.putAll(key, redisMap);
 
             return paymentReadyResponse.next_redirect_pc_url();
@@ -162,7 +162,7 @@ public class KaKaoPaymentService implements PaymentApiService {
 
         RestTemplate restTemplate = new RestTemplate();
 
-        String key = KEY_PREFIX + memberId;
+        String key = REDIS_CACHE_KEY_PREFIX + memberId;
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");
         String price = (String) redisTemplate.opsForHash().get(key, "price");
 

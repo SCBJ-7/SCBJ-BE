@@ -18,6 +18,7 @@ import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.TimeValidator;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final String KEY_PREFIX = "kakaoPay";
+    private final String REDIS_CACHE_KEY_PREFIX = "kakaoPay:memberId";
+    private final String REDIS_LOCK_KEY_PREFIX = "redis:lock:productId";
     private final String PAYMENT_TYPE = "카카오페이";
     private final String BASE_URL = "http://localhost:8080/v1/products";
     private final String KAKAO_BASE_URL = "https://kapi.kakao.com/v1/payment";
@@ -78,14 +80,13 @@ public class PaymentService {
     }
 
     @Transactional
-    public int orderProductWithOutLock(String pgToken, Long memberId){
-
-        System.err.println("시작");
+    public void orderProductWithLettuceLock(String pgToken, Long memberId){
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-        String key = KEY_PREFIX + memberId;
+        //Cache
+        String key = REDIS_CACHE_KEY_PREFIX + memberId;
         String productId = (String) redisTemplate.opsForHash().get(key, "productId");
         String customerName = (String) redisTemplate.opsForHash().get(key, "customerName");
         String customerEmail = (String) redisTemplate.opsForHash().get(key, "customerEmail");
@@ -93,6 +94,16 @@ public class PaymentService {
             .get(key, "customerPhoneNumber");
         String price = (String) redisTemplate.opsForHash().get(key, "price");
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");
+
+        //Lock
+        String redisLockKey = REDIS_LOCK_KEY_PREFIX + productId;
+        while(!getLock(redisLockKey)){
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         Product product = productRepository.findById(Long.valueOf(productId))
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -116,51 +127,16 @@ public class PaymentService {
 
         product.saleProduct();
         paymentHistoryRepository.save(paymentHistory);
-        System.err.println("종료");
-        return product.getStock();
+        releaseLock(redisLockKey);
     }
 
-    @Transactional
-    public int orderProductWithLock(String pgToken, Long memberId){
+    private boolean getLock(String key){
+        //stock 개수를 넣기
+        return redisTemplate.opsForValue().setIfAbsent(key, "lock", Duration.ofSeconds(5));
+    }
 
-        System.err.println("시작");
-
-        Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-        String key = KEY_PREFIX + memberId;
-        String productId = (String) redisTemplate.opsForHash().get(key, "productId");
-        String customerName = (String) redisTemplate.opsForHash().get(key, "customerName");
-        String customerEmail = (String) redisTemplate.opsForHash().get(key, "customerEmail");
-        String customerPhoneNumber = (String) redisTemplate.opsForHash()
-            .get(key, "customerPhoneNumber");
-        String price = (String) redisTemplate.opsForHash().get(key, "price");
-        String tid = (String) redisTemplate.opsForHash().get(key, "tid");
-
-        Product product = productRepository.findByIdWithPessimistic(Long.valueOf(productId))
-            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
-
-//        kaKaoPaymentService.payInfo(pgToken, memberId, Long.valueOf(productId), tid);
-
-        PaymentAgreement agreement = PaymentAgreement.builder()
-            .build();
-
-        PaymentHistory paymentHistory = PaymentHistory.builder()
-            .member(member)
-            .product(product)
-            .customerName(customerName)
-            .customerEmail(customerEmail)
-            .customerPhoneNumber(customerPhoneNumber)
-            .paymentAgreement(agreement)
-            .price(Integer.parseInt(price))
-            .paymentType(PAYMENT_TYPE)
-            .settlement(true)
-            .build();
-
-        product.saleProduct(); //쿼리 2
-        paymentHistoryRepository.save(paymentHistory); //쿼리 1
-        System.err.println("종료");
-        return product.getStock();
-        //트랜잭션.커밋
+    private boolean releaseLock(String key){
+        //stock 개수 -1하기
+        return redisTemplate.delete(key);
     }
 }
