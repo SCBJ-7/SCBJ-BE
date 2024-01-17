@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -65,9 +66,12 @@ public class Product extends BaseEntity {
     @OneToOne(mappedBy = "product")
     private PaymentHistory paymentHistory;
 
+    @Column
+    @Comment("재고")
+    private int stock;
+
     @Builder
-    private Product(Long id, Reservation reservation, Member member, int firstPrice,
-        int secondPrice,
+    private Product(Long id, Reservation reservation, Member member, int firstPrice, int secondPrice,
         String bank, String accountNumber, int secondGrantPeriod, PaymentHistory paymentHistory) {
         this.id = id;
         this.reservation = reservation;
@@ -78,10 +82,15 @@ public class Product extends BaseEntity {
         this.accountNumber = accountNumber;
         this.secondGrantPeriod = secondGrantPeriod;
         this.paymentHistory = paymentHistory;
+        this.stock = 1;
     }
 
     public void delete(LocalDateTime deleteTime){
         super.delete(deleteTime);
+    }
+
+    public void saleProduct(){
+        this.stock--;
     }
 
 }
