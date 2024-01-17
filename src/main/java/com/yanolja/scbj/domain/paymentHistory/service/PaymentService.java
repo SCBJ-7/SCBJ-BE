@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.paymentHistory.service;
 
+import com.google.api.Http;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
@@ -10,6 +11,7 @@ import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import com.yanolja.scbj.domain.paymentHistory.exception.ProductOutOfStockException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.KaKaoPaymentService;
 import com.yanolja.scbj.domain.product.entity.Product;
@@ -18,12 +20,14 @@ import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.TimeValidator;
+import jakarta.persistence.EntityManager;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,8 +49,10 @@ public class PaymentService {
     private final RedisTemplate redisTemplate;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final MemberRepository memberRepository;
+    private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
+
     public PaymentPageFindResponse getPaymentPage(Long productId) {
         Product targetProduct = productRepository.findProductById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
@@ -80,7 +86,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void orderProductWithLettuceLock(String pgToken, Long memberId){
+    public void orderProductWithLettuceLock(String pgToken, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -97,7 +103,7 @@ public class PaymentService {
 
         //Lock
         String redisLockKey = REDIS_LOCK_KEY_PREFIX + productId;
-        while(!getLock(redisLockKey)){
+        while (!getLock(redisLockKey)) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
@@ -107,6 +113,10 @@ public class PaymentService {
 
         Product product = productRepository.findById(Long.valueOf(productId))
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        if (product.getStock() != 1) {
+            throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+        }
 
 //        kaKaoPaymentService.payInfo(pgToken, memberId, Long.valueOf(productId), tid);
 
@@ -127,16 +137,22 @@ public class PaymentService {
 
         product.saleProduct();
         paymentHistoryRepository.save(paymentHistory);
+        entityManager.flush();
         releaseLock(redisLockKey);
+        // 트랜잭션 종료
     }
 
-    private boolean getLock(String key){
-        //stock 개수를 넣기
-        return redisTemplate.opsForValue().setIfAbsent(key, "lock", Duration.ofSeconds(5));
+    private boolean getLock(String key) {
+        Boolean lock = redisTemplate.opsForValue()
+            .setIfAbsent(key, "lock", Duration.ofMillis(5_000));
+        return lock;
     }
 
-    private boolean releaseLock(String key){
-        //stock 개수 -1하기
+    private boolean releaseLock(String key) {
         return redisTemplate.delete(key);
+    }
+
+    public void order(){
+        orderProductWithLettuceLock();
     }
 }

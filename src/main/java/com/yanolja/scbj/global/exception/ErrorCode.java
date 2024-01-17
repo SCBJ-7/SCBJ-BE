@@ -22,6 +22,7 @@ public enum ErrorCode {
     FIREBASE_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파이어베이스 서버가 연결되지 않습니다."),
     //PRODUCT
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 정보를 찾을 수 없습니다."),
+    PRODUCT_OUT_OF_STOCK(HttpStatus.CONFLICT, "상품 재고가 부족합니다."),
 
     //PAYMENT
     PAYMENT_LOAD_FAIL(HttpStatus.BAD_REQUEST, "결제에 실패하였습니다."),
