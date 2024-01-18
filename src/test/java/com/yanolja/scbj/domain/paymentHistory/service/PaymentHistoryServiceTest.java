@@ -120,6 +120,7 @@ class PaymentHistoryServiceTest {
                 "http://example.com/hotel-room-image1.jpg",
                 "더블 베드",
                 200000,
+                100000,
                 LocalDateTime.of(2024, 1, 1,15,0),
                 LocalDateTime.of(2024, 1, 2,11,0),
                 "판매중");
