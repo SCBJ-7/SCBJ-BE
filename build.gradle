@@ -81,6 +81,10 @@ dependencies {
 
 	//retry
 	implementation 'org.springframework.retry:spring-retry'
+
+	//scheduling
+	implementation 'org.quartz-scheduler:quartz:2.3.0'
+
 }
 
 def querydslDir = "src/main/generated"
