@@ -216,7 +216,7 @@ class ProductRestControllerTest {
             // given
             ProductSearchRequest searchRequest =
                 ProductSearchRequest.builder()
-                    .location("서울")
+//                    .location("서울")
                     .build();
 
             ProductSearchResponse response = ProductSearchResponse.builder()
@@ -298,7 +298,7 @@ class ProductRestControllerTest {
                 .weekend(weekendPage)
                 .build();
             objectMapper.writeValueAsString(weekendPage);
-            when(productService.getAllCity(any(ProductCityRequest.class), any(Pageable.class)))
+            when(productService.getAllProductForMainPage(any(ProductCityRequest.class), any(Pageable.class)))
                 .thenReturn(productMainResponse);
 
             // when
