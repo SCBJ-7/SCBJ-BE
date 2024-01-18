@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CityDtoConverter {
     private static final long PRODUCT_QUANTITY = 2;
+    private static final int FIRST_HOTEL_IMAGE = 0;
 
 
     public List<CityResponse> toCityResponse(List<Product> productByCity) {
@@ -43,6 +44,6 @@ public class CityDtoConverter {
 
     private String getHotelUrl(Hotel hotel) {
         return hotel.getHotelRoomImageList().isEmpty() ? null :
-            hotel.getHotelRoomImageList().get(0).getUrl();
+            hotel.getHotelRoomImageList().get(FIRST_HOTEL_IMAGE).getUrl();
     }
 }
