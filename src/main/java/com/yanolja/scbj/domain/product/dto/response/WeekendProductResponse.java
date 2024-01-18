@@ -14,9 +14,7 @@ public record WeekendProductResponse(
     int originalPrice,
     int salePrice,
     double salePercentage,
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     LocalDateTime checkInDate,
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     LocalDateTime checkOutDate,
     boolean isBrunchIncluded,
     boolean isPoolIncluded,
