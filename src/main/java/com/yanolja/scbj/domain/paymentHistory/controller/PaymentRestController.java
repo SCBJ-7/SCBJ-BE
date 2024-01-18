@@ -46,7 +46,6 @@ public class PaymentRestController {
 
         String url = paymentApiService.payReady(securityUtil.getCurrentMemberId(), productId,
             paymentReadyRequest);
-        System.out.println(url); // Todo: 테스트에서만 필요
         return ResponseDTO.res(url, "결제에 성공했습니다.");
     }
 
