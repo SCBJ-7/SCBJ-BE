@@ -1,7 +1,6 @@
 package com.yanolja.scbj.domain.alarm.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -12,17 +11,13 @@ import com.yanolja.scbj.domain.alarm.dto.AlarmResponse;
 import com.yanolja.scbj.domain.alarm.entity.Alarm;
 import com.yanolja.scbj.domain.alarm.repository.AlarmRepository;
 import com.yanolja.scbj.domain.alarm.util.AlarmMapper;
-import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
-import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
 import com.yanolja.scbj.global.config.fcm.FCMService;
-import com.yanolja.scbj.global.util.LocalDateTimeUtil;
 import com.yanolja.scbj.global.util.SecurityUtil;
-import java.lang.management.MemoryMXBean;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -87,8 +82,7 @@ class AlarmServiceTest {
         void createAlarms() {
             //given
             Member member = Member.builder().build();
-            Data data = new Data("TEST용 제목", "TEST용 메시지",
-                LocalDateTimeUtil.convertToString(LocalDateTime.now()));
+            Data data = new Data("TEST용 제목", "TEST용 메시지",LocalDateTime.now());
             PaymentHistory paymentHistory = PaymentHistory.builder().build();
 
             given(memberService.getMember(any(Long.class))).willReturn(member);

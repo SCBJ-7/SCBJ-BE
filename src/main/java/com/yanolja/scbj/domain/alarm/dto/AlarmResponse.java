@@ -8,7 +8,9 @@ public record AlarmResponse(
     Long id,
     String title,
     String content,
+
     LocalDateTime date,
+
     boolean isRead
 ) {
 
