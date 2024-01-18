@@ -224,6 +224,8 @@ class PaymentServiceTest {
                 .build();
             productRepository.save(product);
 
+            System.err.println("================================================================================================");
+            System.err.println("================================================================================================");
             // 동시성 테스트 시작 ====================================================================
 
             int threadCount = 3;
@@ -235,7 +237,7 @@ class PaymentServiceTest {
             for (int i = 0; i < threadCount; i++) {
                 executorService.submit(() ->{
                     try {
-                        paymentService.orderProductWithLettuceLock("asg", member.getId());
+                        paymentService.stockLock("asg", member.getId());
                     } catch (Exception e) {
                         e.printStackTrace();
                         exceptionList.add(e);
@@ -244,7 +246,6 @@ class PaymentServiceTest {
                     }
                 });
             }
-
 
             latch.await();
             Product getProduct = productRepository.findById(product.getId()).get();
