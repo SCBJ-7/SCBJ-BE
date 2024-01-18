@@ -7,8 +7,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableRetry(proxyTargetClass = true)
 public class RetryConfig {
 
-    public static final int MAX_ATTEMPTS = 1;
-    public static final int MAX_DELAY = 100;
-
+    public static final int MAX_ATTEMPTS = 2;
+    public static final int MAX_DELAY = 500;
 
 }

@@ -5,24 +5,24 @@ import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
-
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentApproveResponse;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentCancelResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentReadyResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.KakaoPayException;
+import com.yanolja.scbj.domain.paymentHistory.exception.ProductNotForSaleException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.product.entity.Product;
-import com.yanolja.scbj.domain.product.enums.SecondTransferExistence;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.global.config.RetryConfig;
 import com.yanolja.scbj.global.exception.ErrorCode;
+import com.yanolja.scbj.global.exception.InternalServerException;
+import com.yanolja.scbj.global.util.TimeValidator;
 import jakarta.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,13 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -53,6 +59,7 @@ public class KaKaoPaymentService implements PaymentApiService {
     private final MemberRepository memberRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final RestTemplate restTemplate;
 
     private HttpHeaders headers;
 
@@ -69,34 +76,31 @@ public class KaKaoPaymentService implements PaymentApiService {
 
     @Override
     @Transactional(readOnly = true)
-    public String payReady(Long memberId, Long productId,
-        PaymentReadyRequest paymentReadyRequest) {
+    @Retryable(
+        retryFor = KakaoPayException.class,
+        maxAttempts = RetryConfig.MAX_ATTEMPTS,
+        backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
+    )
+    public String payReady(Long memberId, Long productId, PaymentReadyRequest paymentReadyRequest) {
 
         Product targetProduct = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
                 ErrorCode.PRODUCT_NOT_FOUND));
 
-        RestTemplate restTemplate = new RestTemplate();
+        if (targetProduct.getMember().getId().equals(memberId)) {
+            throw new ProductNotForSaleException(ErrorCode.PRODUCT_NOT_FOR_SALE);
+        }
 
         Hotel targetHotel = targetProduct.getReservation().getHotel();
         Reservation targetReservation = targetProduct.getReservation();
 
-        String productName = targetHotel.getHotelName() + " " + targetHotel.getRoom().getRoomName();
-
-        LocalDateTime changeTime = null;
-        LocalDateTime checkInDateTime = targetReservation.getStartDate();
-
         int price = targetProduct.getFirstPrice();
-        if (targetProduct.getSecondGrantPeriod()
-            != SecondTransferExistence.NOT_EXISTS.getStatus()) {
-            int secondGrantPeriod = targetProduct.getSecondGrantPeriod();
-            changeTime = checkInDateTime.minusHours(secondGrantPeriod);
-
-            if (changeTime.isBefore(LocalDateTime.now())) {
-                price = targetProduct.getSecondPrice();
-            }
+        if (TimeValidator.isOverSecondGrantPeriod(targetProduct,
+            targetReservation.getStartDate())) {
+            price = targetProduct.getSecondPrice();
         }
 
+        String productName = targetHotel.getHotelName() + " " + targetHotel.getRoom().getRoomName();
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
         params.add("partner_order_id", String.valueOf(productId));
@@ -113,9 +117,11 @@ public class KaKaoPaymentService implements PaymentApiService {
 
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
         try {
-            PaymentReadyResponse paymentReadyResponse = restTemplate.postForObject(
-                new URI(KAKAO_BASE_URL + "/ready"), body,
-                PaymentReadyResponse.class);
+            ResponseEntity<PaymentReadyResponse> response = restTemplate.postForEntity(
+                new URI(KAKAO_BASE_URL + "/ready"), body, PaymentReadyResponse.class);
+
+            checkStatus(response.getStatusCode());
+            PaymentReadyResponse paymentReadyResponse = response.getBody();
 
             Map<String, String> redisMap = new HashMap<>();
             redisMap.put("productId", String.valueOf(productId));
@@ -135,11 +141,15 @@ public class KaKaoPaymentService implements PaymentApiService {
         }
     }
 
+
     @Override
     @Transactional
+    @Retryable(
+        retryFor = KakaoPayException.class,
+        maxAttempts = RetryConfig.MAX_ATTEMPTS,
+        backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
+    )
     public void payInfo(String pgToken, Long memberId) {
-
-        RestTemplate restTemplate = new RestTemplate();
 
         String key = KEY_PREFIX + memberId;
         String productId = (String) redisTemplate.opsForHash().get(key, "productId");
@@ -160,8 +170,11 @@ public class KaKaoPaymentService implements PaymentApiService {
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
 
         try {
-            restTemplate.postForObject(new URI(KAKAO_BASE_URL + "/approve"), body,
+            ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
+                new URI(KAKAO_BASE_URL + "/approve"), body,
                 PaymentApproveResponse.class);
+
+            checkStatus(response.getStatusCode());
 
             Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -183,6 +196,7 @@ public class KaKaoPaymentService implements PaymentApiService {
                 .paymentType(PAYMENT_TYPE)
                 .build();
 
+            product.sell();
             paymentHistoryRepository.save(paymentHistory);
 
         } catch (RestClientException | URISyntaxException e) {
@@ -191,9 +205,12 @@ public class KaKaoPaymentService implements PaymentApiService {
     }
 
     @Override
+    @Retryable(
+        retryFor = KakaoPayException.class,
+        maxAttempts = RetryConfig.MAX_ATTEMPTS,
+        backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
+    )
     public void payCancel(Long memberId) {
-
-        RestTemplate restTemplate = new RestTemplate();
 
         String key = KEY_PREFIX + memberId;
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");
@@ -208,11 +225,35 @@ public class KaKaoPaymentService implements PaymentApiService {
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
 
         try {
-            restTemplate.postForObject(new URI(KAKAO_BASE_URL + "/cancel"), body,
-                PaymentCancelResponse.class);
+            ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
+                new URI(KAKAO_BASE_URL + "/cancel"), body, PaymentApproveResponse.class);
+
+            checkStatus(response.getStatusCode());
+
         } catch (URISyntaxException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_CANCEL_FAIL);
         } catch (Exception e) {
         }
     }
+
+    private void checkStatus(HttpStatusCode statusCode){
+        if (statusCode.equals(HttpStatus.BAD_REQUEST) || statusCode.equals(
+            HttpStatus.UNAUTHORIZED) || statusCode.equals(HttpStatus.FORBIDDEN)
+            || statusCode.equals(HttpStatus.NOT_FOUND)) {
+
+            throw new InternalServerException(ErrorCode.SERVER_ERROR);
+        }
+
+        if (statusCode.equals(HttpStatus.INTERNAL_SERVER_ERROR) ||
+            statusCode.equals(HttpStatus.SERVICE_UNAVAILABLE)) {
+
+            throw new KakaoPayException(ErrorCode.KAKAO_PAY_READY_FAIL);
+        }
+    }
+
+    @Recover
+    private void sendExceptionForPayFailure(KakaoPayException e){
+        throw new KakaoPayException(e.getErrorCode());
+    }
+
 }
