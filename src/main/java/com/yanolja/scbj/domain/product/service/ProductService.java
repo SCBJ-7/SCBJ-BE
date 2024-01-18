@@ -24,8 +24,6 @@ import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.exception.ReservationNotFoundException;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
-import com.yanolja.scbj.domain.reservation.service.CityDtoConverter;
-import com.yanolja.scbj.domain.reservation.service.WeekendDtoConverter;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
