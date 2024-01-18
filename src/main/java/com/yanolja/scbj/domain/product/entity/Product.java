@@ -90,6 +90,7 @@ public class Product extends BaseEntity {
     }
 
     public void saleProduct(){
+        System.err.println("재고감소");
         this.stock--;
     }
 
