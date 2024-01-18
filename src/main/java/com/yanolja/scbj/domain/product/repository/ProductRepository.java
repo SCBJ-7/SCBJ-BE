@@ -18,10 +18,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
            h.hotelName, 
            hImg.url, 
            h.room.bedType, 
-           (CASE 
-                WHEN p.secondPrice IS NOT NULL THEN p.secondPrice 
-                ELSE p.firstPrice 
-           END), 
+           p.firstPrice,
+           p.secondPrice, 
            r.startDate, 
            r.endDate, 
            (CASE 
