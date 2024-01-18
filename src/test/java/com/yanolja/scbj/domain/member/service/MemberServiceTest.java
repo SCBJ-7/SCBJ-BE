@@ -154,7 +154,7 @@ class MemberServiceTest {
         void updateMemberAccount() {
             //given
             MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
-                .accountNumber("123-456-789")
+                .accountNumber("123456789")
                 .bank("농협")
                 .build();
 
