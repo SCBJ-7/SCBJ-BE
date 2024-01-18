@@ -11,6 +11,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,11 +19,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
+import com.yanolja.scbj.domain.product.dto.request.ProductCityRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
+import com.yanolja.scbj.domain.product.dto.response.CityResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
+import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;
@@ -226,19 +231,90 @@ class ProductRestControllerTest {
 
             Page<ProductSearchResponse> expectedResponse =
                 new PageImpl<>(List.of(response), pageable, 1);
-
+            objectMapper.writeValueAsString(expectedResponse);
             when(productService.searchByRequest(any(ProductSearchRequest.class), eq(pageable)))
                 .thenReturn(expectedResponse);
 
             // when & then
-            mvc.perform(get("/v1/products")
+            mvc.perform(get("/v1/products/search")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(searchRequest))
                     .param("page", "1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()).andDo(print());
 
+        }
+    }
+
+    @Nested
+    @DisplayName("메인 페이지는")
+    class Context_mainProduct{
+
+        @Test
+        @DisplayName("성공시 200을 가져온다")
+        void getProductsForMainTest() throws Exception {
+            // given
+            List<String> cityNames = List.of("서울", "강원", "부산", "제주", "경상", "전라");
+            ProductCityRequest productCityRequest = new ProductCityRequest(cityNames);
+
+            CityResponse seoulCityResponse = CityResponse.builder()
+                .id(1L)
+                .city("서울")
+                .imageUrl("image_url_seoul.jpg")
+                .hotelName("서울 호텔")
+                .roomType("더블")
+                .originalPrice(200000)
+                .salePrice(180000)
+                .salePercentage(10.0)
+                .checkInDate(LocalDateTime.now())
+                .checkOutDate(LocalDateTime.now().plusDays(1))
+                .build();
+
+            WeekendProductResponse weekendProductResponse = WeekendProductResponse.builder()
+                .id(2L)
+                .hotelName("주말 호텔")
+                .roomType("스위트")
+                .imageUrl("image_url_weekend.jpg")
+                .originalPrice(300000)
+                .salePrice(270000)
+                .salePercentage(10.0)
+                .checkInDate(LocalDateTime.now().plusDays(5))
+                .checkOutDate(LocalDateTime.now().plusDays(6))
+                .isBrunchIncluded(true)
+                .isPoolIncluded(false)
+                .isOceanViewIncluded(true)
+                .roomThemeCount(3)
+                .build();
+
+            Pageable pageable = PageRequest.of(1, 10);
+            Page<WeekendProductResponse> weekendPage = new PageImpl<>(List.of(weekendProductResponse),pageable,1); // 인자를 하나만 줬을때 문제다?
+
+            ProductMainResponse productMainResponse = ProductMainResponse.builder()
+                .seoul(List.of(seoulCityResponse))
+                .gangwon(List.of(seoulCityResponse))
+                .busan(List.of(seoulCityResponse))
+                .jeju(List.of(seoulCityResponse))
+                .gyeongsang(List.of(seoulCityResponse))
+                .jeolla(List.of(seoulCityResponse))
+                .weekend(weekendPage)
+                .build();
+            objectMapper.writeValueAsString(weekendPage);
+            when(productService.getAllCity(any(ProductCityRequest.class), any(Pageable.class)))
+                .thenReturn(productMainResponse);
+
+            // when
+            ResultActions result = mvc.perform(get("/v1/products/main")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(productCityRequest))
+                .param("page", "1")
+                .param("size", "10"));
+
+            // then
+            result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.data").exists());
         }
 
     }
+
 
 }

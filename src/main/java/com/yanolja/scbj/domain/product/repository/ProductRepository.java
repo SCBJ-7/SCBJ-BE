@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.product.repository;
 
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,5 +53,30 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
         + "join fetch h.hotelRoomPrice hp "
         + "where p.id = :productId")
     Optional<Product> findProductById(@Param("productId") Long productId);
+
+
+    @Query("""
+    FROM Product p
+    JOIN FETCH p.reservation r
+    JOIN FETCH r.hotel h
+    LEFT JOIN FETCH p.paymentHistory ph
+    WHERE h.hotelMainAddress = :city AND ph.id IS NULL
+""")
+    List<Product> findProductByCity(@Param("city") String city);
+
+
+    @Query(value = """
+    SELECT * 
+    FROM Product p
+    JOIN Reservation r ON p.reservation_id = r.id
+    JOIN Hotel h ON r.hotel_id = h.id
+    LEFT JOIN PaymentHistory ph ON p.payment_history_id = ph.id
+    WHERE DAYOFWEEK(r.start_date) IN (6, 7, 1)
+    AND r.start_date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 21 DAY)
+    AND ph.id IS NULL
+    """, nativeQuery = true)
+    List<Product> findProductByWeekend();
+
+
 
 }

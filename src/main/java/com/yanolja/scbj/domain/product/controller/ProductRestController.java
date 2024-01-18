@@ -1,7 +1,9 @@
 package com.yanolja.scbj.domain.product.controller;
 
+import com.yanolja.scbj.domain.product.dto.request.ProductCityRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
+import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
@@ -25,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("v1/products")
+@RequestMapping("/v1/products")
 public class ProductRestController {
 
     private final ProductService productService;
@@ -57,7 +59,7 @@ public class ProductRestController {
         return ResponseDTO.res("상품 삭제에 성공했습니다.");
     }
 
-    @GetMapping
+    @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<Page<ProductSearchResponse>> searchProducts(
        @Valid @RequestBody ProductSearchRequest productSearchRequest,
@@ -68,4 +70,15 @@ public class ProductRestController {
 
         return ResponseDTO.res(searchResponses, "조회에 성공하였습니다");
     }
+
+    @GetMapping("/main")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO<ProductMainResponse> getProductsForMain(
+        @Valid @RequestBody ProductCityRequest productCityRequest,
+        @PageableDefault(page = 1) Pageable pageable
+        ) {
+        ProductMainResponse mainResponse = productService.getAllCity(productCityRequest , pageable);
+        return ResponseDTO.res(mainResponse,"조회에 성공하였습니다");
+    }
+
 }

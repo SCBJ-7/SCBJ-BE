@@ -4,9 +4,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
-import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
-import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
@@ -14,10 +12,9 @@ import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.domain.testdata.TestData;
 import com.yanolja.scbj.global.config.QuerydslConfig;
-import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,166 +33,89 @@ import org.springframework.data.domain.PageRequest;
 public class ProductSearchRepositoryTest {
 
 
-
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
     private ProductRepository productRepository;
 
-    private Member createMember(String email, String phoneNumber) {
-        Member member = Member.builder()
-            .email(email)
-            .password("password")
-            .name("홍길동")
-            .phone(phoneNumber)
-            .authority(Authority.ROLE_USER)
-            .build();
-        entityManager.persist(member);
-        return member;
-    }
-
-    private RoomTheme createRoomTheme(Boolean parking, Boolean pool) {
-        RoomTheme roomTheme = RoomTheme.builder()
-            .parkingZone(parking)
-            .breakfast(false)
-            .pool(pool)
-            .oceanView(false)
-            .build();
-        entityManager.persist(roomTheme);
-        return roomTheme;
-    }
-
-    private Hotel createHotel(RoomTheme roomTheme, String hotelAddress, Integer maxPeople) {
-        Room room = Room.builder()
-            .roomName("Deluxe Room")
-            .checkIn(LocalTime.of(14, 0))
-            .checkOut(LocalTime.of(11, 0))
-            .bedType("Double Bed")
-            .standardPeople(100)
-            .maxPeople(maxPeople)
-            .roomTheme(roomTheme)
-            .build();
-
-        Hotel hotel = Hotel.builder()
-            .hotelName("롯데 시그니엘 호텔")
-            .hotelMainAddress(hotelAddress)
-            .hotelDetailAddress("123 Yanolja St, Gangnam-gu")
-            .hotelInfoUrl("http://yanoljahotel.com")
-            .room(room)
-            .build();
-
-        entityManager.persist(hotel);
-        return hotel;
-    }
-
-    private HotelRoomImage createHotelRoomImage(Hotel hotel) {
-        HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
-            .hotel(hotel)
-            .url("http://example.com/hotel-room-image.jpg")
-            .build();
-        entityManager.persist(hotelRoomImage);
-        return hotelRoomImage;
-    }
-
-
-    private YanoljaMember createYanoljaMember(String email) {
-        YanoljaMember yanoljaMember = YanoljaMember.builder()
-            .email(email)
-            .build();
-        entityManager.persist(yanoljaMember);
-        return yanoljaMember;
-    }
-
-    private Reservation createReservation(Hotel hotel, YanoljaMember yanoljaMember,
-                                          LocalDate checkIn, LocalDate checkOut, int purchasePrice) {
-        Reservation reservation = Reservation.builder()
-            .hotel(hotel)
-            .yanoljaMember(yanoljaMember)
-            .startDate(checkIn.atStartOfDay())
-            .endDate(checkOut.atStartOfDay())
-            .purchasePrice(purchasePrice)
-            .build();
-        entityManager.persist(reservation);
-        return reservation;
-    }
-
-    private Product createProduct(Member member, Reservation reservation, int firstPrice, int secondPrice, int time) {
-        Product product = Product.builder()
-            .reservation(reservation)
-            .member(member)
-            .bank("하나 은행")
-            .accountNumber("123123")
-            .firstPrice(firstPrice)
-            .secondPrice(secondPrice)
-            .secondGrantPeriod(time)
-            .build();
-        entityManager.persist(product);
-        return product;
-    }
-
-    private PaymentHistory createPaymentHistory( Product product) {
-        PaymentHistory paymentHistory = PaymentHistory.builder()
-
-            .product(product)
-            .price(10000) // 예시 가격
-            .customerName("홍길동")
-            .customerEmail("hong.gildong@example.com")
-            .customerPhoneNumber("010-1234-5678")
-            .paymentType("신용카드")
-            .settlement(true)
-            .build();
-        entityManager.persist(paymentHistory);
-        return paymentHistory;
-    }
-
     @BeforeEach
     void init() {
         IntStream.rangeClosed(1, 10) // 결제내역이 있으니 포함 X
             .forEach(i -> {
                 String randomAddress = "이천";
-                Member member = createMember("user" + i + "@example.com", "홍길동" + i);
-                RoomTheme roomTheme = createRoomTheme(true,true);
-                Hotel hotel2 = createHotel(roomTheme, randomAddress, 3);
-                createHotelRoomImage(hotel2);
-                YanoljaMember yanoljaMember = createYanoljaMember("yanolja" + i + "@example.com");
-                Reservation reservation = createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(1),
-                    LocalDate.now().plusDays(5),200000);
-                Product product = createProduct(member, reservation, 100000,50000,0);
-                createPaymentHistory(product);
-               entityManager.flush();
+                Member member = TestData.createMember("user" + i + "@example.com", "홍길동" + i);
+                entityManager.persist(member);
+                RoomTheme roomTheme = TestData.createRoomTheme(true, true);
+                entityManager.persist(roomTheme);
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 2);
+                entityManager.persist(hotel2);
+                HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
+                entityManager.persist(hotelRoomImage);
+                YanoljaMember yanoljaMember =
+                    TestData.createYanoljaMember("yanolja" + i + "@example.com");
+                entityManager.persist(yanoljaMember);
+                Reservation reservation =
+                    TestData.createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(1),
+                        LocalDate.now().plusDays(5), 200000);
+                entityManager.persist(reservation);
+                Product product = TestData.createProduct(member, reservation, 100000, 50000, 0);
+                entityManager.persist(product);
+                PaymentHistory paymentHistory = TestData.createPaymentHistory(product);
+                entityManager.persist(paymentHistory);
+                entityManager.flush();
             });
 
 
         IntStream.rangeClosed(1, 5)
             .forEach(i -> {
                 String randomAddress = "강릉";
-                Member member = createMember("user" + i + 20 + "@example.com", "홍길동" + i + 20);
-                RoomTheme roomTheme = createRoomTheme(true,true);
-                Hotel hotel2 = createHotel(roomTheme, randomAddress, 4);
-                createHotelRoomImage(hotel2);
+                Member member =
+                    TestData.createMember("user" + i + 20 + "@example.com", "홍길동" + i + 20);
+                entityManager.persist(member);
+                RoomTheme roomTheme = TestData.createRoomTheme(true, true);
+                entityManager.persist(roomTheme);
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 4);
+                entityManager.persist(hotel2);
+                HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
+                entityManager.persist(hotelRoomImage);
                 YanoljaMember yanoljaMember =
-                    createYanoljaMember("yanolja" + i + 20 + "@example.com");
+                    TestData.createYanoljaMember("yanolja" + i + 20 + "@example.com");
+                entityManager.persist(yanoljaMember);
                 Reservation reservation =
-                    createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(1),
-                        LocalDate.now().plusDays(2),300000);
-                Product product = createProduct(member, reservation, 200000, 100000,1);
+                    TestData.createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(1),
+                        LocalDate.now().plusDays(2), 300000);
+                entityManager.persist(reservation);
+                Product product = TestData.createProduct(member, reservation, 200000, 100000, 1);
+                entityManager.persist(product);
+                PaymentHistory paymentHistory = TestData.createPaymentHistory(null);
+                entityManager.persist(paymentHistory);
                 entityManager.flush();
             });
 
         IntStream.rangeClosed(1, 5)
             .forEach(i -> {
                 String randomAddress = "서울";
-                Member member = createMember("user" + i + 30 + "@example.com", "홍길동" + i + 30);
-                RoomTheme roomTheme = createRoomTheme(true,true);
-                Hotel hotel2 = createHotel(roomTheme, randomAddress, 3);
-                createHotelRoomImage(hotel2);
+                Member member =
+                    TestData.createMember("user" + i + 30 + "@example.com", "홍길동" + i + 30);
+                entityManager.persist(member);
+                RoomTheme roomTheme = TestData.createRoomTheme(true, true);
+                entityManager.persist(roomTheme);
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 3);
+                entityManager.persist(hotel2);
+                HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
+                entityManager.persist(hotelRoomImage);
                 YanoljaMember yanoljaMember =
-                    createYanoljaMember("yanolja" + i + 30 + "@example.com");
+                    TestData.createYanoljaMember("yanolja" + i + 30 + "@example.com");
+                entityManager.persist(yanoljaMember);
                 Reservation reservation =
-                    createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(8),
-                        LocalDate.now().plusDays(13),400000);
-                Product product = createProduct(member, reservation, 300000, 250000,0);
+                    TestData.createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(8),
+                        LocalDate.now().plusDays(13), 400000);
+                entityManager.persist(reservation);
+                Product product = TestData.createProduct(member, reservation, 300000, 250000, 0);
+                entityManager.persist(product);
+                PaymentHistory paymentHistory = TestData.createPaymentHistory(null);
+                entityManager.persist(paymentHistory);
                 entityManager.flush();
             });
         entityManager.clear();
@@ -337,7 +257,7 @@ public class ProductSearchRepositoryTest {
 
         @Test
         @DisplayName("판매중인것만 조회가 된다")
-        public  void will_success_get_on_sale() {
+        public void will_success_get_on_sale() {
             //given
             ProductSearchRequest productSearchRequest = ProductSearchRequest.builder().build();
 
