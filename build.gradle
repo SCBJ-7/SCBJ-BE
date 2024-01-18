@@ -81,6 +81,10 @@ dependencies {
 
 	//retry
 	implementation 'org.springframework.retry:spring-retry'
+
+	// thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 }
 
 def querydslDir = "src/main/generated"
