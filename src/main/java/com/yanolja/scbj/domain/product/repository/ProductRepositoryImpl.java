@@ -4,6 +4,7 @@ import static com.yanolja.scbj.domain.hotelRoom.entity.QHotel.hotel;
 import static com.yanolja.scbj.domain.hotelRoom.entity.QHotelRoomImage.hotelRoomImage;
 import static com.yanolja.scbj.domain.hotelRoom.entity.QRoom.room;
 import static com.yanolja.scbj.domain.hotelRoom.entity.QRoomTheme.roomTheme;
+import static com.yanolja.scbj.domain.paymentHistory.entity.QPaymentHistory.*;
 import static com.yanolja.scbj.domain.product.entity.QProduct.product;
 import static com.yanolja.scbj.domain.reservation.entity.QReservation.reservation;
 
@@ -11,6 +12,8 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import com.yanolja.scbj.domain.paymentHistory.entity.QPaymentHistory;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import java.time.LocalDate;
@@ -45,15 +48,17 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 product.secondGrantPeriod,
                 reservation.startDate,
                 reservation.endDate,
-                product.createdAt
+                product.createdAt,
+                paymentHistory.id
             )
             .from(product)
             .innerJoin(product.reservation, reservation)
             .innerJoin(reservation.hotel, hotel)
             .innerJoin(roomTheme).on(hotel.room.roomTheme.id.eq(roomTheme.id))
             .join(roomTheme)
+            .leftJoin(product.paymentHistory,paymentHistory)
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
-            .where(allFilter(productSearchRequest))
+            .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
             .fetch()
             .stream().map(tuple -> {
                 Integer purchasePrice = tuple.get(reservation.purchasePrice);
@@ -105,8 +110,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     private BooleanExpression betweenDate(LocalDate checkIn, LocalDate checkOut) {
         if (checkIn != null && checkOut != null) {
-            return reservation.startDate.between(checkIn.atStartOfDay(),
-                checkOut.minusDays(1).atStartOfDay());
+            return reservation.startDate.loe(checkOut.minusDays(1).atStartOfDay())
+                .and(reservation.endDate.goe(checkIn.atStartOfDay()));
         }
         return reservation.startDate.goe(LocalDateTime.now());
     }

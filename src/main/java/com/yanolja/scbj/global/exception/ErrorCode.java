@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    //Security
+    AUTH_FORBIDDEN(HttpStatus.FORBIDDEN, "해당 권한으로는 접근이 불가합니다."),
     //JWT
-    INVALID_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 액세스 토큰입니다"),
+    INVALID_TOKEN(HttpStatus.PAYMENT_REQUIRED, "유효하지 않은 액세스 토큰입니다"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 액세스 토큰입니다."),
     //MEMBER
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),

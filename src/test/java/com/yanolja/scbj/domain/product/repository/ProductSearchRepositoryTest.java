@@ -9,6 +9,7 @@ import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
@@ -133,9 +134,24 @@ public class ProductSearchRepositoryTest {
         return product;
     }
 
+    private PaymentHistory createPaymentHistory( Product product) {
+        PaymentHistory paymentHistory = PaymentHistory.builder()
+
+            .product(product)
+            .price(10000) // 예시 가격
+            .customerName("홍길동")
+            .customerEmail("hong.gildong@example.com")
+            .customerPhoneNumber("010-1234-5678")
+            .paymentType("신용카드")
+            .settlement(true)
+            .build();
+        entityManager.persist(paymentHistory);
+        return paymentHistory;
+    }
+
     @BeforeEach
     void init() {
-        IntStream.rangeClosed(1, 10)
+        IntStream.rangeClosed(1, 10) // 결제내역이 있으니 포함 X
             .forEach(i -> {
                 String randomAddress = "이천";
                 Member member = createMember("user" + i + "@example.com", "홍길동" + i);
@@ -146,6 +162,7 @@ public class ProductSearchRepositoryTest {
                 Reservation reservation = createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(1),
                     LocalDate.now().plusDays(5),200000);
                 Product product = createProduct(member, reservation, 100000,50000,0);
+                createPaymentHistory(product);
                entityManager.flush();
             });
 
@@ -154,14 +171,14 @@ public class ProductSearchRepositoryTest {
             .forEach(i -> {
                 String randomAddress = "강릉";
                 Member member = createMember("user" + i + 20 + "@example.com", "홍길동" + i + 20);
-                RoomTheme roomTheme = createRoomTheme(false,false);
-                Hotel hotel2 = createHotel(roomTheme, randomAddress, 2);
+                RoomTheme roomTheme = createRoomTheme(true,true);
+                Hotel hotel2 = createHotel(roomTheme, randomAddress, 4);
                 createHotelRoomImage(hotel2);
                 YanoljaMember yanoljaMember =
                     createYanoljaMember("yanolja" + i + 20 + "@example.com");
                 Reservation reservation =
-                    createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(6),
-                        LocalDate.now().plusDays(8),300000);
+                    createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(1),
+                        LocalDate.now().plusDays(2),300000);
                 Product product = createProduct(member, reservation, 200000, 100000,1);
                 entityManager.flush();
             });
@@ -170,8 +187,8 @@ public class ProductSearchRepositoryTest {
             .forEach(i -> {
                 String randomAddress = "서울";
                 Member member = createMember("user" + i + 30 + "@example.com", "홍길동" + i + 30);
-                RoomTheme roomTheme = createRoomTheme(false,false);
-                Hotel hotel2 = createHotel(roomTheme, randomAddress, 2);
+                RoomTheme roomTheme = createRoomTheme(true,true);
+                Hotel hotel2 = createHotel(roomTheme, randomAddress, 3);
                 createHotelRoomImage(hotel2);
                 YanoljaMember yanoljaMember =
                     createYanoljaMember("yanolja" + i + 30 + "@example.com");
@@ -230,7 +247,7 @@ public class ProductSearchRepositoryTest {
                 System.out.println(productSearchResponse.getOriginalPrice());
             }
 
-            assertThat(content.size()).isEqualTo(10);
+            assertThat(content.size()).isEqualTo(5);
         }
 
         @Test
@@ -308,13 +325,32 @@ public class ProductSearchRepositoryTest {
             List<ProductSearchResponse> content = highSearchResult.getContent();
 
             for (int i = 0; i < 5; i++) {
-                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.5);
+                System.out.println(content.get(i).getSalePrice());
+                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.3333333333333333);
             }
 
             assertThat(lowPriceResult).isNotEmpty();
-            for (int i = 0; i < 10; i++) {
-                assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(100000);
+            for (int i = 0; i < 5; i++) {
+                assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(200000);
             }
+        }
+
+        @Test
+        @DisplayName("판매중인것만 조회가 된다")
+        public  void will_success_get_on_sale() {
+            //given
+            ProductSearchRequest productSearchRequest = ProductSearchRequest.builder().build();
+
+            //when
+            Page<ProductSearchResponse> responses =
+                productRepository.search(PageRequest.of(0, 10), productSearchRequest);
+
+
+            //then
+            assertThat(responses).isNotEmpty();
+            List<ProductSearchResponse> content = responses.getContent();
+            assertThat(content.size()).isEqualTo(10);
+
         }
     }
 }

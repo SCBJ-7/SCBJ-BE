@@ -153,7 +153,7 @@ class MemberRestControllerTest {
         void updateMemberAccount() throws Exception {
             //given
             MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest
-                .builder().accountNumber("123-345-6783").bank("농협").build();
+                .builder().accountNumber("1233456783").bank("농협").build();
             //when & then
             mockMvc.perform(patch("/v1/members/account")
                     .content(objectMapper.writeValueAsString(memberUpdateAccountRequest))

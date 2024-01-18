@@ -12,12 +12,14 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class AlarmMapper {
 
+
     public AlarmResponse toAlarmResponse(Alarm alarm) {
         return AlarmResponse.builder()
             .id(alarm.getId())
             .title(alarm.getTitle())
             .content(alarm.getContent())
             .date(alarm.getCreatedAt())
+            .isRead(alarm.isRead())
             .build();
     }
 
