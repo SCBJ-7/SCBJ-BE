@@ -51,7 +51,7 @@ class AlarmRestControllerTest {
         AlarmResponse alarmResponse = AlarmResponse.builder()
             .title("알림 TEST 제목입니다.")
             .content("알림 TEST 내용입니다.")
-            .date(AlarmMapper.toStringDate(LocalDateTime.now()))
+            .date(LocalDateTime.now())
             .build();
 
         @Test
