@@ -1,6 +1,7 @@
 package com.yanolja.scbj.global.config.fcm;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +26,7 @@ public class FCMRequest {
 
         private final String title;
         private final String message;
-        private final String date;
+        private final LocalDateTime date;
 
     }
 }

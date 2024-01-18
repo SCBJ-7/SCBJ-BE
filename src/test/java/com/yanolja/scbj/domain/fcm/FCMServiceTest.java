@@ -1,13 +1,11 @@
 package com.yanolja.scbj.domain.fcm;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.yanolja.scbj.global.config.AbstractContainersSupport;
 import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
 import com.yanolja.scbj.global.config.fcm.FCMService;
 import com.yanolja.scbj.global.config.fcm.FCMTokenRepository;
-import com.yanolja.scbj.global.util.LocalDateTimeUtil;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +33,6 @@ public class FCMServiceTest extends AbstractContainersSupport {
 //        assertTrue(fcmTokenRepository.hasKey(TEST_EMAIL));
         assertDoesNotThrow(() -> fcmService.sendMessageTo(TEST_EMAIL,
             new Data("TEST용 제목", "TEST용 내용",
-                LocalDateTimeUtil.convertToString(LocalDateTime.now()))));
+                LocalDateTime.now())));
     }
 }
