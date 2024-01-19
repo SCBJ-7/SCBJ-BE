@@ -7,7 +7,8 @@ public record SaleHistoryResponse(
     String name,
     String imageUrl,
     String roomType,
-    Integer price,
+    Integer firstPrice,
+    Integer secondPrice,
     LocalDateTime checkInDate,
     LocalDateTime checkOutDate,
     String saleStatus

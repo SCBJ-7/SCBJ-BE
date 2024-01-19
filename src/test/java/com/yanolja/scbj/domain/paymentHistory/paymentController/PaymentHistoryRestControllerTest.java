@@ -177,6 +177,7 @@ public class PaymentHistoryRestControllerTest {
                 "http://example.com/hotel-room-image1.jpg",
                 "더블 베드",
                 200000,
+                100000,
                 LocalDateTime.of(2024, 1, 1, 15, 0),
                 LocalDateTime.of(2024, 1, 2, 1, 0),
                 "판매중"
@@ -186,6 +187,7 @@ public class PaymentHistoryRestControllerTest {
                 "http://example.com/hotel-room-image2.jpg",
                 "트윈 베드",
                 150000,
+                80000,
                 LocalDateTime.of(2024, 1, 3, 15, 0),
                 LocalDateTime.of(2024, 1, 4, 11, 0),
                 "거래완료"
