@@ -16,6 +16,8 @@ import com.yanolja.scbj.domain.member.exception.NotFoundYanoljaMember;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
+import com.yanolja.scbj.global.config.fcm.FCMService;
+import com.yanolja.scbj.global.config.fcm.FCMTokenRepository;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.SecurityUtil;
@@ -34,15 +36,19 @@ public class MemberService {
     private final SecurityUtil securityUtil;
     private final JwtUtil jwtUtil;
 
+    private final FCMService fcmService;
+
 
     MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder,
         SecurityUtil securityUtil, JwtUtil jwtUtil,
-        YanoljaMemberRepository yanoljaMemberRepository) {
+        YanoljaMemberRepository yanoljaMemberRepository,
+        FCMService fcmService) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.securityUtil = securityUtil;
         this.jwtUtil = jwtUtil;
         this.yanoljaMemberRepository = yanoljaMemberRepository;
+        this.fcmService = fcmService;
     }
 
     public MemberResponse signUp(final MemberSignUpRequest memberSignUpRequest) {
@@ -64,6 +70,11 @@ public class MemberService {
             String accessToken = jwtUtil.generateToken(MemberMapper.toUserDetails(retrivedMember));
             String refreshToken = jwtUtil.generateRefreshToken(
                 String.valueOf(retrivedMember.getId()));
+
+            if(memberSignInRequest.fcmToken() != null) {
+                fcmService.saveToken(retrivedMember.getEmail(), memberSignInRequest.fcmToken());
+            }
+
             return MemberMapper.toSignInResponse(MemberMapper.toMemberResponse(retrivedMember),
                 MemberMapper.toTokenResponse(accessToken, refreshToken));
         } else {
@@ -75,6 +86,10 @@ public class MemberService {
     public void logout(final RefreshRequest refreshRequest) {
         jwtUtil.setBlackList(refreshRequest.getAccessToken().substring(JwtUtil.GRANT_TYPE.length()),
             refreshRequest.getRefreshToken());
+
+        if(refreshRequest.getFcmToken() != null) {
+            fcmService.deleteToken(getMember(securityUtil.getCurrentMemberId()).getEmail());
+        }
     }
 
     public void updateMemberPassword(

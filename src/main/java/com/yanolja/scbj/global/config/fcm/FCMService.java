@@ -128,7 +128,9 @@ public class FCMService {
     }
 
     public void deleteToken(String email) {
-        fcmTokenRepository.deleteToken(email);
+        if(hasKey(email)) {
+            fcmTokenRepository.deleteToken(email);
+        }
     }
 
 

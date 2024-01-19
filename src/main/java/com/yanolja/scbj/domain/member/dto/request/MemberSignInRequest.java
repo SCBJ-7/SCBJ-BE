@@ -13,14 +13,16 @@ public record MemberSignInRequest(
         regexp = EMAIL_REGEX, groups = PatternGroup.class)
     String email,
     @Password(groups = PatternGroup.class)
-    String password
+    String password,
+    String fcmToken
 ) {
     private static final String EMAIL_REGEX = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     @Builder
-    public MemberSignInRequest(String email, String password) {
+    public MemberSignInRequest(String email, String password, String fcmToken) {
         this.email = email;
         this.password = password;
+        this.fcmToken = fcmToken;
     }
 
 }
