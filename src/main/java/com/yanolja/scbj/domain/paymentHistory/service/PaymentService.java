@@ -133,7 +133,9 @@ public class PaymentService {
         PaymentAgreement agreement = PaymentAgreement.builder()
             .build();
 
-        productRepository.updateStock(product.getId());
+//        productRepository.updateStock(product.getId());
+
+        product.saleProduct();
 
         PaymentHistory paymentHistory = PaymentHistory.builder()
             .member(member)
