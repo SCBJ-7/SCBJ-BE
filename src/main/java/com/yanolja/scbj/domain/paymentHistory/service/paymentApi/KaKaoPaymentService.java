@@ -11,6 +11,7 @@ import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.KakaoPayException;
 import com.yanolja.scbj.domain.paymentHistory.exception.ProductNotForSaleException;
+import com.yanolja.scbj.domain.paymentHistory.exception.ProductOutOfStockException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
@@ -20,12 +21,18 @@ import com.yanolja.scbj.global.config.RetryConfig;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.exception.InternalServerException;
 import com.yanolja.scbj.global.util.TimeValidator;
+import io.lettuce.core.RedisClient;
 import jakarta.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.redisson.Redisson;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -39,6 +46,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -50,7 +58,8 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class KaKaoPaymentService implements PaymentApiService {
 
-    private final String KEY_PREFIX = "kakaoPay";
+    private final String REDIS_CACHE_KEY_PREFIX = "kakaoPay:";
+    private final String REDIS_LOCK_KEY_PREFIX = "redis:lock:productId:";
     private final String PAYMENT_TYPE = "카카오페이";
     private final String BASE_URL = "http://localhost:8080/v1/products";
     private final String KAKAO_BASE_URL = "https://kapi.kakao.com/v1/payment";
@@ -60,6 +69,8 @@ public class KaKaoPaymentService implements PaymentApiService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final RestTemplate restTemplate;
+    private final RedissonClient redissonClient;
+
 
     private HttpHeaders headers;
 
@@ -75,14 +86,13 @@ public class KaKaoPaymentService implements PaymentApiService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     @Retryable(
         retryFor = KakaoPayException.class,
         maxAttempts = RetryConfig.MAX_ATTEMPTS,
         backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
     )
-    public String payReady(Long memberId, Long productId, PaymentReadyRequest paymentReadyRequest) {
-
+    public String preparePayment(Long memberId, Long productId, PaymentReadyRequest paymentReadyRequest) {
         Product targetProduct = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
                 ErrorCode.PRODUCT_NOT_FOUND));
@@ -132,7 +142,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             redisMap.put("customerPhoneNumber", paymentReadyRequest.customerPhoneNumber());
 
             HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
-            String key = KEY_PREFIX + memberId;
+            String key = REDIS_CACHE_KEY_PREFIX + memberId;
             hashOperations.putAll(key, redisMap);
 
             return paymentReadyResponse.next_redirect_pc_url();
@@ -141,17 +151,40 @@ public class KaKaoPaymentService implements PaymentApiService {
         }
     }
 
-
     @Override
     @Transactional
+    public void approvePaymentWithLock(String pgToken, Long memberId) {
+        String productId = (String) redisTemplate.opsForHash()
+            .get(REDIS_CACHE_KEY_PREFIX + memberId, "productId");
+
+        RLock lock = redissonClient.getLock(REDIS_LOCK_KEY_PREFIX + productId);
+        Product targetProduct = productRepository.findById(Long.valueOf(productId)).orElseThrow();
+        try {
+            if (!lock.tryLock(500, 5_000, TimeUnit.MICROSECONDS)) {
+                throw new RuntimeException();
+            }
+            if (targetProduct.getStock() == 0) {
+                throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+            }
+            approvePayment(pgToken, memberId);
+        } catch (InterruptedException e) {
+            throw new RuntimeException();
+        } finally {
+            if (lock != null && lock.isLocked()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Retryable(
         retryFor = KakaoPayException.class,
         maxAttempts = RetryConfig.MAX_ATTEMPTS,
         backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
     )
-    public void payInfo(String pgToken, Long memberId) {
+    public void approvePayment(String pgToken, Long memberId) {
 
-        String key = KEY_PREFIX + memberId;
+        String key = REDIS_CACHE_KEY_PREFIX + memberId;
         String productId = (String) redisTemplate.opsForHash().get(key, "productId");
         String customerName = (String) redisTemplate.opsForHash().get(key, "customerName");
         String customerEmail = (String) redisTemplate.opsForHash().get(key, "customerEmail");
@@ -169,6 +202,13 @@ public class KaKaoPaymentService implements PaymentApiService {
 
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
 
+        Product product = productRepository.findById(Long.valueOf(productId))
+            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        if (product.getStock() == 0) {
+            throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+        }
+
         try {
             ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
                 new URI(KAKAO_BASE_URL + "/approve"), body,
@@ -178,9 +218,6 @@ public class KaKaoPaymentService implements PaymentApiService {
 
             Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-            Product product = productRepository.findById(Long.valueOf(productId))
-                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
             PaymentAgreement agreement = PaymentAgreement.builder()
                 .build();
@@ -210,9 +247,9 @@ public class KaKaoPaymentService implements PaymentApiService {
         maxAttempts = RetryConfig.MAX_ATTEMPTS,
         backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
     )
-    public void payCancel(Long memberId) {
+    public void cancelPayment(Long memberId) {
 
-        String key = KEY_PREFIX + memberId;
+        String key = REDIS_CACHE_KEY_PREFIX + memberId;
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");
         String price = (String) redisTemplate.opsForHash().get(key, "price");
 
