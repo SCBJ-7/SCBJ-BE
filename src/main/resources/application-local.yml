@@ -4,7 +4,10 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${LOCAL_MYSQL_USERNAME}
     password: ${LOCAL_MYSQL_PASSWORD}
-
+    hikari:
+      max-lifetime: 30000
+      maximum-pool-size: 50
+      connection-timeout: 30000
 
   jpa:
     hibernate:
@@ -44,3 +47,6 @@ fcm:
   request-url: "https://fcm.googleapis.com/v1/projects/scbj-af2e3/messages:send"
   credential-path: "/credential/fcm-service-key.json"
   scope : "https://www.googleapis.com/auth/cloud-platform"
+
+kakao-api:
+  api-key: ${API-KEY}
