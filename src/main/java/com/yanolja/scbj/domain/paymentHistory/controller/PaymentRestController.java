@@ -73,4 +73,10 @@ public class PaymentRestController {
         return ResponseDTO.res("결제에 실패했습니다.");
     }
 
+    @GetMapping("/test")
+    public void test(){
+        paymentService.stockLock("test", 1L);
+    }
+
+
 }
