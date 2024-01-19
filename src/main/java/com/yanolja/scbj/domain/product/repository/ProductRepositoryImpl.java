@@ -59,6 +59,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .leftJoin(product.paymentHistory,paymentHistory)
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
             .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
+            .groupBy(product.id)
             .fetch()
             .stream().map(tuple -> {
                 Integer purchasePrice = tuple.get(reservation.purchasePrice);
