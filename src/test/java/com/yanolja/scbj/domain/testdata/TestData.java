@@ -100,6 +100,7 @@ public class TestData {
             .customerPhoneNumber("010-1234-5678")
             .paymentType("신용카드")
             .settlement(true)
+            .productName("호텔이름 객실이름")
             .build();
     }
 }
