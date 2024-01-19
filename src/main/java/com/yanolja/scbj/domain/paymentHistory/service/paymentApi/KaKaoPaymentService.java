@@ -125,7 +125,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             ResponseEntity<PaymentReadyResponse> response = restTemplate.postForEntity(
                 new URI(KAKAO_BASE_URL + "/ready"), body, PaymentReadyResponse.class);
 
-            checkStatus(response.getStatusCode());
+            checkStatus(response.getStatusCode(), ErrorCode.KAKAO_PAY_READY_FAIL);
             PaymentReadyResponse paymentReadyResponse = response.getBody();
 
             Map<String, String> redisMap = new HashMap<>();
@@ -181,7 +181,7 @@ public class KaKaoPaymentService implements PaymentApiService {
                 new URI(KAKAO_BASE_URL + "/approve"), body,
                 PaymentApproveResponse.class);
 
-            checkStatus(response.getStatusCode());
+            checkStatus(response.getStatusCode(), ErrorCode.KAKAO_PAY_INFO_FAIL);
 
             Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -238,7 +238,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
                 new URI(KAKAO_BASE_URL + "/cancel"), body, PaymentApproveResponse.class);
 
-            checkStatus(response.getStatusCode());
+            checkStatus(response.getStatusCode(), ErrorCode.KAKAO_PAY_CANCEL_FAIL);
 
         } catch (URISyntaxException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_CANCEL_FAIL);
@@ -246,7 +246,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         }
     }
 
-    private void checkStatus(HttpStatusCode statusCode) {
+    private void checkStatus(HttpStatusCode statusCode, ErrorCode errorCode){
         if (statusCode.equals(HttpStatus.BAD_REQUEST) || statusCode.equals(
             HttpStatus.UNAUTHORIZED) || statusCode.equals(HttpStatus.FORBIDDEN)
             || statusCode.equals(HttpStatus.NOT_FOUND)) {
@@ -257,7 +257,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         if (statusCode.equals(HttpStatus.INTERNAL_SERVER_ERROR) ||
             statusCode.equals(HttpStatus.SERVICE_UNAVAILABLE)) {
 
-            throw new KakaoPayException(ErrorCode.KAKAO_PAY_READY_FAIL);
+            throw new KakaoPayException(errorCode);
         }
     }
 

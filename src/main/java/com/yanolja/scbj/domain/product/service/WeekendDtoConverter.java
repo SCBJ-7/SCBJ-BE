@@ -42,10 +42,9 @@ public class WeekendDtoConverter {
                     .build();
 
             })
-            .sorted(Comparator
-                .comparing(WeekendProductResponse::checkInDate)
-                .thenComparing(WeekendProductResponse::salePercentage, Comparator.reverseOrder())
-                .thenComparing(WeekendProductResponse::roomThemeCount, Comparator.reverseOrder()))
+            .sorted(ascendCheckin()
+                .thenComparing(descendSalePercentage())
+                .thenComparing(descendRoomThemeCount()))
             .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
@@ -54,12 +53,22 @@ public class WeekendDtoConverter {
         return new PageImpl<>(responses.subList(start, end), pageable, responses.size());
     }
 
+    private Comparator<WeekendProductResponse> ascendCheckin() {
+        return Comparator
+            .comparing(WeekendProductResponse::checkInDate);
+    }
+    private Comparator<WeekendProductResponse> descendSalePercentage() {
+        return Comparator.comparing(WeekendProductResponse::salePercentage, Comparator.reverseOrder());
+    }
+
+    private Comparator<WeekendProductResponse> descendRoomThemeCount() {
+        return Comparator.comparing(WeekendProductResponse::roomThemeCount, Comparator.reverseOrder());
+    }
+
     private int getThemeCount(RoomTheme roomTheme) {
-        int count = 0;
-        if (roomTheme.isBreakfast()) count++;
-        if (roomTheme.isPool()) count++;
-        if (roomTheme.isOceanView()) count++;
-        return count;
+        return (roomTheme.isBreakfast() ? 1 : 0) +
+            (roomTheme.isPool() ? 1 : 0) +
+            (roomTheme.isOceanView() ? 1 : 0);
     }
 
     private String getHotelUrl(Hotel hotel) {
