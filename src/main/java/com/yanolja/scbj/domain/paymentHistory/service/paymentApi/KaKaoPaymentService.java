@@ -12,6 +12,7 @@ import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentReadyResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.KakaoPayException;
+import com.yanolja.scbj.domain.paymentHistory.exception.ProductOutOfStockException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.enums.SecondTransferExistence;
@@ -19,7 +20,9 @@ import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.exception.ErrorCode;
+import com.yanolja.scbj.global.repository.RedisRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -28,11 +31,13 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -45,6 +50,7 @@ import org.springframework.web.client.RestTemplate;
 public class KaKaoPaymentService implements PaymentApiService {
 
     private final String REDIS_CACHE_KEY_PREFIX = "kakaoPay:memberId";
+    private final String REDIS_LOCK_KEY_PREFIX = "redis:lock:productId";
     private final String PAYMENT_TYPE = "카카오페이";
     private final String BASE_URL = "http://localhost:8080/v1/products";
     private final String KAKAO_BASE_URL = "https://kapi.kakao.com/v1/payment";
@@ -52,9 +58,11 @@ public class KaKaoPaymentService implements PaymentApiService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
+    private final RedisRepository redisRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final EntityManager entityManager;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     private HttpHeaders headers;
 
@@ -160,7 +168,6 @@ public class KaKaoPaymentService implements PaymentApiService {
     @Override
     public void payCancel(Long memberId) {
 
-        RestTemplate restTemplate = new RestTemplate();
 
         String key = REDIS_CACHE_KEY_PREFIX + memberId;
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");

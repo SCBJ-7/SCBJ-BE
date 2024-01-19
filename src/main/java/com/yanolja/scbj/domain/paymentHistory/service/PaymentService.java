@@ -29,13 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 
 @Slf4j
@@ -58,6 +53,7 @@ public class PaymentService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final MemberRepository memberRepository;
     private final TransactionManager transactionManager;
+    private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
     public PaymentPageFindResponse getPaymentPage(Long productId) {
@@ -92,16 +88,16 @@ public class PaymentService {
             .build();
     }
 
+    //부모 트랜잭션
+    @Transactional
+    public void stockLock(String pgToken, Long memberId){
+        String redisLockKey = orderProductWithLettuceLock(pgToken, memberId);
+        redisRepository.unlock(redisLockKey);
+    }
+
     //자식트랜잭션
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String orderProductWithLettuceLock(String pgToken, Long memberId) {
-//
-//        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-//            @Override
-//            protected void doInTransactionWithoutResult(TransactionStatus status) {
-//
-//            }
-//        });
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -128,7 +124,7 @@ public class PaymentService {
         Product product = productRepository.findById(Long.valueOf(productId))
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        if (product.getStock() < 1) {
+        if (product.getStock() == 0) {
             throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 
@@ -136,6 +132,8 @@ public class PaymentService {
 
         PaymentAgreement agreement = PaymentAgreement.builder()
             .build();
+
+        productRepository.updateStock(product.getId());
 
         PaymentHistory paymentHistory = PaymentHistory.builder()
             .member(member)
@@ -146,21 +144,11 @@ public class PaymentService {
             .paymentAgreement(agreement)
             .price(Integer.parseInt(price))
             .paymentType(PAYMENT_TYPE)
-            .settlement(true)
+            .settlement(false)
             .build();
 
-        product.saleProduct();
-        paymentHistoryRepository.save(paymentHistory);
-        System.err.println("트랜잭션 종료");
-        return redisLockKey;
-        // 트랜잭션 종료
-    }
 
-    //부모 트랜잭션
-//    @Transactional(propagation = Propagation.REQUIRED)
-    public void stockLock(String pgToken, Long memberId){
-        log.info("현재 스레드: {}", Thread.currentThread().getName());
-        String redisLockKey = orderProductWithLettuceLock(pgToken, memberId);
-//        redisRepository.unlock(redisLockKey);
+        paymentHistoryRepository.save(paymentHistory);
+        return redisLockKey;
     }
 }

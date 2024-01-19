@@ -20,6 +20,7 @@ import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -39,10 +40,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @SpringBootTest
@@ -72,6 +77,8 @@ class PaymentServiceTest {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     private PaymentHistoryRepository paymentHistoryRepository;
@@ -141,6 +148,9 @@ class PaymentServiceTest {
         }
     }
 
+
+
+
     @Nested
     @DisplayName("Lettuce를 사용하여 ")
     class Context_LettuceLock {
@@ -200,7 +210,8 @@ class PaymentServiceTest {
             reservationRepository.save(reservation);
 
 
-            String key = "kakaoPay:memberId" + member.getId();
+            String REDIS_CACHE_KEY_PREFIX = "kakaoPay:memberId";
+            String key = REDIS_CACHE_KEY_PREFIX + member.getId();
 
             Map<String, String> map = new HashMap<>();
             map.put("productId", "1");
@@ -222,6 +233,7 @@ class PaymentServiceTest {
                 .secondPrice(25000000)
                 .secondGrantPeriod(3)
                 .build();
+
             productRepository.save(product);
 
             System.err.println("================================================================================================");
@@ -232,15 +244,12 @@ class PaymentServiceTest {
             ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
 
-            List<Exception> exceptionList = new ArrayList<>();
-
             for (int i = 0; i < threadCount; i++) {
                 executorService.submit(() ->{
                     try {
-                        paymentService.stockLock("asg", member.getId());
+                        paymentService.stockLock("asg", 1L);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        exceptionList.add(e);
                     } finally {
                         latch.countDown();
                     }
@@ -248,7 +257,7 @@ class PaymentServiceTest {
             }
 
             latch.await();
-            Product getProduct = productRepository.findById(product.getId()).get();
+            Product getProduct = productRepository.findById(1L).get();
             Assertions.assertThat(getProduct.getStock()).isEqualTo(0);
 
         }
