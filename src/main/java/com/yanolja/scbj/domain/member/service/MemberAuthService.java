@@ -3,6 +3,7 @@ package com.yanolja.scbj.domain.member.service;
 import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.exception.InvalidRefreshTokenException;
+import com.yanolja.scbj.domain.member.exception.NotExpiredTokenException;
 import com.yanolja.scbj.global.config.CustomUserDetailsService;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import com.yanolja.scbj.global.exception.ErrorCode;
@@ -25,6 +26,7 @@ public class MemberAuthService {
         String username = null;
         try {
             username = jwtUtil.extractUsername(refreshRequest.getAccessToken().substring(7));
+            throw new NotExpiredTokenException(ErrorCode.NOT_EXPIRED_TOKEN);
         } catch (ExpiredJwtException e) {
             username = e.getClaims().getSubject();
         } finally {
