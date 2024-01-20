@@ -75,6 +75,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     """, nativeQuery = true)
     List<Product> findProductByWeekend();
 
-
+    @Query("SELECT p FROM Product p JOIN FETCH p.reservation r WHERE r.id = :reservationId")
+    Optional<Product> findByReservationId(@Param("reservationId") Long reservationId);
 
 }
