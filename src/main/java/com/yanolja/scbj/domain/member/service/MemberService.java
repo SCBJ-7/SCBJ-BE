@@ -19,8 +19,16 @@ import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.global.config.fcm.FCMService;
 import com.yanolja.scbj.global.config.fcm.FCMTokenRepository;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
+import com.yanolja.scbj.global.config.jwt.exception.ExpiredTokenException;
+import com.yanolja.scbj.global.config.jwt.exception.InvalidTokenException;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.SecurityUtil;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.io.DecodingException;
+import io.jsonwebtoken.security.SignatureException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,14 +72,15 @@ public class MemberService {
 
     public MemberSignInResponse signIn(final MemberSignInRequest memberSignInRequest) {
         Member retrivedMember = memberRepository.findByEmail(memberSignInRequest.email())
-            .orElseThrow(() -> new InvalidEmailAndPasswordException(ErrorCode.INVALID_EMAIL_AND_PASSWORD));
+            .orElseThrow(
+                () -> new InvalidEmailAndPasswordException(ErrorCode.INVALID_EMAIL_AND_PASSWORD));
 
         if (passwordEncoder.matches(memberSignInRequest.password(), retrivedMember.getPassword())) {
             String accessToken = jwtUtil.generateToken(MemberMapper.toUserDetails(retrivedMember));
             String refreshToken = jwtUtil.generateRefreshToken(
                 String.valueOf(retrivedMember.getId()));
 
-            if(memberSignInRequest.fcmToken() != null) {
+            if (memberSignInRequest.fcmToken() != null) {
                 fcmService.saveToken(retrivedMember.getEmail(), memberSignInRequest.fcmToken());
             }
 
@@ -84,11 +93,30 @@ public class MemberService {
 
 
     public void logout(final RefreshRequest refreshRequest) {
-        jwtUtil.setBlackList(refreshRequest.getAccessToken().substring(JwtUtil.GRANT_TYPE.length()),
-            refreshRequest.getRefreshToken());
 
-        if(refreshRequest.getFcmToken() != null) {
-            fcmService.deleteToken(getMember(securityUtil.getCurrentMemberId()).getEmail());
+        try {
+            Member currentMember = getCurrentMember();
+            String memberIdUsingTokenParser = jwtUtil.extractUsername(
+                refreshRequest.getAccessToken().substring(JwtUtil.GRANT_TYPE.length()));
+
+            if (currentMember.getId() != Long.parseLong(memberIdUsingTokenParser)) {
+                throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
+            }
+
+            if (jwtUtil.isRefreshTokenValid(memberIdUsingTokenParser,
+                refreshRequest.getRefreshToken())) {
+                jwtUtil.setBlackList(
+                    refreshRequest.getAccessToken().substring(JwtUtil.GRANT_TYPE.length()),
+                    refreshRequest.getRefreshToken());
+
+                fcmService.deleteToken(currentMember.getEmail());
+            }
+
+        } catch (ExpiredJwtException | ExpiredTokenException ex) {
+            throw new ExpiredTokenException(ErrorCode.EXPIRED_TOKEN);
+        } catch (MalformedJwtException | SignatureException | UnsupportedJwtException |
+                 SecurityException | DecodingException ex) {
+            throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
         }
     }
 
@@ -132,7 +160,8 @@ public class MemberService {
     }
 
     public Member getMember(long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        return memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     private Member getCurrentMember() {
