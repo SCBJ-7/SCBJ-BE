@@ -122,22 +122,14 @@ public class ProductService {
     }
 
 
-    public ProductMainResponse getAllCity(ProductCityRequest productCityRequest,
-                                          Pageable pageable
+    public ProductMainResponse getAllProductForMainPage(ProductCityRequest productCityRequest,
+                                                        Pageable pageable
     ) {
         List<String> cities = productCityRequest.cityNames();
         HashMap<String, List<CityResponse>> savedProduct = new HashMap<>();
 
-        for (String city : cities) {
-            List<Product> productByCity = productRepository.findProductByCity(city);
-            List<CityResponse> findProductCityResponse =
-                cityDtoConverter.toCityResponse(productByCity);
-            savedProduct.put(city, findProductCityResponse);
-        }
-
-        List<Product> productByWeekend = productRepository.findProductByWeekend();
-        Page<WeekendProductResponse> weekendProductResponse =
-            weekendDtoConverter.toWeekendProductResponse(productByWeekend, pageable);
+        getEachCity(cities, savedProduct);
+        Page<WeekendProductResponse> weekendProductResponse = getWeekendProducts(pageable);
 
         return ProductMainResponse.builder()
             .seoul(savedProduct.get("서울"))
@@ -148,5 +140,21 @@ public class ProductService {
             .gyeongsang(savedProduct.get("경상"))
             .weekend(weekendProductResponse.isEmpty() ? Page.empty() : weekendProductResponse)
             .build();
+    }
+
+    private Page<WeekendProductResponse> getWeekendProducts(Pageable pageable) {
+        List<Product> productByWeekend = productRepository.findProductByWeekend();
+        Page<WeekendProductResponse> weekendProductResponse =
+            weekendDtoConverter.toWeekendProductResponse(productByWeekend, pageable);
+        return weekendProductResponse;
+    }
+
+    private void getEachCity(List<String> cities, HashMap<String, List<CityResponse>> savedProduct) {
+        cities.forEach(city -> {
+            List<Product> productsByCity = productRepository.findProductByCity(city);
+            List<CityResponse> cityResponses = cityDtoConverter.toCityResponse(productsByCity);
+            savedProduct.put(city, cityResponses);
+        });
+
     }
 }

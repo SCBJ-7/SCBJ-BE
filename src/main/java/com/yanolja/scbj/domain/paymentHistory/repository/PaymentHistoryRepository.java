@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.paymentHistory.repository;
 
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, Long> {
+
     @Query(
         "SELECT new com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse(p.id, p.createdAt, hp.url ,h.hotelName, h.room.bedType, p.price, r.startDate, r.endDate) "
             +
@@ -24,4 +26,13 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
         @Param("memberId") Long memberId, Pageable pageable);
 
     Optional<PaymentHistory> findByIdAndMemberId(Long paymentHistoryId, Long memberId);
+
+    @Query(
+    """
+        select ph from PaymentHistory ph 
+        join fetch Member m
+        where ph.settlement = false 
+    """
+    )
+    List<PaymentHistory> findPaymentHistoriesWithNotSettlement();
 }
