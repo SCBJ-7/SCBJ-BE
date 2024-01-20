@@ -145,7 +145,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             String key = REDIS_CACHE_KEY_PREFIX + memberId;
             hashOperations.putAll(key, redisMap);
 
-            return paymentReadyResponse.next_redirect_pc_url();
+            return paymentReadyResponse.redirectPcUrl();
         } catch (URISyntaxException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_READY_FAIL);
         }
