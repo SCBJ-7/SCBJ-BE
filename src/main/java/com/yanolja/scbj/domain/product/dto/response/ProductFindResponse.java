@@ -20,7 +20,8 @@ public record ProductFindResponse(
     RoomThemeFindResponse roomTheme,
     String hotelAddress,
     String hotelInfoUrl,
-    boolean saleStatus
+    boolean saleStatus,
+    boolean isSeller
 ) {
 
     @Builder
