@@ -19,7 +19,7 @@ public class RefreshRequest {
     private String refreshToken;
 
     @Builder
-    private RefreshRequest(String accessToken, String refreshToken, String fcmToken) {
+    private RefreshRequest(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
