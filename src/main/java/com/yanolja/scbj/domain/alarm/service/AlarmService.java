@@ -6,19 +6,20 @@ import com.yanolja.scbj.domain.alarm.exception.AlarmNotFoundException;
 import com.yanolja.scbj.domain.alarm.repository.AlarmRepository;
 import com.yanolja.scbj.domain.alarm.util.AlarmMapper;
 import com.yanolja.scbj.domain.member.entity.Member;
-import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.service.MemberService;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.CheckInAlarmResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.PaymentHistoryNotFoundException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
-import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
 import com.yanolja.scbj.global.config.fcm.FCMService;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.util.SecurityUtil;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,9 @@ public class AlarmService {
     private final FCMService fcmService;
     private final MemberService memberService;
     private final PaymentHistoryRepository paymentHistoryRepository;
+
+    private final String CHECK_IN_ALARM_TITLE = "체크인 전 알림";
+    private final String CHECK_IN_ALARM_CONTNET = "1일 후 '%s'에 체크인 할 수 있어요!";
 
     @Transactional
     public List<AlarmResponse> getAlarms() {
@@ -66,5 +70,13 @@ public class AlarmService {
             .orElseThrow(() -> new PaymentHistoryNotFoundException(ErrorCode.PURCHASE_LOAD_FAIL));
     }
 
+    @Scheduled(fixedRate = 60000)
+    private void AlarmBeforeCheckIn() {
+        List<CheckInAlarmResponse> PaymentHistorysNeedForCheckInAlarm = paymentHistoryRepository.findPurchasedHistoriesNeedForCheckInAlarm();
+        PaymentHistorysNeedForCheckInAlarm.stream().forEach(
+            ph -> createAlarm(ph.memberId(), ph.productHistoryId(),
+                new Data(CHECK_IN_ALARM_TITLE,String.format(CHECK_IN_ALARM_CONTNET, ph.productName()),
+                    LocalDateTime.now())));
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.paymentHistory.repository;
 
+import com.yanolja.scbj.domain.paymentHistory.dto.response.CheckInAlarmResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import java.util.List;
@@ -35,4 +36,15 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     """
     )
     List<PaymentHistory> findPaymentHistoriesWithNotSettlement();
+
+
+    @Query(
+        "SELECT new com.yanolja.scbj.domain.paymentHistory.dto.response.CheckInAlarmResponse(ph.id, m.id ,ph.productName, r.startDate) "
+            +
+            "FROM PaymentHistory ph " +
+            "INNER JOIN ph.member m " +
+            "INNER JOIN ph.product p " +
+            "INNER JOIN p.reservation r " +
+            "WHERE FUNCTION('DATE_FORMAT',r.startDate,'%Y-%m-%d %H:%i') = FUNCTION('DATE_FORMAT',FUNCTION('DATE_SUB', CURRENT_TIMESTAMP, 1, 'DAY'),'%Y-%m-%d %H:%i')")
+    List<CheckInAlarmResponse> findPurchasedHistoriesNeedForCheckInAlarm();
 }
