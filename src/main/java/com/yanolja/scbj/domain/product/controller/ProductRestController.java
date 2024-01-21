@@ -1,6 +1,5 @@
 package com.yanolja.scbj.domain.product.controller;
 
-import com.yanolja.scbj.domain.product.dto.request.ProductCityRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
@@ -11,6 +10,7 @@ import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -74,10 +75,10 @@ public class ProductRestController {
     @GetMapping("/main")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<ProductMainResponse> getProductsForMain(
-        @Valid @RequestBody ProductCityRequest productCityRequest,
+        @Valid @RequestParam("cityNames") List<String> cityNames,
         @PageableDefault(page = 1) Pageable pageable
         ) {
-        ProductMainResponse mainResponse = productService.getAllProductForMainPage(productCityRequest , pageable);
+        ProductMainResponse mainResponse = productService.getAllProductForMainPage(cityNames , pageable);
         return ResponseDTO.res(mainResponse,"조회에 성공하였습니다");
     }
 
