@@ -114,7 +114,8 @@ class ProductServiceTest {
                 .secondPrice(productPostRequest.secondPrice())
                 .bank(productPostRequest.bank())
                 .accountNumber(productPostRequest.accountNumber())
-                .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
+                .secondGrantPeriod(productPostRequest.secondGrantPeriod())
+                .stock(1).build();
 
             given(productRepository.save(any(Product.class))).willReturn(product);
 
@@ -162,7 +163,8 @@ class ProductServiceTest {
                 .secondPrice(productPostRequest.secondPrice())
                 .bank(productPostRequest.bank())
                 .accountNumber(productPostRequest.accountNumber())
-                .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
+                .secondGrantPeriod(productPostRequest.secondGrantPeriod())
+                .stock(1).build();
 
             given(productRepository.save(any(Product.class))).willReturn(product);
 

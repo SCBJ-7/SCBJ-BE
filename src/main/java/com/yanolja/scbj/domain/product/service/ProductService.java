@@ -88,7 +88,8 @@ public class ProductService {
             .secondPrice(productPostRequest.secondPrice())
             .bank(productPostRequest.bank())
             .accountNumber(productPostRequest.accountNumber())
-            .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
+            .secondGrantPeriod(productPostRequest.secondGrantPeriod())
+            .stock(1).build();
 
         Product savedProduct = productRepository.save(product);
 
