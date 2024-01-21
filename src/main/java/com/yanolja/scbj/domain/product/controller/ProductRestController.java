@@ -59,7 +59,7 @@ public class ProductRestController {
         return ResponseDTO.res("상품 삭제에 성공했습니다.");
     }
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<Page<ProductSearchResponse>> searchProducts(
        @Valid @RequestBody ProductSearchRequest productSearchRequest,
