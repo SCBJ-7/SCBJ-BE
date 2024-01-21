@@ -12,11 +12,19 @@ public class SecurityUtil {
     public Long getCurrentMemberId() {
         final Authentication authentication = SecurityContextHolder.getContext()
             .getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getName().equals("anonymousUser")) {
+        if (isUserNotAuthenticated()) {
             throw new ForbbidenException(ErrorCode.AUTH_FORBIDDEN);
         }
 
         return Long.parseLong(authentication.getName());
+    }
+
+    public boolean isUserNotAuthenticated(){
+        final Authentication authentication = SecurityContextHolder.getContext()
+            .getAuthentication();
+
+        return authentication == null || !authentication.isAuthenticated()
+            || authentication.getName().equals("anonymousUser");
     }
 
 }
