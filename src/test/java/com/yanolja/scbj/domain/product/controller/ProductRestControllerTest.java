@@ -236,7 +236,7 @@ class ProductRestControllerTest {
                 .thenReturn(expectedResponse);
 
             // when & then
-            mvc.perform(get("/v1/products/search")
+            mvc.perform(post("/v1/products/search")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(searchRequest))
                     .param("page", "1"))
