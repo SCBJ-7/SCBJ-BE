@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
-import com.yanolja.scbj.domain.product.dto.request.ProductCityRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.CityResponse;
@@ -254,7 +253,6 @@ class ProductRestControllerTest {
         void getProductsForMainTest() throws Exception {
             // given
             List<String> cityNames = List.of("서울", "강원", "부산", "제주", "경상", "전라");
-            ProductCityRequest productCityRequest = new ProductCityRequest(cityNames);
 
             CityResponse seoulCityResponse = CityResponse.builder()
                 .id(1L)
@@ -298,13 +296,13 @@ class ProductRestControllerTest {
                 .weekend(weekendPage)
                 .build();
             objectMapper.writeValueAsString(weekendPage);
-            when(productService.getAllProductForMainPage(any(ProductCityRequest.class), any(Pageable.class)))
+            when(productService.getAllProductForMainPage(any(), any(Pageable.class)))
                 .thenReturn(productMainResponse);
 
             // when
             ResultActions result = mvc.perform(get("/v1/products/main")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productCityRequest))
+                .param("cityNames", "서울", "강원", "부산", "제주", "경상", "전라")
                 .param("page", "1")
                 .param("size", "10"));
 
