@@ -130,7 +130,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         if (hotelMainAddress == null || hotelMainAddress.isEmpty()) {
             return null;
         }
-        return hotel.hotelMainAddress.contains(hotelMainAddress);
+        return hotel.hotelMainAddress.eq(hotelMainAddress);
     }
 
     private BooleanExpression eqParking(Boolean hasParking) {
