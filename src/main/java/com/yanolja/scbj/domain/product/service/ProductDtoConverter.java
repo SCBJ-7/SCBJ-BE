@@ -7,17 +7,21 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
-import com.yanolja.scbj.domain.product.enums.SecondTransferExistence;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.global.util.SecurityUtil;
 import com.yanolja.scbj.global.util.TimeValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ProductDtoConverter {
+
+    private final SecurityUtil securityUtil;
 
     public ProductFindResponse toFindResponse(Product product) {
 
@@ -45,14 +49,8 @@ public class ProductDtoConverter {
 
         int price = product.getFirstPrice();
 
-        LocalDateTime changeTime = null;
-        if(product.getSecondGrantPeriod() != SecondTransferExistence.NOT_EXISTS.getStatus()){
-            long changeHour = product.getSecondGrantPeriod();
-            changeTime = checkInDateTime.minusHours(changeHour);
-
-            if (changeTime.isAfter(LocalDateTime.now())) {
-                price = product.getSecondPrice();
-            }
+        if (TimeValidator.isOverSecondGrantPeriod(product, checkInDateTime)) {
+            price = product.getSecondPrice();
         }
 
         List<HotelRoomImage> hotelRoomImageList = foundHotel.getHotelRoomImageList();
@@ -76,6 +74,7 @@ public class ProductDtoConverter {
             .hotelAddress(foundHotel.getHotelDetailAddress())
             .saleStatus(getSaleStatus(product, checkInDateTime))
             .hotelInfoUrl(foundHotel.getHotelInfoUrl())
+            .isSeller(checkSeller(product))
             .build();
     }
 
@@ -84,6 +83,13 @@ public class ProductDtoConverter {
             return true;
         }
         return LocalDateTime.now().isAfter(checkIn);
+    }
+
+    private boolean checkSeller(Product product) {
+        if (securityUtil.isUserNotAuthenticated()) {
+            return false;
+        }
+        return product.getMember().getId() == securityUtil.getCurrentMemberId();
     }
 
 }

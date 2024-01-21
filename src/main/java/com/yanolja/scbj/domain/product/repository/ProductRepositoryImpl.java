@@ -82,13 +82,13 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .toList();
 
         Long total = queryFactory
-            .select(product.count())
+            .select(product.countDistinct())
             .from(product)
             .innerJoin(product.reservation, reservation)
             .innerJoin(reservation.hotel, hotel)
             .leftJoin(room.roomTheme, roomTheme).on(hotel.room.roomTheme.id.eq(roomTheme.id))
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
-            .where(allFilter(productSearchRequest))
+            .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
             .fetchOne();
 
         return new PageImpl<>(response, pageable, total != null ? total : 0);
