@@ -2,11 +2,14 @@ package com.yanolja.scbj.domain.product.entity;
 
 import com.querydsl.core.annotations.QueryInit;
 import com.yanolja.scbj.domain.member.entity.Member;
+import com.yanolja.scbj.domain.member.entity.MemberAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.common.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,6 +45,11 @@ public class Product extends BaseEntity {
     @Comment("멤버 식별자")
     private Member member;
 
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "product_agreement_id")
+    @Comment("상품 약관 식별자")
+    private ProductAgreement productAgreement;
+
     @Column(nullable = false)
     @Comment("1차 양도 가격")
     private int firstPrice;
@@ -70,11 +78,14 @@ public class Product extends BaseEntity {
     private int stock;
 
     @Builder
-    private Product(Long id, Reservation reservation, Member member, int firstPrice, int secondPrice,
-        String bank, String accountNumber, int secondGrantPeriod, PaymentHistory paymentHistory) {
+    public Product(Long id, Reservation reservation,
+        Member member, ProductAgreement productAgreement, int firstPrice, int secondPrice,
+        String bank, String accountNumber, int secondGrantPeriod,
+        PaymentHistory paymentHistory) {
         this.id = id;
         this.reservation = reservation;
         this.member = member;
+        this.productAgreement = productAgreement;
         this.firstPrice = firstPrice;
         this.secondPrice = secondPrice;
         this.bank = bank;
