@@ -61,7 +61,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
             .groupBy(product.id)
             .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
             .fetch()
             .stream().map(tuple -> {
                 Integer purchasePrice = tuple.get(reservation.purchasePrice);
@@ -81,6 +80,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 );
             })
             .sorted(sort(productSearchRequest.getSorted()))
+            .limit(pageable.getPageSize())
             .toList();
 
         Long total = queryFactory
@@ -187,7 +187,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 comparator = Comparator.comparing(ProductSearchResponse::getCreatedAt).reversed();
             case "높은 할인 순" -> comparator =
                 Comparator.comparing(ProductSearchResponse::getSalePercentage).reversed();
-            case "높은 가격 순"->
+            case "낮은 가격 순"->
                 comparator = Comparator.comparing(ProductSearchResponse::getSalePrice); //낮은 가격순
             default -> comparator = Comparator.comparing(ProductSearchResponse::getCheckIn)
                 .thenComparing(ProductSearchResponse::getSalePercentage, Comparator.reverseOrder());
