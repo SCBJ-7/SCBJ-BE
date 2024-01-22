@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.paymentHistory.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,9 +21,36 @@ public class PaymentAgreement {
     @Comment("결제 내역 식별자")
     private Long id;
 
+    @Column(nullable = false)
+    @Comment("만 14세 이상 이용 동의")
+    private boolean isAgeOver14;
+
+    @Column(nullable = false)
+    @Comment("이용 규칙 동의")
+    private boolean useAgree;
+
+    @Column(nullable = false)
+    @Comment("취소 및 환불 규칙 동의")
+    private boolean cancelAndRefund;
+
+    @Column(nullable = false)
+    @Comment("개인정보 수집 및 이용 동의")
+    private boolean collectPersonalInfo;
+
+    @Column(nullable = false)
+    @Comment("개인정보 제 3자 제공 동의")
+    private boolean thirdPartySharing;
+
 
     @Builder
-    public PaymentAgreement(Long id) {
+    private PaymentAgreement(Long id, boolean isAgeOver14, boolean useAgree,
+        boolean cancelAndRefund,
+        boolean collectPersonalInfo, boolean thirdPartySharing) {
         this.id = id;
+        this.isAgeOver14 = isAgeOver14;
+        this.useAgree = useAgree;
+        this.cancelAndRefund = cancelAndRefund;
+        this.collectPersonalInfo = collectPersonalInfo;
+        this.thirdPartySharing = thirdPartySharing;
     }
 }
