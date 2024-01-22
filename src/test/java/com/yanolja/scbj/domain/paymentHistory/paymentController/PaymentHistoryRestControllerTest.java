@@ -131,7 +131,6 @@ public class PaymentHistoryRestControllerTest {
         @DisplayName("성공시 구매내역 리스트를 보여준다")
         void will_success() throws Exception {
             // given
-            Pageable pageable = PageRequest.of(0, 10);
             List<PurchasedHistoryResponse> responses = List.of(
                 new PurchasedHistoryResponse(1L, LocalDateTime.now(), "wwww.yanolja.com", "A 호텔",
                     "디럭스", 20000,
@@ -140,11 +139,9 @@ public class PaymentHistoryRestControllerTest {
                     "wwww.yanolja.com", "B 호텔", "스텐다드",
                     15000, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1))
             );
-            Page<PurchasedHistoryResponse> response =
-                new PageImpl<>(responses, pageable, responses.size());
 
-            given(paymentHistoryService.getUsersPurchasedHistory(any(Pageable.class),
-                anyLong())).willReturn(response);
+            given(paymentHistoryService.getUsersPurchasedHistory(
+                anyLong())).willReturn(responses);
 
             // when
             MvcResult result = mockMvc.perform(get("/v1/members/purchased-history")
@@ -193,12 +190,8 @@ public class PaymentHistoryRestControllerTest {
                 "거래완료"
             ));
 
-            PageImpl<SaleHistoryResponse> saleHistoryResponses =
-                new PageImpl<>(responses, pageable, responses.size());
 
-            given(paymentHistoryService.getUsersSaleHistory(any(Pageable.class),
-                anyLong())).willReturn(
-                saleHistoryResponses);
+            given(paymentHistoryService.getUsersSaleHistory(anyLong())).willReturn(responses);
 
             //when
             MvcResult result = mockMvc.perform(get("/v1/members/sale-history")

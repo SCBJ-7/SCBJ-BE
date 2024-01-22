@@ -22,8 +22,8 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
             "LEFT JOIN HotelRoomImage hp ON hp.hotel.id = h.id " +
             "WHERE p.member.id = :memberId "
     )
-    Page<PurchasedHistoryResponse> findPurchasedHistoriesByMemberId(
-        @Param("memberId") Long memberId, Pageable pageable);
+    List<PurchasedHistoryResponse> findPurchasedHistoriesByMemberId(
+        @Param("memberId") Long memberId);
 
     Optional<PaymentHistory> findByIdAndMemberId(Long paymentHistoryId, Long memberId);
 

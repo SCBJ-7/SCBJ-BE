@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -72,7 +73,6 @@ class PaymentHistoryServiceTest {
         void will_success() {
             // given
             Long memberId = 1L;
-            Pageable pageable = PageRequest.of(1, 10);
             PurchasedHistoryResponse response = new PurchasedHistoryResponse(
                 1L, // id
                 LocalDateTime.now(), // createdAt
@@ -83,18 +83,15 @@ class PaymentHistoryServiceTest {
                 LocalDateTime.now().plusDays(3), // checkInDate
                 LocalDateTime.now().plusDays(5) // checkOutDate
             );
-            Page<PurchasedHistoryResponse> expectedPage =
-                new PageImpl<>(List.of(response), pageable, 1);
 
-            given(paymentHistoryRepository.findPurchasedHistoriesByMemberId(memberId,
-                pageable)).willReturn(expectedPage);
+            given(paymentHistoryRepository.findPurchasedHistoriesByMemberId(memberId)).willReturn(List.of(response));
 
             // when
-            Page<PurchasedHistoryResponse> result =
-                paymentHistoryService.getUsersPurchasedHistory(pageable, memberId);
+            List<PurchasedHistoryResponse> result =
+                paymentHistoryService.getUsersPurchasedHistory( memberId);
 
             //then
-            assertThat(result.getContent()).containsExactly(response);
+            assertThat(result).containsExactly(response);
             assertThat(result).isNotNull();
         }
 
@@ -125,18 +122,16 @@ class PaymentHistoryServiceTest {
                 LocalDateTime.of(2024, 1, 2,11,0),
                 "판매중");
 
-            Page<SaleHistoryResponse> expectedPage =
-                new PageImpl<>(List.of(response), pageable, 1);
 
-            given(productRepository.findSaleHistoriesByMemberId(memberId, pageable)).willReturn(
-                expectedPage);
+            given(productRepository.findSaleHistoriesByMemberId(memberId)).willReturn(
+                List.of(response));
 
             //when
-            Page<SaleHistoryResponse> result =
-                productRepository.findSaleHistoriesByMemberId(memberId, pageable);
+            List<SaleHistoryResponse> result =
+                productRepository.findSaleHistoriesByMemberId(memberId);
 
             //then
-            assertThat(result.getContent()).containsExactly(response);
+            assertThat(result).containsExactly(response);
             assertThat(result).isNotNull();
 
         }
