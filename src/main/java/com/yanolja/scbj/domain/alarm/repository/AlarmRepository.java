@@ -10,4 +10,6 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
     Optional<List<Alarm>> getAllByMemberIdOrderByCreatedAtDesc(Long memberId);
 
+    boolean existsAlarmByMemberIdAndCheckedIsFalse(Long memeberId);
+
 }

@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.alarm.service;
 
+import com.yanolja.scbj.domain.alarm.dto.AlarmHasNonReadResponse;
 import com.yanolja.scbj.domain.alarm.dto.AlarmResponse;
 import com.yanolja.scbj.domain.alarm.entity.Alarm;
 import com.yanolja.scbj.domain.alarm.exception.AlarmNotFoundException;
@@ -64,6 +65,11 @@ public class AlarmService {
     private PaymentHistory getPaymentHistory(long paymentHistoryId) {
         return paymentHistoryRepository.findById(paymentHistoryId)
             .orElseThrow(() -> new PaymentHistoryNotFoundException(ErrorCode.PURCHASE_LOAD_FAIL));
+    }
+
+    public AlarmHasNonReadResponse hasNonReadAlarm() {
+        return AlarmMapper.toAlarmHasNonReadResponse(
+            alarmRepository.existsAlarmByMemberIdAndCheckedIsFalse(securityUtil.getCurrentMemberId()));
     }
 
 

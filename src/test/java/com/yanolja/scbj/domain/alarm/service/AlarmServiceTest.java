@@ -2,11 +2,13 @@ package com.yanolja.scbj.domain.alarm.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.yanolja.scbj.domain.alarm.dto.AlarmHasNonReadResponse;
 import com.yanolja.scbj.domain.alarm.dto.AlarmResponse;
 import com.yanolja.scbj.domain.alarm.entity.Alarm;
 import com.yanolja.scbj.domain.alarm.repository.AlarmRepository;
@@ -94,6 +96,22 @@ class AlarmServiceTest {
             assertDoesNotThrow(() -> alarmService.createAlarm(1L, 1L, data));
             verify(alarmRepository, times(1)).save(any());
             verify(fcmService, times(1)).sendMessageTo(any(),any());
+        }
+
+        @Test
+        @DisplayName("안 읽은 알림이 있는지 확인할 수 있다.")
+        void hasNonReadAlarm() {
+            //given
+            AlarmHasNonReadResponse expectedalarmHasNonReadResponse = AlarmHasNonReadResponse.builder()
+                .hasNonReadAlarm(true)
+                .build();
+
+
+            given(securityUtil.getCurrentMemberId()).willReturn(1L);
+            given(alarmRepository.existsAlarmByMemberIdAndCheckedIsFalse(1L)).willReturn(true);
+
+            //when, then
+            assertEquals(expectedalarmHasNonReadResponse, alarmService.hasNonReadAlarm());
         }
     }
 }

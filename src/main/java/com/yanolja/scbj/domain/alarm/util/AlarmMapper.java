@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.alarm.util;
 
+import com.yanolja.scbj.domain.alarm.dto.AlarmHasNonReadResponse;
 import com.yanolja.scbj.domain.alarm.dto.AlarmResponse;
 import com.yanolja.scbj.domain.alarm.entity.Alarm;
 import com.yanolja.scbj.domain.member.entity.Member;
@@ -19,7 +20,7 @@ public class AlarmMapper {
             .title(alarm.getTitle())
             .content(alarm.getContent())
             .date(alarm.getCreatedAt())
-            .isRead(alarm.isRead())
+            .isRead(alarm.isChecked())
             .build();
     }
 
@@ -29,6 +30,12 @@ public class AlarmMapper {
             .paymentHistory(paymentHistory)
             .title(data.getTitle())
             .content(data.getMessage())
+            .build();
+    }
+
+    public AlarmHasNonReadResponse toAlarmHasNonReadResponse(boolean hasNonReadAlarm) {
+        return AlarmHasNonReadResponse.builder()
+            .hasNonReadAlarm(hasNonReadAlarm)
             .build();
     }
 
