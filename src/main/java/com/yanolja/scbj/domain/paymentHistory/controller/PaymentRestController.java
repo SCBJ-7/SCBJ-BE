@@ -46,7 +46,7 @@ public class PaymentRestController {
 
         String url = paymentApiService.preparePayment(securityUtil.getCurrentMemberId(), productId,
             paymentReadyRequest);
-        return ResponseDTO.res(url, "결제에 성공했습니다.");
+        return ResponseDTO.res(url, "결제에 요청에 성공했습니다.");
     }
 
     @GetMapping("/pay-success")
