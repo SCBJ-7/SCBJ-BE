@@ -61,7 +61,10 @@ public class KaKaoPaymentService implements PaymentApiService {
     private final String REDIS_CACHE_KEY_PREFIX = "kakaoPay:";
     private final String REDIS_LOCK_KEY_PREFIX = "redis:lock:productId:";
     private final String PAYMENT_TYPE = "카카오페이";
-    private final String BASE_URL = "http://localhost:8080/v1/products";
+
+//  private final String BASE_URL = "http:/localhost:8080/v1/products";
+    @Value("${server.url}")
+    private String BASE_URL;
     private final String KAKAO_BASE_URL = "https://kapi.kakao.com/v1/payment";
 
     private final ProductRepository productRepository;
@@ -120,9 +123,9 @@ public class KaKaoPaymentService implements PaymentApiService {
         params.add("total_amount", price);
         params.add("tax_free_amount", 0);
         params.add("approval_url",
-            BASE_URL + "/pay-success?memberId=" + memberId + "&paymentType=kakaoPaymentService");
+            BASE_URL + "/v1/products/pay-success?memberId=" + memberId + "&paymentType=kakaoPaymentService");
         params.add("cancel_url",
-            BASE_URL + "/pay-cancel?memberId=" + memberId + "&paymentType=kakaoPaymentService");
+            BASE_URL + "/v1/products/pay-cancel?memberId=" + memberId + "&paymentType=kakaoPaymentService");
         params.add("fail_url", BASE_URL + "/pay-fail");
 
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
