@@ -32,12 +32,10 @@ public class PaymentHistoryRestController {
 
     @GetMapping("/purchased-history")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<Page<PurchasedHistoryResponse>> getPurchasedHistories(
-        @PageableDefault(page = 1) Pageable pageable
-    ) {
+    public ResponseDTO<List<PurchasedHistoryResponse>> getPurchasedHistories() {
         Long memberId = securityUtil.getCurrentMemberId();
-        Page<PurchasedHistoryResponse> response =
-            paymentHistoryService.getUsersPurchasedHistory(pageable, memberId);
+        List<PurchasedHistoryResponse> response =
+            paymentHistoryService.getUsersPurchasedHistory(memberId);
         return ResponseDTO.res(response, "조회에 성공하였습니다.");
     }
 
