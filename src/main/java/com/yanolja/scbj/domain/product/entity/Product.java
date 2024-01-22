@@ -71,8 +71,7 @@ public class Product extends BaseEntity {
 
     @Builder
     private Product(Long id, Reservation reservation, Member member, int firstPrice, int secondPrice,
-        String bank, String accountNumber, int secondGrantPeriod, PaymentHistory paymentHistory,
-        int stock) {
+        String bank, String accountNumber, int secondGrantPeriod, PaymentHistory paymentHistory) {
         this.id = id;
         this.reservation = reservation;
         this.member = member;
@@ -82,7 +81,7 @@ public class Product extends BaseEntity {
         this.accountNumber = accountNumber;
         this.secondGrantPeriod = secondGrantPeriod;
         this.paymentHistory = paymentHistory;
-        this.stock = stock;
+        this.stock = 1;
     }
 
     public void delete(LocalDateTime deleteTime){
