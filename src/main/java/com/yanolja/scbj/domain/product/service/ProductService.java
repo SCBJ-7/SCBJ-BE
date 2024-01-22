@@ -15,6 +15,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
+import com.yanolja.scbj.domain.product.entity.ProductAgreement;
 import com.yanolja.scbj.domain.product.exception.FirstPriceHigherException;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.exception.SecondPriceHigherException;
@@ -56,6 +57,13 @@ public class ProductService {
 
         YanoljaMember yanoljaMember = member.getYanoljaMember();
 
+        ProductAgreement productAgreement = ProductAgreement.builder()
+            .standardTimeSellingPolicy(productPostRequest.standardTimeSellingPolicy())
+            .totalAmountPolicy(productPostRequest.totalAmountPolicy())
+            .sellingModificationPolicy(productPostRequest.sellingModificationPolicy())
+            .productAgreement(productPostRequest.productAgreement())
+            .build();
+
         Reservation reservation = reservationRepository.findByIdAndYanoljaMemberId(reservationId,
             yanoljaMember.getId()).orElseThrow(
             () -> new ReservationNotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
@@ -84,6 +92,7 @@ public class ProductService {
         Product product = Product.builder()
             .reservation(reservation)
             .member(member)
+            .productAgreement(productAgreement)
             .firstPrice(productPostRequest.firstPrice())
             .secondPrice(productPostRequest.secondPrice())
             .bank(productPostRequest.bank())
