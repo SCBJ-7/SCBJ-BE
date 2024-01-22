@@ -22,6 +22,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
+import com.yanolja.scbj.domain.product.entity.ProductAgreement;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
@@ -80,7 +81,15 @@ class ProductServiceTest {
             long reservationId = 1L;
             ProductPostRequest productPostRequest = ProductPostRequest.builder().firstPrice(350000)
                 .secondPrice(200000).bank("신한은행").accountNumber("1000-4400-3330").isRegistered(true)
-                .secondGrantPeriod(48).build();
+                .secondGrantPeriod(48).standardTimeSellingPolicy(true).totalAmountPolicy(true)
+                .sellingModificationPolicy(true).productAgreement(true).build();
+
+            ProductAgreement productAgreement = ProductAgreement.builder()
+                .standardTimeSellingPolicy(productPostRequest.standardTimeSellingPolicy())
+                .totalAmountPolicy(productPostRequest.totalAmountPolicy())
+                .sellingModificationPolicy(productPostRequest.sellingModificationPolicy())
+                .productAgreement(productPostRequest.productAgreement())
+                .build();
 
             MemberUpdateAccountRequest memberUpdateAccountRequest =
                 MemberUpdateAccountRequest.builder()
@@ -105,11 +114,11 @@ class ProductServiceTest {
                 any(Long.TYPE))).willReturn(
                 java.util.Optional.ofNullable(reservation));
 
-
             Product product = Product.builder()
                 .id(1L)
                 .reservation(reservation)
                 .member(member)
+                .productAgreement(productAgreement)
                 .firstPrice(productPostRequest.firstPrice())
                 .secondPrice(productPostRequest.secondPrice())
                 .bank(productPostRequest.bank())
@@ -120,7 +129,6 @@ class ProductServiceTest {
 
             // when
             ProductPostResponse result = productService.postProduct(1L, 1L, productPostRequest);
-
 
             // then
             assertThat(result).isNotNull();
@@ -303,7 +311,6 @@ class ProductServiceTest {
                 .build();
 
             Pageable pageable = PageRequest.of(1, 10);
-
 
             PageImpl<ProductSearchResponse> expectedPage =
                 new PageImpl<>(List.of(response), pageable, 1);
