@@ -12,6 +12,8 @@ import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepositor
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,10 +31,10 @@ public class PaymentHistoryService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final ProductRepository productRepository;
 
-    public Page<PurchasedHistoryResponse> getUsersPurchasedHistory(Pageable pageable, Long id) {
-        Page<PurchasedHistoryResponse> response =
-            paymentHistoryRepository.findPurchasedHistoriesByMemberId(id, pageable);
-        return response.isEmpty() ? Page.empty() : response;
+    public List<PurchasedHistoryResponse> getUsersPurchasedHistory( Long id) {
+        List<PurchasedHistoryResponse> response =
+            paymentHistoryRepository.findPurchasedHistoriesByMemberId(id);
+        return response.isEmpty() ? Collections.emptyList() : response;
     }
 
     public Page<SaleHistoryResponse> getUsersSaleHistory(Pageable pageable, Long id) {
