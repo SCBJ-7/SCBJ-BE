@@ -69,7 +69,7 @@ public class AlarmService {
 
     public AlarmHasNonReadResponse hasNonReadAlarm() {
         return AlarmMapper.toAlarmHasNonReadResponse(
-            alarmRepository.existsAlarmByMemberIdAndReadIsFalse(securityUtil.getCurrentMemberId()));
+            alarmRepository.existsAlarmByMemberIdAndCheckedIsFalse(securityUtil.getCurrentMemberId()));
     }
 
 

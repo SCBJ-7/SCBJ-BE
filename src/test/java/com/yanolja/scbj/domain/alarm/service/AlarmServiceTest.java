@@ -108,9 +108,9 @@ class AlarmServiceTest {
 
 
             given(securityUtil.getCurrentMemberId()).willReturn(1L);
-            given(alarmRepository.existsAlarmByMemberIdAndReadIsFalse(1L)).willReturn(true);
+            given(alarmRepository.existsAlarmByMemberIdAndCheckedIsFalse(1L)).willReturn(true);
 
-            //when & then
+            //when, then
             assertEquals(expectedalarmHasNonReadResponse, alarmService.hasNonReadAlarm());
         }
     }

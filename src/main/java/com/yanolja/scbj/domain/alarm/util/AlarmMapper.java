@@ -20,7 +20,7 @@ public class AlarmMapper {
             .title(alarm.getTitle())
             .content(alarm.getContent())
             .date(alarm.getCreatedAt())
-            .isRead(alarm.isRead())
+            .isRead(alarm.isChecked())
             .build();
     }
 
