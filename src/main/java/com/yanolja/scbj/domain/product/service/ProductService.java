@@ -46,7 +46,6 @@ public class ProductService {
     private final WeekendDtoConverter weekendDtoConverter;
 
     private static final int MIN_SECOND_GRANT_PERIOD = 3;
-    private static final int FIXED_STOCK = 1;
 
     @Transactional
     public ProductPostResponse postProduct(Long memberId, Long reservationId,
@@ -90,7 +89,7 @@ public class ProductService {
             .bank(productPostRequest.bank())
             .accountNumber(productPostRequest.accountNumber())
             .secondGrantPeriod(productPostRequest.secondGrantPeriod())
-            .stock(FIXED_STOCK).build();
+            .build();
 
         Product savedProduct = productRepository.save(product);
 
