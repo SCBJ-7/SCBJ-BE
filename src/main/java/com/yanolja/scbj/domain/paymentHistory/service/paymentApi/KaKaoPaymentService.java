@@ -70,6 +70,8 @@ public class KaKaoPaymentService implements PaymentApiService {
     private String BASE_URL;
     private final String KAKAO_BASE_URL = "https://kapi.kakao.com/v1/payment";
 
+    private final int OUT_OF_STOCK = 0;
+
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
@@ -172,7 +174,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             if (!lock.tryLock(500, 5_000, TimeUnit.MICROSECONDS)) {
                 throw new RuntimeException();
             }
-            if (targetProduct.getStock() == 0) {
+            if (targetProduct.getStock() == OUT_OF_STOCK) {
                 throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
             }
             approvePayment(pgToken, memberId);
