@@ -18,6 +18,7 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 리프레쉬 토큰입니다."),
     INVALID_EMAIL_AND_PASSWORD(HttpStatus.BAD_REQUEST, "아이디 혹은 비밀번호를 확인해주세요."),
     NOT_FOUND_YANOLJA_MEMBER(HttpStatus.NOT_FOUND, "야놀자 계정을 찾을 수 없습니다."),
+    IS_NOT_YANOLJA_MEMBER(HttpStatus.UNAUTHORIZED, "야놀자 연동 계정이 아닙니다."),
 
     //SERVER
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류입니다."),

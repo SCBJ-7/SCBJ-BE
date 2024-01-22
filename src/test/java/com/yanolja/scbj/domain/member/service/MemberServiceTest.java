@@ -69,6 +69,9 @@ class MemberServiceTest {
             .password(bCryptPasswordEncoder.encode(testRawPassword))
             .name("test")
             .phone("010-1234-5678")
+            .yanoljaMember(YanoljaMember.builder()
+                .email("test@gmail.com")
+                .build())
             .build();
 
         @Test
@@ -87,6 +90,7 @@ class MemberServiceTest {
                 .name(testMember.getName())
                 .phone(testMember.getPhone())
                 .id(testMember.getId())
+                .linkedToYanolja(true)
                 .build();
 
             given(memberRepository.existsByEmail(any(String.class))).willReturn(false);
