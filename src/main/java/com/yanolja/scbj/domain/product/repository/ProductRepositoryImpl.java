@@ -60,7 +60,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
             .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
             .groupBy(product.id)
-            .offset(pageable.getOffset())
             .fetch()
             .stream().map(tuple -> {
                 Integer purchasePrice = tuple.get(reservation.purchasePrice);
@@ -79,21 +78,30 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     tuple.get(product.createdAt)
                 );
             })
-            .sorted(sort(productSearchRequest.getSorted()))
-            .limit(pageable.getPageSize())
+//            .sorted(sort(productSearchRequest.getSorted()))
             .toList();
 
-        Long total = queryFactory
-            .select(product.countDistinct())
-            .from(product)
-            .innerJoin(product.reservation, reservation)
-            .innerJoin(reservation.hotel, hotel)
-            .leftJoin(room.roomTheme, roomTheme).on(hotel.room.roomTheme.id.eq(roomTheme.id))
-            .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
-            .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
-            .fetchOne();
 
-        return new PageImpl<>(response, pageable, total != null ? total : 0);
+        response.sort(sort(productSearchRequest.getSorted()));
+
+        int total = response.size();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), total);
+        List<ProductSearchResponse> paginatedList = response.subList(start, end);
+
+
+//        Long total = queryFactory
+//            .select(product.countDistinct())
+//            .from(product)
+//            .innerJoin(product.reservation, reservation)
+//            .innerJoin(reservation.hotel, hotel)
+//            .leftJoin(room.roomTheme, roomTheme).on(hotel.room.roomTheme.id.eq(roomTheme.id))
+//            .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
+//            .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
+//            .fetchOne();
+
+        return new PageImpl<>(paginatedList, pageable, total);
     }
 
     private BooleanBuilder allFilter(ProductSearchRequest productSearchRequest) {
