@@ -3,6 +3,7 @@ package com.yanolja.scbj.domain.paymentHistory.controller;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentCancelResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.PaymentApiService;
 import com.yanolja.scbj.global.common.ResponseDTO;
@@ -38,15 +39,15 @@ public class PaymentRestController {
 
     @PostMapping("/{product_id}/payments")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<String> preparePayment(@PathVariable("product_id") long productId,
+    public ResponseDTO<PreparePaymentResponse> preparePayment(@PathVariable("product_id") long productId,
         @RequestParam("paymentType") String paymentType,
         @Valid @RequestBody PaymentReadyRequest paymentReadyRequest) {
 
         PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
 
-        String url = paymentApiService.preparePayment(securityUtil.getCurrentMemberId(), productId,
+        PreparePaymentResponse preparePaymentResponse = paymentApiService.preparePayment(securityUtil.getCurrentMemberId(), productId,
             paymentReadyRequest);
-        return ResponseDTO.res(url, "결제에 요청에 성공했습니다.");
+        return ResponseDTO.res(preparePaymentResponse, "결제에 요청에 성공했습니다.");
     }
 
     @GetMapping("/pay-success")

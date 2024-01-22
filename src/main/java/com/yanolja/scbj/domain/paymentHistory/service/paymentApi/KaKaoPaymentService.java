@@ -8,6 +8,7 @@ import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentApproveResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentReadyResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.KakaoPayException;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -101,7 +103,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         maxAttempts = RetryConfig.MAX_ATTEMPTS,
         backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
     )
-    public String preparePayment(Long memberId, Long productId, PaymentReadyRequest paymentReadyRequest) {
+    public PreparePaymentResponse preparePayment(Long memberId, Long productId, PaymentReadyRequest paymentReadyRequest) {
         Product targetProduct = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
                 ErrorCode.PRODUCT_NOT_FOUND));
@@ -156,7 +158,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             String key = REDIS_CACHE_KEY_PREFIX + memberId;
             hashOperations.putAll(key, redisMap);
 
-            return paymentReadyResponse.redirectPcUrl();
+            return PreparePaymentResponse.builder().url(paymentReadyResponse.redirectPcUrl()).build();
         } catch (URISyntaxException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_READY_FAIL);
         }
@@ -217,7 +219,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         Product product = productRepository.findById(Long.valueOf(productId))
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        if (product.getStock() == 0) {
+        if (product.getStock() == OUT_OF_STOCK) {
             throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 

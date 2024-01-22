@@ -1,6 +1,7 @@
 package com.yanolja.scbj.domain.paymentHistory.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 
 public record PaymentReadyResponse(
     String tid,
@@ -8,4 +9,7 @@ public record PaymentReadyResponse(
     String redirectPcUrl
 ) {
 
+    @Builder
+    public PaymentReadyResponse {
+    }
 }
