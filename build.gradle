@@ -82,6 +82,9 @@ dependencies {
 	//retry
 	implementation 'org.springframework.retry:spring-retry'
 
+	//scheduling
+	implementation 'org.quartz-scheduler:quartz:2.3.0'
+
 	// thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 

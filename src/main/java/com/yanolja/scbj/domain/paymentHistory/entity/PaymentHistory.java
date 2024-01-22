@@ -39,6 +39,10 @@ public class PaymentHistory extends BaseEntity {
     @Comment("상품 식별자")
     private Product product;
 
+    @Column(length = 50, nullable = false)
+    @Comment("상품 이름")
+    private String productName;
+
     @OneToOne
     @JoinColumn(name = "payment_agreement_id")
     @Cascade(CascadeType.ALL)
@@ -71,13 +75,13 @@ public class PaymentHistory extends BaseEntity {
 
 
     @Builder
-    private PaymentHistory(Long id, Member member, Product product,
-        PaymentAgreement paymentAgreement,
-        int price, String customerName, String customerEmail, String customerPhoneNumber,
-        String paymentType, boolean settlement) {
+    private PaymentHistory(Long id, Member member, Product product, String productName,
+        PaymentAgreement paymentAgreement, int price, String customerName, String customerEmail,
+        String customerPhoneNumber, String paymentType, boolean settlement) {
         this.id = id;
         this.member = member;
         this.product = product;
+        this.productName = productName;
         this.paymentAgreement = paymentAgreement;
         this.price = price;
         this.customerName = customerName;
@@ -85,5 +89,12 @@ public class PaymentHistory extends BaseEntity {
         this.customerPhoneNumber = customerPhoneNumber;
         this.paymentType = paymentType;
         this.settlement = settlement;
+    }
+
+
+    public void processSettlement() {
+        if (!this.settlement) {
+            this.settlement = true;
+        }
     }
 }

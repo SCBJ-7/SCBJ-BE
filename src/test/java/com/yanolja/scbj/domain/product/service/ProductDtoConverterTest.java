@@ -1,14 +1,18 @@
 package com.yanolja.scbj.domain.product.service;
 
+import static org.mockito.BDDMockito.given;
+
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
+import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -18,10 +22,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ProductDtoConverterTest {
+
+    @Mock
+    private SecurityUtil securityUtil;
 
     @InjectMocks
     private ProductDtoConverter productDtoConverter;
@@ -74,8 +82,13 @@ class ProductDtoConverterTest {
                 .settlement(true)
                 .build();
 
+            Member member = Member.builder()
+                .id(1L)
+                .build();
+
             Product product = Product.builder()
                 .id(1L)
+                .member(member)
                 .firstPrice(200000)
                 .secondPrice(100000)
                 .bank("국민")
@@ -84,6 +97,9 @@ class ProductDtoConverterTest {
                 .reservation(reservation)
                 .paymentHistory(paymentHistory)
                 .build();
+
+            given(securityUtil.isUserNotAuthenticated()).willReturn(false);
+            given(securityUtil.getCurrentMemberId()).willReturn(1L);
 
             // when
             ProductFindResponse response = productDtoConverter.toFindResponse(product);

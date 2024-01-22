@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.paymentHistory.service.paymentApi;
 
+import com.yanolja.scbj.domain.alarm.service.AlarmService;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
@@ -18,6 +19,7 @@ import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.config.RetryConfig;
+import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.exception.InternalServerException;
 import com.yanolja.scbj.global.util.TimeValidator;
@@ -25,6 +27,7 @@ import io.lettuce.core.RedisClient;
 import jakarta.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -70,6 +73,7 @@ public class KaKaoPaymentService implements PaymentApiService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
+    private final AlarmService alarmService;
     private final RedisTemplate<String, String> redisTemplate;
     private final RestTemplate restTemplate;
     private final RedissonClient redissonClient;
@@ -114,6 +118,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         }
 
         String productName = targetHotel.getHotelName() + " " + targetHotel.getRoom().getRoomName();
+
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
         params.add("partner_order_id", String.valueOf(productId));
@@ -143,6 +148,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             redisMap.put("customerName", paymentReadyRequest.customerName());
             redisMap.put("customerEmail", paymentReadyRequest.customerEmail());
             redisMap.put("customerPhoneNumber", paymentReadyRequest.customerPhoneNumber());
+            redisMap.put("productName", productName);
 
             HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
             String key = REDIS_CACHE_KEY_PREFIX + memberId;
@@ -195,6 +201,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             .get(key, "customerPhoneNumber");
         String price = (String) redisTemplate.opsForHash().get(key, "price");
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");
+        String productName = (String) redisTemplate.opsForHash().get(key, "productName");
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
@@ -237,7 +244,10 @@ public class KaKaoPaymentService implements PaymentApiService {
                 .build();
 
             product.sell();
-            paymentHistoryRepository.save(paymentHistory);
+            PaymentHistory savedPaymentHistory = paymentHistoryRepository.save(paymentHistory);
+
+            alarmService.createAlarm(product.getMember().getId(), savedPaymentHistory.getId(),
+                new Data("판매완료", productName + "의 판매가 완료되었어요!", LocalDateTime.now()));
 
         } catch (RestClientException | URISyntaxException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_INFO_FAIL);
@@ -292,7 +302,7 @@ public class KaKaoPaymentService implements PaymentApiService {
     }
 
     @Recover
-    private void sendExceptionForPayFailure(KakaoPayException e){
+    private void sendExceptionForPayFailure(KakaoPayException e) {
         throw new KakaoPayException(e.getErrorCode());
     }
 

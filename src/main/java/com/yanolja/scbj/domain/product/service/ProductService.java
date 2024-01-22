@@ -6,7 +6,6 @@ import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.service.MemberService;
-import com.yanolja.scbj.domain.product.dto.request.ProductCityRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.CityResponse;
@@ -89,7 +88,8 @@ public class ProductService {
             .secondPrice(productPostRequest.secondPrice())
             .bank(productPostRequest.bank())
             .accountNumber(productPostRequest.accountNumber())
-            .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
+            .secondGrantPeriod(productPostRequest.secondGrantPeriod())
+            .build();
 
         Product savedProduct = productRepository.save(product);
 
@@ -122,13 +122,12 @@ public class ProductService {
     }
 
 
-    public ProductMainResponse getAllProductForMainPage(ProductCityRequest productCityRequest,
+    public ProductMainResponse getAllProductForMainPage(List<String> cityNames,
                                                         Pageable pageable
     ) {
-        List<String> cities = productCityRequest.cityNames();
         HashMap<String, List<CityResponse>> savedProduct = new HashMap<>();
 
-        getEachCity(cities, savedProduct);
+        getEachCity(cityNames, savedProduct);
         Page<WeekendProductResponse> weekendProductResponse = getWeekendProducts(pageable);
 
         return ProductMainResponse.builder()
