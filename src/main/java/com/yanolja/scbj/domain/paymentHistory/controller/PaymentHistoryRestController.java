@@ -8,6 +8,7 @@ import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificSaleHistoryRe
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -42,12 +43,10 @@ public class PaymentHistoryRestController {
 
     @GetMapping("/sale-history")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<Page<SaleHistoryResponse>> getSaleHistories(
-        @PageableDefault(page = 1) Pageable pageable
-    ) {
+    public ResponseDTO<List<SaleHistoryResponse>> getSaleHistories() {
         Long memberId = securityUtil.getCurrentMemberId();
-        Page<SaleHistoryResponse> response =
-            paymentHistoryService.getUsersSaleHistory(pageable, memberId);
+        List<SaleHistoryResponse> response =
+            paymentHistoryService.getUsersSaleHistory(memberId);
         return ResponseDTO.res(response, "조회에 성공하였습니다.");
     }
 
