@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReservationDtoConverter {
 
-    private static final int RESERVATION_IMAGE = 0;
+    private final int RESERVATION_IMAGE = 0;
     private final ProductRepository productRepository;
 
     public List<ReservationFindResponse> toFindResponse(List<Reservation> reservationList) {

@@ -21,7 +21,6 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationDtoConverter reservationDtoConverter;
-    private final ProductRepository productRepository;
 
     @Transactional
     public List<ReservationFindResponse> findReservation(Long memberId) {
