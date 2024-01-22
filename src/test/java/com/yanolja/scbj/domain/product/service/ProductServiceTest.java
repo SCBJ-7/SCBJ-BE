@@ -143,7 +143,16 @@ class ProductServiceTest {
             long yanoljaId = 1L;
             long reservationId = 1L;
             ProductPostRequest productPostRequest = ProductPostRequest.builder().firstPrice(350000)
-                .bank("신한은행").accountNumber("1000-4400-3330").isRegistered(false).build();
+                .bank("신한은행").accountNumber("1000-4400-3330").isRegistered(false)
+                .secondGrantPeriod(48).standardTimeSellingPolicy(true).totalAmountPolicy(true)
+                .sellingModificationPolicy(true).productAgreement(true).build();
+
+            ProductAgreement productAgreement = ProductAgreement.builder()
+                .standardTimeSellingPolicy(productPostRequest.standardTimeSellingPolicy())
+                .totalAmountPolicy(productPostRequest.totalAmountPolicy())
+                .sellingModificationPolicy(productPostRequest.sellingModificationPolicy())
+                .productAgreement(productPostRequest.productAgreement())
+                .build();
 
             YanoljaMember yanoljaMember = YanoljaMember.builder().id(yanoljaId)
                 .email("yang980329@naver.com").build();
@@ -166,6 +175,7 @@ class ProductServiceTest {
                 .id(1L)
                 .reservation(reservation)
                 .member(member)
+                .productAgreement(productAgreement)
                 .firstPrice(productPostRequest.firstPrice())
                 .secondPrice(productPostRequest.secondPrice())
                 .bank(productPostRequest.bank())
