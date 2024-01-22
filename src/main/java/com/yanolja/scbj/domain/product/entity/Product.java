@@ -78,7 +78,7 @@ public class Product extends BaseEntity {
     private int stock;
 
     @Builder
-    public Product(Long id, Reservation reservation,
+    private Product(Long id, Reservation reservation,
         Member member, ProductAgreement productAgreement, int firstPrice, int secondPrice,
         String bank, String accountNumber, int secondGrantPeriod,
         PaymentHistory paymentHistory) {

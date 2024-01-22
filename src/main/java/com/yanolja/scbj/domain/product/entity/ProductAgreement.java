@@ -43,7 +43,7 @@ public class ProductAgreement {
     private Boolean productAgreement;
 
     @Builder
-    public ProductAgreement(Long id, Boolean standardTimeSellingPolicy,
+    private ProductAgreement(Long id, Boolean standardTimeSellingPolicy,
         Boolean totalAmountPolicy, Boolean sellingModificationPolicy,
         Boolean productAgreement) {
         this.id = id;
