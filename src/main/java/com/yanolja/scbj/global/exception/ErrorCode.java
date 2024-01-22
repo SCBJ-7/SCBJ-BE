@@ -28,6 +28,7 @@ public enum ErrorCode {
     //PRODUCT
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 정보를 찾을 수 없습니다."),
     PRODUCT_NOT_FOR_SALE(HttpStatus.BAD_REQUEST, "본인의 상품은 구매할 수 없습니다."),
+    PRODUCT_OUT_OF_STOCK(HttpStatus.CONFLICT, "상품 재고가 부족합니다."),
 
     //PAYMENT
     PAYMENT_LOAD_FAIL(HttpStatus.BAD_REQUEST, "결제에 실패하였습니다."),

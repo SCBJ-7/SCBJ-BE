@@ -49,3 +49,7 @@ fcm:
 
 kakao-api:
   api-key : ${API-KEY}
+
+
+server:
+  url : ${SERVER-URL}
