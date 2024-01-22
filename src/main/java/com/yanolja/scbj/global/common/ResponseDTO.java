@@ -24,8 +24,8 @@ public class ResponseDTO<T> {
      * @param <T>        데이터의 제네릭 타입
      * @return 생성된 ResponseDTO 객체
      */
-    public static <T> ResponseDTO<T> res(@Nullable T data, String message) {
-        return ResponseDTO.<T>builder()
+    public static <Void> ResponseDTO<Void> res(@Nullable Void data, String message) {
+        return ResponseDTO.<Void>builder()
             .message(message)
             .data(data)
             .build();
@@ -38,8 +38,8 @@ public class ResponseDTO<T> {
      * @param <T>        데이터의 제네릭 타입
      * @return 생성된 ResponseDTO 객체
      */
-    public static <T> ResponseDTO<T> res(String message) {
-        return ResponseDTO.<T>builder()
+    public static <Void> ResponseDTO<Void> res(String message) {
+        return ResponseDTO.<Void>builder()
             .message(message)
             .build();
     }
