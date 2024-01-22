@@ -60,6 +60,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
             .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
             .groupBy(product.id)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
             .fetch()
             .stream().map(tuple -> {
                 Integer purchasePrice = tuple.get(reservation.purchasePrice);
@@ -128,7 +130,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         if (hotelMainAddress == null || hotelMainAddress.isEmpty()) {
             return null;
         }
-        return hotel.hotelMainAddress.contains(hotelMainAddress);
+        return hotel.hotelMainAddress.eq(hotelMainAddress);
     }
 
     private BooleanExpression eqParking(Boolean hasParking) {
