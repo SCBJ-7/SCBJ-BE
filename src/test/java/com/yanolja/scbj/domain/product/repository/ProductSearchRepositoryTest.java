@@ -136,14 +136,12 @@ public class ProductSearchRepositoryTest {
 
             // when
             Page<ProductSearchResponse> results =
-                productRepository.search(PageRequest.of(0, 1), searchRequest);
+                productRepository.search(PageRequest.of(0, 10), searchRequest);
 
             // then
             assertThat(results).isNotEmpty();
             List<ProductSearchResponse> responses = results.getContent();
-            for (ProductSearchResponse respons : responses) {
-                System.err.println(respons.getOriginalPrice());
-            }
+
             assertThat(responses.size()).isEqualTo(5);
         }
 
@@ -163,9 +161,6 @@ public class ProductSearchRepositoryTest {
             //then
             assertThat(results).isNotEmpty();
             List<ProductSearchResponse> content = results.getContent();
-            for (ProductSearchResponse productSearchResponse : content) {
-                System.out.println(productSearchResponse.getOriginalPrice());
-            }
 
             assertThat(content.size()).isEqualTo(5);
         }
@@ -185,10 +180,6 @@ public class ProductSearchRepositoryTest {
 
             //then
             assertThat(results).isNotEmpty();
-            for (ProductSearchResponse result : results) {
-                System.out.println(result.getOriginalPrice());
-
-            }
             List<ProductSearchResponse> content = results.getContent();
             assertThat(content.size()).isEqualTo(10);
         }

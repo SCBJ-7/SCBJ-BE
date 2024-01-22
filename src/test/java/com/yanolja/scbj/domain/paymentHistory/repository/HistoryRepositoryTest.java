@@ -153,6 +153,7 @@ class HistoryRepositoryTest {
             .price(20000)
             .paymentType("신용카드")
             .settlement(false)
+            .productName("호텔이름 객실이름")
             .build();
         entityManager.persist(paymentHistory);
         return paymentHistory;
