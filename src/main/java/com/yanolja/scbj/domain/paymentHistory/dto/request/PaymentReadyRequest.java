@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 public record PaymentReadyRequest(
     @NotBlank(groups = NotBlankGroup.class)
@@ -22,4 +23,7 @@ public record PaymentReadyRequest(
     String customerPhoneNumber
 ) {
 
+    @Builder
+    public PaymentReadyRequest {
+    }
 }
