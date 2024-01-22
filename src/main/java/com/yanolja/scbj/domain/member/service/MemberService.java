@@ -22,6 +22,7 @@ import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import com.yanolja.scbj.global.config.jwt.exception.ExpiredTokenException;
 import com.yanolja.scbj.global.config.jwt.exception.InvalidTokenException;
 import com.yanolja.scbj.global.exception.ErrorCode;
+import com.yanolja.scbj.global.exception.IsNotYanoljaMemberException;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -137,8 +138,13 @@ public class MemberService {
     }
 
     public void updateMemberAccount(final MemberUpdateAccountRequest memberUpdateAccountRequest) {
-        getCurrentMember().updateAccount(memberUpdateAccountRequest.accountNumber(),
-            memberUpdateAccountRequest.bank());
+        if(isYanoljaLinkedUpMember()) {
+            getCurrentMember().updateAccount(memberUpdateAccountRequest.accountNumber(),
+                memberUpdateAccountRequest.bank());
+        }
+        else {
+            throw new IsNotYanoljaMemberException(ErrorCode.IS_NOT_YANOLJA_MEMBER);
+        }
     }
 
     public void updateMemberName(final String nameToUpdate) {
