@@ -37,10 +37,10 @@ public class PaymentHistoryService {
         return response.isEmpty() ? Collections.emptyList() : response;
     }
 
-    public Page<SaleHistoryResponse> getUsersSaleHistory(Pageable pageable, Long id) {
-        Page<SaleHistoryResponse> response =
-            productRepository.findSaleHistoriesByMemberId(id, pageable);
-        return response.isEmpty() ? Page.empty() : response;
+    public List<SaleHistoryResponse> getUsersSaleHistory(Long id) {
+        List<SaleHistoryResponse> response =
+            productRepository.findSaleHistoriesByMemberId(id);
+        return response.isEmpty() ? Collections.emptyList() : response;
     }
 
     @Transactional(readOnly = true)
