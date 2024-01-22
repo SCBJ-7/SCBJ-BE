@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -79,13 +80,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 );
             })
 //            .sorted(sort(productSearchRequest.getSorted()))
-            .toList();
+            .collect(Collectors.toList());
 
 
         response.sort(sort(productSearchRequest.getSorted()));
 
         int total = response.size();
-
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), total);
         List<ProductSearchResponse> paginatedList = response.subList(start, end);
