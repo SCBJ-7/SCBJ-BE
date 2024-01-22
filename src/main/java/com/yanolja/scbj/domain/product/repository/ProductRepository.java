@@ -42,7 +42,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
        LEFT JOIN p.paymentHistory ph 
        WHERE p.member.id = :memberId
        """)
-    Page<SaleHistoryResponse> findSaleHistoriesByMemberId(@Param("memberId") Long memberId, Pageable pageable);
+    List<SaleHistoryResponse> findSaleHistoriesByMemberId(@Param("memberId") Long memberId);
 
     @Query("select p from Product p "
         + "join fetch p.reservation r "
