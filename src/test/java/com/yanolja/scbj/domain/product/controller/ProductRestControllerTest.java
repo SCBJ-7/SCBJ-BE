@@ -26,6 +26,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductStockResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.config.SecurityConfig;
@@ -314,5 +315,25 @@ class ProductRestControllerTest {
 
     }
 
+    @Nested
+    @DisplayName("상품 재고 조회는")
+    class Context_getProductStock {
 
+        @Test
+        @DisplayName("재고가 존재시 true를 반환한다.")
+        void will_success() throws Exception {
+            // given
+            long productId = 1L;
+            ProductStockResponse productStockResponse = ProductStockResponse.builder()
+                .hasStock(true).build();
+
+            given(productService.isProductStockLeft(any(Long.TYPE))).willReturn(productStockResponse);
+
+            // when, then
+            mvc.perform(get("/v1/products/" + productId + "/stock"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.data.hasStock", is(productStockResponse.hasStock())));
+        }
+    }
 }
