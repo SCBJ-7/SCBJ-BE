@@ -65,45 +65,10 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
 
     @Query(value = """
          SELECT
-                p.id as pid,
-                p.first_price as pfirst_price,
-                p.second_grant_period as psecond_grant_period,
-                p.second_price as psecond_price,
-                p.account_number as paccount_number,
-                p.bank as pbank,
-                p.stock as pstock,
-                p.created_at as pcreated_at,
-                p.updated_at as pupdated_at,
-                p.deleted_at as pdeleted_at,
-            
-                r.id as rid,
-                r.start_date as rstart_date,
-                r.end_date as rend_date,
-                r.purchase_price as rpurchase_price,
-                r.created_at as rcreated_at,
-                r.updated_at as rupdated_at,
-                r.deleted_at as rdeleted_at,
-            
-                h.id as hid,
-                h.hotel_name as hhotel_name,
-                h.hotel_main_address as hhotel_main_address,
-                h.hotel_detail_address as hhotel_detail_address,
-                h.hotel_info_url as hhotel_info_url
-                
-//                ph.id as phid,
-//                ph.product_name as phproduct_name,
-//                ph.price as phprice,
-//                ph.customer_name as phcustomer_name,
-//                ph.customer_email as phcustomer_email,
-//                ph.customer_phone_number as phcustomer_phone_number,
-//                ph.payment_type as php_payment_type,
-//                ph.settlement as phsettlement,
-//                ph.created_at as phcreated_at,
-//                ph.updated_at as phupdated_at,
-//                ph.deleted_at as phdeleted_at
+            p.*
         FROM product p
         JOIN reservation r ON p.reservation_id = r.id
-        JOIN hotel h ON r.hotel_id = h.id
+        JOIN hotel h ON r.id = h.id
         LEFT JOIN payment_history ph ON p.id = ph.product_id
         WHERE DAYOFWEEK(r.start_date) IN (6, 7, 1)
         AND r.start_date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 21 DAY)
