@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.mockData;
+package com.yanolja.scbj_crawling.mockData;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
