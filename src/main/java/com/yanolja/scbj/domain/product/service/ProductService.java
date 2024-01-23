@@ -146,7 +146,7 @@ public class ProductService {
             .jeju(savedProduct.get("제주"))
             .jeolla(savedProduct.get("전라"))
             .gyeongsang(savedProduct.get("경상"))
-            .weekend(weekendProductResponse.isEmpty() ? Page.empty() : weekendProductResponse)
+            .weekend(weekendProductResponse.isEmpty() ? Page.empty(pageable) : weekendProductResponse)
             .build();
     }
 

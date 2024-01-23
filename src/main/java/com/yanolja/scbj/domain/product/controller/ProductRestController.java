@@ -76,7 +76,7 @@ public class ProductRestController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<ProductMainResponse> getProductsForMain(
         @Valid @RequestParam("cityNames") List<String> cityNames,
-        @PageableDefault(page = 1) Pageable pageable
+        @PageableDefault() Pageable pageable
         ) {
         ProductMainResponse mainResponse = productService.getAllProductForMainPage(cityNames , pageable);
         return ResponseDTO.res(mainResponse,"조회에 성공하였습니다");
