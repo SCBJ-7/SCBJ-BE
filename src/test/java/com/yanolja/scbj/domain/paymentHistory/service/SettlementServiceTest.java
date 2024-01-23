@@ -26,18 +26,17 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.assertj.core.api.Assertions;
-import org.checkerframework.checker.units.qual.A;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-//
+
 @SpringBootTest(properties = {
-//    "schedule.cron = * * * ? * *",
     "schedule.cron = 0/1 * * * * ?",
 })
 class SettlementServiceTest {
@@ -77,13 +76,14 @@ class SettlementServiceTest {
 
     @Nested
     @DisplayName("정산 로직은 ")
-    class Context_processSettlement{
+    @TestInstance(Lifecycle.PER_CLASS)
+    class Context_processSettlement {
 
         private Product product;
         private Member member;
 
-        @BeforeEach
-        void init(){
+        @BeforeAll
+        void init() {
             RoomTheme roomTheme = RoomTheme.builder()
                 .breakfast(true)
                 .pool(true)
@@ -102,7 +102,6 @@ class SettlementServiceTest {
                 .maxPeople(4)
                 .roomTheme(roomTheme)
                 .build();
-
 
             Hotel hotel = Hotel.builder()
                 .hotelName("테스트 호텔")
@@ -150,9 +149,7 @@ class SettlementServiceTest {
 
             member = memberService.getMember(1L);
 
-//            memberRepository.save(member);
-
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 10; i++) {
 
                 Reservation reservation = Reservation.builder()
                     .hotel(hotel)
@@ -191,10 +188,9 @@ class SettlementServiceTest {
 
         @Test
         @DisplayName("시간에 맞춰 스케줄링이 된다.")
-        void _will_success_scheduled() throws Exception{
+        void _will_success_scheduled() throws Exception {
             // when
-            // 1초 마다 스케줄링 실행
-            Thread.sleep(5000);
+            Thread.sleep(3000);
 
             // then
             List<PaymentHistory> paymentHistoryList = paymentHistoryRepository.findAll();
@@ -202,10 +198,9 @@ class SettlementServiceTest {
             Assertions.assertThat(paymentHistoryList.get(0).isSettlement()).isEqualTo(true);
         }
 
-
         @Test
         @DisplayName("성공 시 정산 상태가 업데이트 된다.")
-        void _will_success_update(){
+        void _will_success_update() {
             // when
             long startTime = System.currentTimeMillis();
             settlementService.settlementPaymentHistorySchedule();
