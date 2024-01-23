@@ -6,6 +6,7 @@ import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,7 +38,7 @@ public class CityDtoConverter {
 
             }).sorted(Comparator.comparingDouble(CityResponse::salePercentage))
             .limit(PRODUCT_QUANTITY)
-            .toList();
+            .collect(Collectors.toList());
 
 
     }
