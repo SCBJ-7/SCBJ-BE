@@ -88,19 +88,19 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
                 h.hotel_name as hhotel_name,
                 h.hotel_main_address as hhotel_main_address,
                 h.hotel_detail_address as hhotel_detail_address,
-                h.hotel_info_url as hhotel_info_url,
-            
-                ph.id as phid,
-                ph.product_name as phproduct_name,
-                ph.price as phprice,
-                ph.customer_name as phcustomer_name,
-                ph.customer_email as phcustomer_email,
-                ph.customer_phone_number as phcustomer_phone_number,
-                ph.payment_type as php_payment_type,
-                ph.settlement as phsettlement,
-                ph.created_at as phcreated_at,
-                ph.updated_at as phupdated_at,
-                ph.deleted_at as phdeleted_at
+                h.hotel_info_url as hhotel_info_url
+                
+//                ph.id as phid,
+//                ph.product_name as phproduct_name,
+//                ph.price as phprice,
+//                ph.customer_name as phcustomer_name,
+//                ph.customer_email as phcustomer_email,
+//                ph.customer_phone_number as phcustomer_phone_number,
+//                ph.payment_type as php_payment_type,
+//                ph.settlement as phsettlement,
+//                ph.created_at as phcreated_at,
+//                ph.updated_at as phupdated_at,
+//                ph.deleted_at as phdeleted_at
         FROM product p
         JOIN reservation r ON p.reservation_id = r.id
         JOIN hotel h ON r.hotel_id = h.id
