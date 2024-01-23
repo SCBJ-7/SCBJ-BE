@@ -88,6 +88,6 @@ public class ProductRestController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<ProductStockResponse> getProductStock(
         @PathVariable("product_id") long productId) {
-        return ResponseDTO.res(productService.isProductStockLeft(productId), "상품 조회에 성공했습니다.");
+        return ResponseDTO.res(productService.isProductStockLeft(productId), "상품 재고 조회에 성공했습니다.");
     }
 }
