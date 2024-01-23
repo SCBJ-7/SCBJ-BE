@@ -49,3 +49,6 @@ kakao-api:
 
 server:
   url: ${SERVER-URL}
+
+schedule:
+  cron : ${SCHEDULE-CRON}
