@@ -48,6 +48,7 @@ public class ProductService {
     private final WeekendDtoConverter weekendDtoConverter;
 
     private static final int MIN_SECOND_GRANT_PERIOD = 3;
+    private final int OUT_OF_STOCK = 0;
 
     @Transactional
     public ProductPostResponse postProduct(Long memberId, Long reservationId,
@@ -170,7 +171,7 @@ public class ProductService {
     public ProductStockResponse isProductStockLeft(long productId) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
-        if(product.getStock() > 0){
+        if(product.getStock() > OUT_OF_STOCK){
             return ProductStockResponse.builder().hasStock(true).build();
         }
         return ProductStockResponse.builder().hasStock(false).build();
