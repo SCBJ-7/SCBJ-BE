@@ -79,9 +79,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     tuple.get(product.createdAt)
                 );
             })
-//            .sorted(sort(productSearchRequest.getSorted()))
             .collect(Collectors.toList());
-
 
         response.sort(sort(productSearchRequest.getSorted()));
 
@@ -91,15 +89,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         List<ProductSearchResponse> paginatedList = response.subList(start, end);
 
 
-//        Long total = queryFactory
-//            .select(product.countDistinct())
-//            .from(product)
-//            .innerJoin(product.reservation, reservation)
-//            .innerJoin(reservation.hotel, hotel)
-//            .leftJoin(room.roomTheme, roomTheme).on(hotel.room.roomTheme.id.eq(roomTheme.id))
-//            .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
-//            .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
-//            .fetchOne();
 
         return new PageImpl<>(paginatedList, pageable, total);
     }
