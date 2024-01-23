@@ -26,9 +26,9 @@ ext {
 	set('snippetsDir', file("build/generated-snippets"))
 }
 
-springBoot {
-	mainClass = 'com.yanolja.scbj.ScbjApplication'
-}
+//springBoot {
+//	mainClass = 'com.yanolja.scbj.ScbjApplication'
+//}
 
 dependencies {
 	//Jpa
