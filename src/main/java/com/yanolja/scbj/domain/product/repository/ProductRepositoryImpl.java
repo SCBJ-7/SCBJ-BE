@@ -84,13 +84,16 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         response.sort(sort(productSearchRequest.getSorted()));
 
         int total = response.size();
+        List<ProductSearchResponse> paginatedResponse = doPaginated(response, pageable, total);
+
+        return new PageImpl<>(paginatedResponse, pageable, total);
+    }
+
+    private List<ProductSearchResponse> doPaginated(List<ProductSearchResponse> response,
+                                                    Pageable pageable, int total) {
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), total);
-        List<ProductSearchResponse> paginatedList = response.subList(start, end);
-
-
-
-        return new PageImpl<>(paginatedList, pageable, total);
+        return response.subList(start, end);
     }
 
     private BooleanBuilder allFilter(ProductSearchRequest productSearchRequest) {
