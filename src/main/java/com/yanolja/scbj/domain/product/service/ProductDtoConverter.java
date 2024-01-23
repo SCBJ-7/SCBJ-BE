@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ProductDtoConverter {
-
+    private final int OUT_OF_STOCK = 0;
     private final SecurityUtil securityUtil;
 
     public ProductFindResponse toFindResponse(Product product) {
@@ -79,7 +79,7 @@ public class ProductDtoConverter {
     }
 
     private boolean getSaleStatus(Product product, LocalDateTime checkIn) {
-        if (product.getStock() == 0){
+        if (product.getStock() == OUT_OF_STOCK){
             return false;
         }
         return LocalDateTime.now().isAfter(checkIn);
