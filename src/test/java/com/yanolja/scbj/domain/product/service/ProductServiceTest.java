@@ -1,10 +1,14 @@
 package com.yanolja.scbj.domain.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
@@ -21,6 +25,7 @@ import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductStockResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.entity.ProductAgreement;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
@@ -335,6 +340,147 @@ class ProductServiceTest {
             assertThat(result).isNotNull();
             System.out.println(response.getCheckIn());
             assertThat(result.getContent()).containsExactly(response);
+        }
+    }
+
+    @Nested
+    @DisplayName("상품 재고 조회는")
+    class Context_getProductStock {
+
+        @Test
+        @DisplayName("재고가 존재시 true를 반환한다.")
+        void will_success() throws Exception {
+
+            // given
+            long productId = 1L;
+
+            RoomTheme roomTheme = RoomTheme.builder()
+                .id(1L)
+                .build();
+
+            Room room = Room.builder()
+                .checkIn(LocalTime.now())
+                .checkOut(LocalTime.now())
+                .roomTheme(roomTheme)
+                .build();
+
+            HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
+                .id(1L)
+                .offPeakPrice(100000)
+                .peakPrice(200000)
+                .build();
+
+            Hotel hotel = Hotel.builder()
+                .id(1L)
+                .room(room)
+                .hotelRoomPrice(hotelRoomPrice)
+                .build();
+
+            Reservation reservation = Reservation.builder()
+                .id(1L)
+                .hotel(hotel)
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now())
+                .build();
+
+            PaymentHistory paymentHistory = PaymentHistory.builder()
+                .id(1L)
+                .price(100000)
+                .customerName("tester")
+                .customerEmail("qwe@nav.com")
+                .customerPhoneNumber("010-1122-3344")
+                .paymentType("카카오페이")
+                .settlement(true)
+                .build();
+
+            Product product = Product.builder()
+                .id(1L)
+                .firstPrice(200000)
+                .secondPrice(100000)
+                .bank("국민")
+                .accountNumber("12512-2131-12512")
+                .secondGrantPeriod(24)
+                .reservation(reservation)
+                .paymentHistory(paymentHistory)
+                .build();
+
+            given(productRepository.findById(any())).willReturn(Optional.of(product));
+
+            // when
+            ProductStockResponse result = productService.isProductStockLeft(productId);
+
+            //then
+            assertThat(result).isNotNull();
+            assertThat(result.hasStock()).isEqualTo(true);
+        }
+
+        @Test
+        @DisplayName("재고가 존재하지 않을 경우 false를 반환한다.")
+        void will_NotSuccess() throws Exception {
+
+            // given
+            long productId = 1L;
+
+            RoomTheme roomTheme = RoomTheme.builder()
+                .id(1L)
+                .build();
+
+            Room room = Room.builder()
+                .checkIn(LocalTime.now())
+                .checkOut(LocalTime.now())
+                .roomTheme(roomTheme)
+                .build();
+
+            HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
+                .id(1L)
+                .offPeakPrice(100000)
+                .peakPrice(200000)
+                .build();
+
+            Hotel hotel = Hotel.builder()
+                .id(1L)
+                .room(room)
+                .hotelRoomPrice(hotelRoomPrice)
+                .build();
+
+            Reservation reservation = Reservation.builder()
+                .id(1L)
+                .hotel(hotel)
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now())
+                .build();
+
+            PaymentHistory paymentHistory = PaymentHistory.builder()
+                .id(1L)
+                .price(100000)
+                .customerName("tester")
+                .customerEmail("qwe@nav.com")
+                .customerPhoneNumber("010-1122-3344")
+                .paymentType("카카오페이")
+                .settlement(true)
+                .build();
+
+            Product product = Product.builder()
+                .id(1L)
+                .firstPrice(200000)
+                .secondPrice(100000)
+                .bank("국민")
+                .accountNumber("12512-2131-12512")
+                .secondGrantPeriod(24)
+                .reservation(reservation)
+                .paymentHistory(paymentHistory)
+                .build();
+
+            product.sell();
+
+            given(productRepository.findById(any())).willReturn(Optional.of(product));
+
+            // when
+            ProductStockResponse result = productService.isProductStockLeft(productId);
+
+            //then
+            assertThat(result).isNotNull();
+            assertThat(result.hasStock()).isEqualTo(false);
         }
     }
 }

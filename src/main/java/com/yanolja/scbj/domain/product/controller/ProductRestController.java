@@ -6,6 +6,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductStockResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,4 +84,10 @@ public class ProductRestController {
         return ResponseDTO.res(mainResponse,"조회에 성공하였습니다");
     }
 
+    @GetMapping("/{product_id}/stock")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO<ProductStockResponse> getProductStock(
+        @PathVariable("product_id") long productId) {
+        return ResponseDTO.res(productService.isProductStockLeft(productId), "상품 재고 조회에 성공했습니다.");
+    }
 }

@@ -13,6 +13,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductStockResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.entity.ProductAgreement;
@@ -47,6 +48,7 @@ public class ProductService {
     private final WeekendDtoConverter weekendDtoConverter;
 
     private static final int MIN_SECOND_GRANT_PERIOD = 3;
+    private final int OUT_OF_STOCK = 0;
 
     @Transactional
     public ProductPostResponse postProduct(Long memberId, Long reservationId,
@@ -123,7 +125,7 @@ public class ProductService {
     }
 
     public Page<ProductSearchResponse> searchByRequest(ProductSearchRequest productSearchRequest,
-                                              Pageable pageable) {
+        Pageable pageable) {
         Page<ProductSearchResponse> responses =
             productRepository.search(pageable, productSearchRequest);
 
@@ -132,7 +134,7 @@ public class ProductService {
 
 
     public ProductMainResponse getAllProductForMainPage(List<String> cityNames,
-                                                        Pageable pageable
+        Pageable pageable
     ) {
         HashMap<String, List<CityResponse>> savedProduct = new HashMap<>();
 
@@ -157,12 +159,21 @@ public class ProductService {
         return weekendProductResponse;
     }
 
-    private void getEachCity(List<String> cities, HashMap<String, List<CityResponse>> savedProduct) {
+    private void getEachCity(List<String> cities,
+        HashMap<String, List<CityResponse>> savedProduct) {
         cities.forEach(city -> {
             List<Product> productsByCity = productRepository.findProductByCity(city);
             List<CityResponse> cityResponses = cityDtoConverter.toCityResponse(productsByCity);
             savedProduct.put(city, cityResponses);
         });
+    }
 
+    public ProductStockResponse isProductStockLeft(long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+        if(product.getStock() > OUT_OF_STOCK){
+            return ProductStockResponse.builder().hasStock(true).build();
+        }
+        return ProductStockResponse.builder().hasStock(false).build();
     }
 }
