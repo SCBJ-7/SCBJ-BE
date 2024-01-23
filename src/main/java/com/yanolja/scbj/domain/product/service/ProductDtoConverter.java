@@ -79,8 +79,8 @@ public class ProductDtoConverter {
     }
 
     private boolean getSaleStatus(Product product, LocalDateTime checkIn) {
-        if (product.getPaymentHistory() != null) {
-            return true;
+        if (product.getStock() == 0){
+            return false;
         }
         return LocalDateTime.now().isAfter(checkIn);
     }
