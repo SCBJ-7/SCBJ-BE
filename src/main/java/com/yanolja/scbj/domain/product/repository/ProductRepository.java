@@ -54,6 +54,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
 
 
     @Query("""
+    SELECT p
     FROM Product p
     JOIN FETCH p.reservation r
     JOIN FETCH r.hotel h
