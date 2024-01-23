@@ -68,7 +68,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     FROM product p
     JOIN reservation r ON p.reservation_id = r.id
     JOIN hotel h ON r.hotel_id = h.id
-    LEFT JOIN payment_history ph ON p.payment_history_id = ph.id
+    LEFT JOIN payment_history ph ON p.id = ph.product_id
     WHERE DAYOFWEEK(r.start_date) IN (6, 7, 1)
     AND r.start_date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 21 DAY)
     AND ph.id IS NULL
