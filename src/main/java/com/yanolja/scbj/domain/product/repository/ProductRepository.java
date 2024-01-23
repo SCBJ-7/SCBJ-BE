@@ -89,9 +89,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
                 h.hotel_main_address as hhotel_main_address,
                 h.hotel_detail_address as hhotel_detail_address,
                 h.hotel_info_url as hhotel_info_url,
-                h.created_at as hcreated_at,
-                h.updated_at as hupdated_at,
-                h.deleted_at as hdeleted_at,
             
                 ph.id as phid,
                 ph.product_name as phproduct_name,
