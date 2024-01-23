@@ -71,7 +71,7 @@ public class AlarmService {
     }
 
     @Scheduled(fixedRate = 60000)
-    private void AlarmBeforeCheckIn() {
+    public void AlarmBeforeCheckIn() {
         List<CheckInAlarmResponse> PaymentHistorysNeedForCheckInAlarm = paymentHistoryRepository.findPurchasedHistoriesNeedForCheckInAlarm();
         PaymentHistorysNeedForCheckInAlarm.stream().forEach(
             ph -> createAlarm(ph.memberId(), ph.productHistoryId(),

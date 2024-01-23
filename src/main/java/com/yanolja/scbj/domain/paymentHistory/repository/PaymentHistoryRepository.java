@@ -39,8 +39,7 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
 
 
     @Query(
-        "SELECT new com.yanolja.scbj.domain.paymentHistory.dto.response.CheckInAlarmResponse(ph.id, m.id ,ph.productName, r.startDate) "
-            +
+        "SELECT new com.yanolja.scbj.domain.paymentHistory.dto.response.CheckInAlarmResponse(ph.id, m.id ,ph.productName, r.startDate) "+
             "FROM PaymentHistory ph " +
             "INNER JOIN ph.member m " +
             "INNER JOIN ph.product p " +
