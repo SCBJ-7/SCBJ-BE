@@ -1,5 +1,10 @@
 package com.yanolja.scbj.domain.product.service;
 
+import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
+import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
+import com.yanolja.scbj.domain.hotelRoom.entity.Room;
+import com.yanolja.scbj.domain.hotelRoom.util.RoomThemeMapper;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
@@ -26,9 +31,13 @@ import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.exception.ReservationNotFoundException;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
+import com.yanolja.scbj.global.util.SecurityUtil;
+import com.yanolja.scbj.global.util.TimeValidator;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,10 +51,10 @@ public class ProductService {
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final ProductRepository productRepository;
-    private final ProductDtoConverter productDtoConverter;
     private final MemberService memberService;
     private final CityDtoConverter cityDtoConverter;
     private final WeekendDtoConverter weekendDtoConverter;
+    private final SecurityUtil securityUtil;
 
     private static final int MIN_SECOND_GRANT_PERIOD = 3;
     private final int OUT_OF_STOCK = 0;
@@ -113,8 +122,62 @@ public class ProductService {
         Product foundProduct = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        return productDtoConverter.toFindResponse(foundProduct);
+        Reservation foundReservation = foundProduct.getReservation();
+        Hotel foundHotel = foundReservation.getHotel();
+        Room foundRoom = foundHotel.getRoom();
+
+        RoomThemeFindResponse roomThemeResponse = RoomThemeMapper.toFindResponse(
+            foundRoom.getRoomTheme());
+
+        return ProductMapper.toProductFindResponse(foundHotel,
+            getHotelRoomImageUrlList(foundHotel.getHotelRoomImageList()), foundRoom,
+            foundReservation.getStartDate(), foundReservation.getEndDate(),
+            getOriginalPrice(foundHotel),
+            getSalePrice(foundProduct, foundReservation.getStartDate()),
+            roomThemeResponse, getSaleStatus(foundProduct, foundReservation.getStartDate()),
+            checkSeller(foundProduct));
     }
+
+    private boolean getSaleStatus(Product product, LocalDateTime checkIn) {
+        if (product.getStock() == OUT_OF_STOCK){
+            return false;
+        }
+        return LocalDateTime.now().isBefore(checkIn);
+    }
+
+    private boolean checkSeller(Product product) {
+        if (securityUtil.isUserNotAuthenticated()) {
+            return false;
+        }
+        return product.getMember().getId() == securityUtil.getCurrentMemberId();
+    }
+
+    private int getOriginalPrice(Hotel hotel){
+        int originalPrice = hotel.getHotelRoomPrice().getOffPeakPrice();
+
+        if (TimeValidator.isPeakTime(LocalDate.now())) {
+            originalPrice = hotel.getHotelRoomPrice().getPeakPrice();
+        }
+
+        return originalPrice;
+    }
+
+    private int getSalePrice(Product product, LocalDateTime checkInDateTime){
+        int price = product.getFirstPrice();
+
+        if (TimeValidator.isOverSecondGrantPeriod(product, checkInDateTime)) {
+            price = product.getSecondPrice();
+        }
+
+        return price;
+    }
+
+    private List<String> getHotelRoomImageUrlList(List<HotelRoomImage> hotelRoomImageList){
+        return hotelRoomImageList.stream()
+            .map(HotelRoomImage::getUrl)
+            .collect(Collectors.toList());
+    }
+
 
     @Transactional
     public void deleteProduct(Long productId) {
