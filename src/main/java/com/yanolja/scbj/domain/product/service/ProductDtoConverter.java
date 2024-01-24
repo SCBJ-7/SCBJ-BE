@@ -82,7 +82,7 @@ public class ProductDtoConverter {
         if (product.getStock() == OUT_OF_STOCK){
             return false;
         }
-        return LocalDateTime.now().isAfter(checkIn);
+        return LocalDateTime.now().isBefore(checkIn);
     }
 
     private boolean checkSeller(Product product) {
