@@ -27,6 +27,7 @@ import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
+import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -75,6 +76,9 @@ public class KakaoPaymentServiceTest {
     @Mock
     private HashOperations hashOperations;
 
+    @Mock
+    private SecurityUtil securityUtil;
+
 
     private Member member;
     private Product product;
@@ -97,7 +101,7 @@ public class KakaoPaymentServiceTest {
             responseEntity);
 
         // when
-        kaKaoPaymentService.cancelPayment(member.getId());
+        kaKaoPaymentService.cancelPayment();
 
         // then
         verify(restTemplate, times(1)).postForEntity(any(), any(), any());
@@ -190,8 +194,8 @@ public class KakaoPaymentServiceTest {
             given(redisTemplate.opsForHash()).willReturn(hashOperations);
 
             // when
-            PreparePaymentResponse result = kaKaoPaymentService.preparePayment(memberId,
-                productId, paymentReadyRequest);
+            PreparePaymentResponse result = kaKaoPaymentService.preparePayment(productId,
+                paymentReadyRequest);
 
             // then
             Assertions.assertThat(result).isNotNull();
@@ -214,11 +218,11 @@ public class KakaoPaymentServiceTest {
 
             given(productRepository.findById(any(Long.TYPE))).willReturn(
                 Optional.ofNullable(product));
+            given(securityUtil.getCurrentMemberId()).willReturn(1L);
 
             // when, then
             assertThrows(ProductNotForSaleException.class, () -> {
-                kaKaoPaymentService.preparePayment(memberId,
-                    productId, paymentReadyRequest);
+                kaKaoPaymentService.preparePayment(productId, paymentReadyRequest);
             });
         }
 
