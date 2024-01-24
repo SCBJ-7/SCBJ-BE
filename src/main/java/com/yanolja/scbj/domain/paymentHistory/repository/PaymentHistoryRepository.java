@@ -30,7 +30,7 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     @Query(
     """
         select ph from PaymentHistory ph 
-        join fetch Member m
+        join fetch ph.member m
         where ph.settlement = false 
     """
     )
