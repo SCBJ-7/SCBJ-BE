@@ -253,6 +253,7 @@ public class KaKaoPaymentService implements PaymentApiService {
 
             PaymentHistory paymentHistory = PaymentHistory.builder()
                 .member(member)
+                .productName(productName)
                 .product(product)
                 .customerName(customerName)
                 .customerEmail(customerEmail)
