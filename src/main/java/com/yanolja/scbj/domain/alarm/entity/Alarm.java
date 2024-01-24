@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 
 @Entity
@@ -45,8 +46,9 @@ public class Alarm extends BaseEntity {
     private String content;
 
     @Column(nullable = false)
+    @ColumnDefault(value = "false")
     @Comment("읽음 여부")
-    private boolean read;
+    private boolean checked;
 
     @Builder
     private Alarm(Long id, Member member, PaymentHistory paymentHistory, String title,
@@ -59,6 +61,6 @@ public class Alarm extends BaseEntity {
     }
 
     public void read() {
-        read = true;
+        checked = true;
     }
 }

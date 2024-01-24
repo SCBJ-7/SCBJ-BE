@@ -1,10 +1,10 @@
 package com.yanolja.scbj.domain.reservation.service;
 
-import com.yanolja.scbj.domain.hotelRoom.repository.RefundPolicyRepository;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.dto.response.ReservationFindResponse;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
@@ -20,7 +20,6 @@ public class ReservationService {
 
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
-    private final RefundPolicyRepository refundPolicyRepository;
     private final ReservationDtoConverter reservationDtoConverter;
 
     @Transactional

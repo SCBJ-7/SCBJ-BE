@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.payment.service;
+package com.yanolja.scbj.domain.paymentHistory.service;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;

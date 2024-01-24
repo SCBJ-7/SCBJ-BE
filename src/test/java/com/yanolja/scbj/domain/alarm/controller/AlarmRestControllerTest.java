@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.yanolja.scbj.domain.alarm.dto.AlarmHasNonReadResponse;
 import com.yanolja.scbj.domain.alarm.dto.AlarmResponse;
 import com.yanolja.scbj.domain.alarm.service.AlarmService;
 import com.yanolja.scbj.domain.alarm.util.AlarmMapper;
@@ -69,6 +70,20 @@ class AlarmRestControllerTest {
                 .andExpect(jsonPath("$.data[0].title").value(alarmResponse.title()))
                 .andExpect(jsonPath("$.data[0].content").value(alarmResponse.content()))
                 .andExpect(jsonPath("$.data[0].isRead").value(false))
+                .andDo(print());
+        }
+
+        @Test
+        @DisplayName("알림 읽음 여부를 조회할 때")
+        void hasNonReadAlarm() throws Exception {
+            // given
+            AlarmHasNonReadResponse alarmHasNonReadResponse = AlarmMapper.toAlarmHasNonReadResponse(true);
+            given(alarmService.hasNonReadAlarm()).willReturn(alarmHasNonReadResponse);
+
+            // when & then
+            mockMvc.perform(get("/v1/alarms/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.hasNonReadAlarm").value(true))
                 .andDo(print());
         }
     }

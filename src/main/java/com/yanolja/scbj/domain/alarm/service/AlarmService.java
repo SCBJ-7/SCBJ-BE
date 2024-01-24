@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.alarm.service;
 
+import com.yanolja.scbj.domain.alarm.dto.AlarmHasNonReadResponse;
 import com.yanolja.scbj.domain.alarm.dto.AlarmResponse;
 import com.yanolja.scbj.domain.alarm.entity.Alarm;
 import com.yanolja.scbj.domain.alarm.exception.AlarmNotFoundException;
@@ -75,8 +76,15 @@ public class AlarmService {
         List<CheckInAlarmResponse> PaymentHistorysNeedForCheckInAlarm = paymentHistoryRepository.findPurchasedHistoriesNeedForCheckInAlarm();
         PaymentHistorysNeedForCheckInAlarm.stream().forEach(
             ph -> createAlarm(ph.memberId(), ph.productHistoryId(),
-                new Data(CHECK_IN_ALARM_TITLE,String.format(CHECK_IN_ALARM_CONTNET, ph.productName()),
+                new Data(CHECK_IN_ALARM_TITLE,
+                    String.format(CHECK_IN_ALARM_CONTNET, ph.productName()),
                     LocalDateTime.now())));
     }
+
+    public AlarmHasNonReadResponse hasNonReadAlarm() {
+        return AlarmMapper.toAlarmHasNonReadResponse(
+            alarmRepository.existsAlarmByMemberIdAndCheckedIsFalse(securityUtil.getCurrentMemberId()));
+    }
+
 
 }

@@ -1,27 +1,30 @@
 package com.yanolja.scbj.domain.product.controller;
 
-import com.yanolja.scbj.domain.product.dto.request.ProductCityRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductStockResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -74,11 +77,17 @@ public class ProductRestController {
     @GetMapping("/main")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<ProductMainResponse> getProductsForMain(
-        @Valid @RequestBody ProductCityRequest productCityRequest,
-        @PageableDefault(page = 1) Pageable pageable
+        @Valid @RequestParam("cityNames") List<String> cityNames,
+        @PageableDefault() Pageable pageable
         ) {
-        ProductMainResponse mainResponse = productService.getAllProductForMainPage(productCityRequest , pageable);
+        ProductMainResponse mainResponse = productService.getAllProductForMainPage(cityNames , pageable);
         return ResponseDTO.res(mainResponse,"조회에 성공하였습니다");
     }
 
+    @GetMapping("/{product_id}/stock")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO<ProductStockResponse> getProductStock(
+        @PathVariable("product_id") long productId) {
+        return ResponseDTO.res(productService.isProductStockLeft(productId), "상품 재고 조회에 성공했습니다.");
+    }
 }

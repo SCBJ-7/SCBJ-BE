@@ -21,6 +21,7 @@ import com.yanolja.scbj.domain.member.helper.TestConstants;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
+import com.yanolja.scbj.global.config.fcm.FCMService;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.util.Optional;
@@ -47,6 +48,9 @@ class MemberServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
+    private FCMService fcmService;
+
+    @Mock
     private YanoljaMemberRepository yanoljaMemberRepository;
     @InjectMocks
     private MemberService memberService;
@@ -65,6 +69,9 @@ class MemberServiceTest {
             .password(bCryptPasswordEncoder.encode(testRawPassword))
             .name("test")
             .phone("010-1234-5678")
+            .yanoljaMember(YanoljaMember.builder()
+                .email("test@gmail.com")
+                .build())
             .build();
 
         @Test
@@ -83,6 +90,7 @@ class MemberServiceTest {
                 .name(testMember.getName())
                 .phone(testMember.getPhone())
                 .id(testMember.getId())
+                .linkedToYanolja(true)
                 .build();
 
             given(memberRepository.existsByEmail(any(String.class))).willReturn(false);
@@ -124,8 +132,13 @@ class MemberServiceTest {
                 .accessToken(TestConstants.GRANT_TYPE.getValue())
                 .refreshToken(TestConstants.REFRESH_PREFIX.getValue()).build();
 
-            //when & then
+            // when
+            given(securityUtil.getCurrentMemberId()).willReturn(1L);
+            given(memberRepository.findById(1L)).willReturn(Optional.of(testMember));
+            given(jwtUtil.extractUsername(any())).willReturn("1");
+            given(jwtUtil.isRefreshTokenValid(any(), any())).willReturn(true);
             memberService.logout(refreshRequest);
+            // then
             verify(jwtUtil, times(1)).setBlackList(refreshRequest.getAccessToken().substring(7),
                 refreshRequest.getRefreshToken());
         }

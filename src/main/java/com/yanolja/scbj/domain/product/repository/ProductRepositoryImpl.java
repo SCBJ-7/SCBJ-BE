@@ -2,18 +2,14 @@ package com.yanolja.scbj.domain.product.repository;
 
 import static com.yanolja.scbj.domain.hotelRoom.entity.QHotel.hotel;
 import static com.yanolja.scbj.domain.hotelRoom.entity.QHotelRoomImage.hotelRoomImage;
-import static com.yanolja.scbj.domain.hotelRoom.entity.QRoom.room;
 import static com.yanolja.scbj.domain.hotelRoom.entity.QRoomTheme.roomTheme;
-import static com.yanolja.scbj.domain.paymentHistory.entity.QPaymentHistory.*;
+import static com.yanolja.scbj.domain.paymentHistory.entity.QPaymentHistory.paymentHistory;
 import static com.yanolja.scbj.domain.product.entity.QProduct.product;
 import static com.yanolja.scbj.domain.reservation.entity.QReservation.reservation;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
-import com.yanolja.scbj.domain.paymentHistory.entity.QPaymentHistory;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import java.time.LocalDate;
@@ -21,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -56,14 +53,16 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .innerJoin(reservation.hotel, hotel)
             .innerJoin(roomTheme).on(hotel.room.roomTheme.id.eq(roomTheme.id))
             .join(roomTheme)
-            .leftJoin(product.paymentHistory,paymentHistory)
+            .leftJoin(product.paymentHistory, paymentHistory)
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
             .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
             .groupBy(product.id)
             .fetch()
             .stream().map(tuple -> {
                 Integer purchasePrice = tuple.get(reservation.purchasePrice);
-                Integer salePrice = getSalePrice(tuple.get(reservation.startDate), tuple.get(product.secondGrantPeriod), tuple.get(product.firstPrice), tuple.get(product.secondPrice));
+                Integer salePrice = getSalePrice(tuple.get(reservation.startDate),
+                    tuple.get(product.secondGrantPeriod), tuple.get(product.firstPrice),
+                    tuple.get(product.secondPrice));
                 return new ProductSearchResponse(
                     tuple.get(product.id),
                     tuple.get(hotel.hotelName),
@@ -78,20 +77,21 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     tuple.get(product.createdAt)
                 );
             })
-            .sorted(sort(productSearchRequest.getSorted()))
-            .toList();
+            .collect(Collectors.toList());
 
-        Long total = queryFactory
-            .select(product.countDistinct())
-            .from(product)
-            .innerJoin(product.reservation, reservation)
-            .innerJoin(reservation.hotel, hotel)
-            .leftJoin(room.roomTheme, roomTheme).on(hotel.room.roomTheme.id.eq(roomTheme.id))
-            .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
-            .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
-            .fetchOne();
+        response.sort(sort(productSearchRequest.getSorted()));
 
-        return new PageImpl<>(response, pageable, total != null ? total : 0);
+        int total = response.size();
+        List<ProductSearchResponse> paginatedResponse = doPaginated(response, pageable, total);
+
+        return new PageImpl<>(paginatedResponse, pageable, total);
+    }
+
+    private List<ProductSearchResponse> doPaginated(List<ProductSearchResponse> response,
+                                                    Pageable pageable, int total) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), total);
+        return response.subList(start, end);
     }
 
     private BooleanBuilder allFilter(ProductSearchRequest productSearchRequest) {
@@ -128,7 +128,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         if (hotelMainAddress == null || hotelMainAddress.isEmpty()) {
             return null;
         }
-        return hotel.hotelMainAddress.contains(hotelMainAddress);
+        return hotel.hotelMainAddress.eq(hotelMainAddress);
     }
 
     private BooleanExpression eqParking(Boolean hasParking) {
@@ -185,7 +185,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 comparator = Comparator.comparing(ProductSearchResponse::getCreatedAt).reversed();
             case "높은 할인 순" -> comparator =
                 Comparator.comparing(ProductSearchResponse::getSalePercentage).reversed();
-            case "높은 가격 순"->
+            case "낮은 가격 순" ->
                 comparator = Comparator.comparing(ProductSearchResponse::getSalePrice); //낮은 가격순
             default -> comparator = Comparator.comparing(ProductSearchResponse::getCheckIn)
                 .thenComparing(ProductSearchResponse::getSalePercentage, Comparator.reverseOrder());

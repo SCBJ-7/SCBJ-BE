@@ -26,6 +26,10 @@ ext {
 	set('snippetsDir', file("build/generated-snippets"))
 }
 
+//springBoot {
+//	mainClass = 'com.yanolja.scbj.ScbjApplication'
+//}
+
 dependencies {
 	//Jpa
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -88,6 +92,8 @@ dependencies {
 	// thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+	//redisson
+	implementation 'org.redisson:redisson-spring-boot-starter:3.21.1'
 
 }
 

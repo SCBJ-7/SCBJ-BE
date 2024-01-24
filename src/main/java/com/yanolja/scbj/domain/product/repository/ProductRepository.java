@@ -42,7 +42,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
        LEFT JOIN p.paymentHistory ph 
        WHERE p.member.id = :memberId
        """)
-    Page<SaleHistoryResponse> findSaleHistoriesByMemberId(@Param("memberId") Long memberId, Pageable pageable);
+    List<SaleHistoryResponse> findSaleHistoriesByMemberId(@Param("memberId") Long memberId);
 
     @Query("select p from Product p "
         + "join fetch p.reservation r "
@@ -54,6 +54,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
 
 
     @Query("""
+    SELECT p
     FROM Product p
     JOIN FETCH p.reservation r
     JOIN FETCH r.hotel h
@@ -64,17 +65,19 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
 
 
     @Query(value = """
-    SELECT * 
-    FROM Product p
-    JOIN Reservation r ON p.reservation_id = r.id
-    JOIN Hotel h ON r.hotel_id = h.id
-    LEFT JOIN PaymentHistory ph ON p.payment_history_id = ph.id
-    WHERE DAYOFWEEK(r.start_date) IN (6, 7, 1)
-    AND r.start_date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 21 DAY)
-    AND ph.id IS NULL
-    """, nativeQuery = true)
+         SELECT
+            p.*
+        FROM product p
+        JOIN reservation r ON p.reservation_id = r.id
+        JOIN hotel h ON r.id = h.id
+        LEFT JOIN payment_history ph ON p.id = ph.product_id
+        WHERE DAYOFWEEK(r.start_date) IN (6, 7, 1)
+        AND r.start_date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 21 DAY)
+        AND ph.id IS NULL
+        """, nativeQuery = true)
     List<Product> findProductByWeekend();
 
-
+    @Query("SELECT p FROM Product p JOIN FETCH p.reservation r WHERE r.id = :reservationId")
+    Optional<Product> findByReservationId(@Param("reservationId") Long reservationId);
 
 }

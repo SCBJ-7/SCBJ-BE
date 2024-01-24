@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
-import com.yanolja.scbj.domain.product.dto.request.ProductCityRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.CityResponse;
@@ -27,6 +26,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductStockResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.config.SecurityConfig;
@@ -254,7 +254,6 @@ class ProductRestControllerTest {
         void getProductsForMainTest() throws Exception {
             // given
             List<String> cityNames = List.of("서울", "강원", "부산", "제주", "경상", "전라");
-            ProductCityRequest productCityRequest = new ProductCityRequest(cityNames);
 
             CityResponse seoulCityResponse = CityResponse.builder()
                 .id(1L)
@@ -298,13 +297,13 @@ class ProductRestControllerTest {
                 .weekend(weekendPage)
                 .build();
             objectMapper.writeValueAsString(weekendPage);
-            when(productService.getAllProductForMainPage(any(ProductCityRequest.class), any(Pageable.class)))
+            when(productService.getAllProductForMainPage(any(), any(Pageable.class)))
                 .thenReturn(productMainResponse);
 
             // when
             ResultActions result = mvc.perform(get("/v1/products/main")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productCityRequest))
+                .param("cityNames", "서울", "강원", "부산", "제주", "경상", "전라")
                 .param("page", "1")
                 .param("size", "10"));
 
@@ -316,5 +315,25 @@ class ProductRestControllerTest {
 
     }
 
+    @Nested
+    @DisplayName("상품 재고 조회는")
+    class Context_getProductStock {
 
+        @Test
+        @DisplayName("재고가 존재시 true를 반환한다.")
+        void will_success() throws Exception {
+            // given
+            long productId = 1L;
+            ProductStockResponse productStockResponse = ProductStockResponse.builder()
+                .hasStock(true).build();
+
+            given(productService.isProductStockLeft(any(Long.TYPE))).willReturn(productStockResponse);
+
+            // when, then
+            mvc.perform(get("/v1/products/" + productId + "/stock"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.data.hasStock", is(productStockResponse.hasStock())));
+        }
+    }
 }

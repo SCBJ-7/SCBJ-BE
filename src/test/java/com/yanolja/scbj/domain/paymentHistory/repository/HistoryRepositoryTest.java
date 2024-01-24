@@ -21,6 +21,7 @@ import com.yanolja.scbj.global.config.QuerydslConfiguration;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -180,14 +181,13 @@ class HistoryRepositoryTest {
             paymentHistoryRepository.save(paymentHistory);
 
             //when
-            Page<PurchasedHistoryResponse> results =
-                paymentHistoryRepository.findPurchasedHistoriesByMemberId(member.getId(),
-                    PageRequest.of(0, 1));
+            List<PurchasedHistoryResponse> results =
+                paymentHistoryRepository.findPurchasedHistoriesByMemberId(member.getId());
 
             // then
             assertThat(results).isNotNull();
-            assertThat(results.getContent()).isNotNull();
-            PurchasedHistoryResponse firstResult = results.getContent().get(0);
+            assertThat(results).isNotNull();
+            PurchasedHistoryResponse firstResult = results.get(0);
             assertThat(firstResult.name()).isEqualTo("롯데 시그니엘 호텔");
             assertThat(firstResult.imageUrl()).isEqualTo("http://example.com/hotel-room-image.jpg");
             assertThat(firstResult.price()).isEqualTo(20000);
@@ -214,13 +214,13 @@ class HistoryRepositoryTest {
             paymentHistoryRepository.save(paymentHistory);
 
             //when
-            Page<SaleHistoryResponse> results =
-                productRepository.findSaleHistoriesByMemberId(member.getId(), PageRequest.of(0, 1));
+            List<SaleHistoryResponse> results =
+                productRepository.findSaleHistoriesByMemberId(member.getId());
 
             //then
             assertThat(results).isNotNull();
-            assertThat(results.getContent()).isNotNull();
-            SaleHistoryResponse firstResult = results.getContent().get(0);
+            assertThat(results).isNotNull();
+            SaleHistoryResponse firstResult = results.get(0);
             assertThat(firstResult.saleStatus()).isEqualTo("거래완료");
         }
     }

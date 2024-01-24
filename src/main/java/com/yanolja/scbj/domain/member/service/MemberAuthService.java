@@ -29,18 +29,19 @@ public class MemberAuthService {
             throw new NotExpiredTokenException(ErrorCode.NOT_EXPIRED_TOKEN);
         } catch (ExpiredJwtException e) {
             username = e.getClaims().getSubject();
-        } finally {
-            if (jwtUtil.isRefreshTokenValid(username, refreshRequest.getRefreshToken())) {
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-                String newAccessToken = jwtUtil.generateToken(userDetails);
-                String newRefreshToken = jwtUtil.generateRefreshToken(username);
+        }
 
-                return TokenResponse.builder().accessToken(newAccessToken)
-                    .refreshToken(newRefreshToken)
-                    .build();
-            } else {
-                throw new InvalidRefreshTokenException(ErrorCode.INVALID_REFRESH_TOKEN);
-            }
+        if (jwtUtil.isRefreshTokenValid(username, refreshRequest.getRefreshToken())) {
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            String newAccessToken = jwtUtil.generateToken(userDetails);
+            String newRefreshToken = jwtUtil.generateRefreshToken(username);
+
+            return TokenResponse.builder().accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
+
+        } else {
+            throw new InvalidRefreshTokenException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
 }

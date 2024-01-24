@@ -22,6 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -78,7 +79,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 ErrorCode.EXPIRED_TOKEN.getSimpleMessage());
             return;
         } catch (MalformedJwtException | SignatureException | UnsupportedJwtException |
-                 SecurityException | DecodingException ex) {
+                 SecurityException | DecodingException | UsernameNotFoundException ex) {
             sendErrorResponse(response, ErrorCode.INVALID_TOKEN.getHttpStatus().value(),
                 ErrorCode.INVALID_TOKEN.getSimpleMessage());
             return;

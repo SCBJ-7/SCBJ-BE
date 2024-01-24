@@ -6,7 +6,6 @@ import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.service.MemberService;
-import com.yanolja.scbj.domain.product.dto.request.ProductCityRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.CityResponse;
@@ -14,8 +13,10 @@ import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductStockResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
+import com.yanolja.scbj.domain.product.entity.ProductAgreement;
 import com.yanolja.scbj.domain.product.exception.FirstPriceHigherException;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.exception.SecondPriceHigherException;
@@ -47,6 +48,7 @@ public class ProductService {
     private final WeekendDtoConverter weekendDtoConverter;
 
     private static final int MIN_SECOND_GRANT_PERIOD = 3;
+    private final int OUT_OF_STOCK = 0;
 
     @Transactional
     public ProductPostResponse postProduct(Long memberId, Long reservationId,
@@ -56,6 +58,13 @@ public class ProductService {
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         YanoljaMember yanoljaMember = member.getYanoljaMember();
+
+        ProductAgreement productAgreement = ProductAgreement.builder()
+            .standardTimeSellingPolicy(productPostRequest.standardTimeSellingPolicy())
+            .totalAmountPolicy(productPostRequest.totalAmountPolicy())
+            .sellingModificationPolicy(productPostRequest.sellingModificationPolicy())
+            .productAgreement(productPostRequest.productAgreement())
+            .build();
 
         Reservation reservation = reservationRepository.findByIdAndYanoljaMemberId(reservationId,
             yanoljaMember.getId()).orElseThrow(
@@ -85,11 +94,13 @@ public class ProductService {
         Product product = Product.builder()
             .reservation(reservation)
             .member(member)
+            .productAgreement(productAgreement)
             .firstPrice(productPostRequest.firstPrice())
             .secondPrice(productPostRequest.secondPrice())
             .bank(productPostRequest.bank())
             .accountNumber(productPostRequest.accountNumber())
-            .secondGrantPeriod(productPostRequest.secondGrantPeriod()).build();
+            .secondGrantPeriod(productPostRequest.secondGrantPeriod())
+            .build();
 
         Product savedProduct = productRepository.save(product);
 
@@ -114,7 +125,7 @@ public class ProductService {
     }
 
     public Page<ProductSearchResponse> searchByRequest(ProductSearchRequest productSearchRequest,
-                                              Pageable pageable) {
+        Pageable pageable) {
         Page<ProductSearchResponse> responses =
             productRepository.search(pageable, productSearchRequest);
 
@@ -122,13 +133,12 @@ public class ProductService {
     }
 
 
-    public ProductMainResponse getAllProductForMainPage(ProductCityRequest productCityRequest,
-                                                        Pageable pageable
+    public ProductMainResponse getAllProductForMainPage(List<String> cityNames,
+        Pageable pageable
     ) {
-        List<String> cities = productCityRequest.cityNames();
         HashMap<String, List<CityResponse>> savedProduct = new HashMap<>();
 
-        getEachCity(cities, savedProduct);
+        getEachCity(cityNames, savedProduct);
         Page<WeekendProductResponse> weekendProductResponse = getWeekendProducts(pageable);
 
         return ProductMainResponse.builder()
@@ -138,7 +148,7 @@ public class ProductService {
             .jeju(savedProduct.get("제주"))
             .jeolla(savedProduct.get("전라"))
             .gyeongsang(savedProduct.get("경상"))
-            .weekend(weekendProductResponse.isEmpty() ? Page.empty() : weekendProductResponse)
+            .weekend(weekendProductResponse.isEmpty() ? Page.empty(pageable) : weekendProductResponse)
             .build();
     }
 
@@ -149,12 +159,21 @@ public class ProductService {
         return weekendProductResponse;
     }
 
-    private void getEachCity(List<String> cities, HashMap<String, List<CityResponse>> savedProduct) {
+    private void getEachCity(List<String> cities,
+        HashMap<String, List<CityResponse>> savedProduct) {
         cities.forEach(city -> {
             List<Product> productsByCity = productRepository.findProductByCity(city);
             List<CityResponse> cityResponses = cityDtoConverter.toCityResponse(productsByCity);
             savedProduct.put(city, cityResponses);
         });
+    }
 
+    public ProductStockResponse isProductStockLeft(long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+        if(product.getStock() > OUT_OF_STOCK){
+            return ProductStockResponse.builder().hasStock(true).build();
+        }
+        return ProductStockResponse.builder().hasStock(false).build();
     }
 }
