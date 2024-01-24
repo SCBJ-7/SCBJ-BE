@@ -23,6 +23,7 @@ import com.yanolja.scbj.global.config.RetryConfig;
 import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.exception.InternalServerException;
+import com.yanolja.scbj.global.util.SecurityUtil;
 import com.yanolja.scbj.global.util.TimeValidator;
 import io.lettuce.core.RedisClient;
 import jakarta.annotation.PostConstruct;
@@ -81,7 +82,7 @@ public class KaKaoPaymentService implements PaymentApiService {
     private final RedisTemplate<String, String> redisTemplate;
     private final RestTemplate restTemplate;
     private final RedissonClient redissonClient;
-
+    private final SecurityUtil securityUtil;
 
     private HttpHeaders headers;
 
@@ -103,7 +104,8 @@ public class KaKaoPaymentService implements PaymentApiService {
         maxAttempts = RetryConfig.MAX_ATTEMPTS,
         backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
     )
-    public PreparePaymentResponse preparePayment(Long memberId, Long productId, PaymentReadyRequest paymentReadyRequest) {
+    public PreparePaymentResponse preparePayment(Long productId, PaymentReadyRequest paymentReadyRequest) {
+        Long memberId = securityUtil.getCurrentMemberId();
         Product targetProduct = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
                 ErrorCode.PRODUCT_NOT_FOUND));
@@ -132,9 +134,9 @@ public class KaKaoPaymentService implements PaymentApiService {
         params.add("total_amount", price);
         params.add("tax_free_amount", 0);
         params.add("approval_url",
-            BASE_URL + "/v1/products/pay-success?memberId=" + memberId + "&paymentType=kakaoPaymentService");
+            BASE_URL + productId +"/ready?member_id=" + memberId);
         params.add("cancel_url",
-            BASE_URL + "/v1/products/pay-cancel?memberId=" + memberId + "&paymentType=kakaoPaymentService");
+            BASE_URL + productId + "?member_id=" + memberId);
         params.add("fail_url", BASE_URL + "/pay-fail");
 
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
@@ -171,7 +173,8 @@ public class KaKaoPaymentService implements PaymentApiService {
 
     @Override
     @Transactional
-    public void approvePaymentWithLock(String pgToken, Long memberId) {
+    public void approvePaymentWithLock(String pgToken) {
+        Long memberId = securityUtil.getCurrentMemberId();
         String productId = (String) redisTemplate.opsForHash()
             .get(REDIS_CACHE_KEY_PREFIX + memberId, "productId");
 
@@ -280,7 +283,8 @@ public class KaKaoPaymentService implements PaymentApiService {
         maxAttempts = RetryConfig.MAX_ATTEMPTS,
         backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
     )
-    public void cancelPayment(Long memberId) {
+    public void cancelPayment() {
+        Long memberId = securityUtil.getCurrentMemberId();
 
         String key = REDIS_CACHE_KEY_PREFIX + memberId;
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");

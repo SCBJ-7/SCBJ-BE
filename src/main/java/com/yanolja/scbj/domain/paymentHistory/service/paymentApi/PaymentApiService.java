@@ -5,9 +5,9 @@ import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentRespons
 
 public interface PaymentApiService {
 
-    PreparePaymentResponse preparePayment(Long memberId, Long productId, PaymentReadyRequest paymentReadyRequest);
+    PreparePaymentResponse preparePayment(Long productId, PaymentReadyRequest paymentReadyRequest);
 
-    void approvePaymentWithLock(String pgToken, Long memberId);
+    void approvePaymentWithLock(String pgToken);
 
-    void cancelPayment(Long memberId);
+    void cancelPayment();
 }

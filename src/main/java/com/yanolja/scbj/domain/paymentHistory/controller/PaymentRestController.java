@@ -7,7 +7,6 @@ import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentRespons
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.PaymentApiService;
 import com.yanolja.scbj.global.common.ResponseDTO;
-import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentRestController {
 
     private final PaymentService paymentService;
-    private final SecurityUtil securityUtil;
     private final Map<String, PaymentApiService> paymentApiServiceMap;
 
     @GetMapping("/{product_id}/payments")
@@ -39,13 +37,14 @@ public class PaymentRestController {
 
     @PostMapping("/{product_id}/payments")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<PreparePaymentResponse> preparePayment(@PathVariable("product_id") long productId,
+    public ResponseDTO<PreparePaymentResponse> preparePayment(
+        @PathVariable("product_id") Long productId,
         @RequestParam("paymentType") String paymentType,
         @Valid @RequestBody PaymentReadyRequest paymentReadyRequest) {
 
         PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
 
-        PreparePaymentResponse preparePaymentResponse = paymentApiService.preparePayment(securityUtil.getCurrentMemberId(), productId,
+        PreparePaymentResponse preparePaymentResponse = paymentApiService.preparePayment(productId,
             paymentReadyRequest);
         return ResponseDTO.res(preparePaymentResponse, "결제에 요청에 성공했습니다.");
     }
@@ -53,20 +52,21 @@ public class PaymentRestController {
     @GetMapping("/pay-success")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<Void> successPayment(@RequestParam("pg_token") String pgToken,
-        @RequestParam("memberId") Long memberId, @RequestParam("paymentType") String paymentType) {
+        @RequestParam("paymentType") String paymentType) {
 
         PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
-        paymentApiService.approvePaymentWithLock(pgToken, memberId);
+        paymentApiService.approvePaymentWithLock(pgToken);
+
         return ResponseDTO.res("결제에 성공했습니다.");
     }
 
     @GetMapping("/pay-cancel")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<PaymentCancelResponse> cancelPayment(
-        @RequestParam("memberId") Long memberId, @RequestParam("paymentType") String paymentType) {
+        @RequestParam("paymentType") String paymentType) {
 
         PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
-        paymentApiService.cancelPayment(memberId);
+        paymentApiService.cancelPayment();
 
         return ResponseDTO.res("결제에 실패했습니다.");
     }

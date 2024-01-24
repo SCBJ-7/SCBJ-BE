@@ -3,6 +3,7 @@ package com.yanolja.scbj.domain.paymentHistory.controller;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -132,7 +133,7 @@ class PaymentRestControllerTest {
             PaymentApiService paymentApiService = mock(KaKaoPaymentService.class);
 
             given(paymentApiServiceMap.get(any())).willReturn(kaKaoPaymentService);
-            given(kaKaoPaymentService.preparePayment(any(Long.TYPE), any(Long.TYPE),
+            given(kaKaoPaymentService.preparePayment(any(Long.TYPE),
                 any(PaymentReadyRequest.class))).willReturn(preparePaymentResponse);
 
             // when
@@ -186,7 +187,7 @@ class PaymentRestControllerTest {
             PaymentApiService paymentApiService = mock(KaKaoPaymentService.class);
 
             given(paymentApiServiceMap.get(any())).willReturn(kaKaoPaymentService);
-            doNothing().when(kaKaoPaymentService).cancelPayment(any());
+            doNothing().when(kaKaoPaymentService).cancelPayment();
 
             // when
             ResultActions result = mvc.perform(
