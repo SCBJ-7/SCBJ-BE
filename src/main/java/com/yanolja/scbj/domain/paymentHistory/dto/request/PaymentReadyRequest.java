@@ -20,7 +20,13 @@ public record PaymentReadyRequest(
     @Email(message = "유효하지 않은 이메일입니다.", groups = PatternGroup.class)
     String customerEmail,
     @Phone(groups = PatternGroup.class)
-    String customerPhoneNumber
+    String customerPhoneNumber,
+
+    boolean isAgeOver14,
+    boolean useAgree,
+    boolean cancelAndRefund,
+    boolean collectPersonalInfo,
+    boolean thirdPartySharing
 ) {
 
     @Builder
