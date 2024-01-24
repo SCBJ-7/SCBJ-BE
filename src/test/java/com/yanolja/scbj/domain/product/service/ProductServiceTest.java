@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
@@ -31,6 +32,7 @@ import com.yanolja.scbj.domain.product.entity.ProductAgreement;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
+import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,7 +73,7 @@ class ProductServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private ProductDtoConverter productDtoConverter;
+    private SecurityUtil securityUtil;
 
     @Nested
     @DisplayName("postProduct()는 ")
@@ -222,16 +224,22 @@ class ProductServiceTest {
                 .peakPrice(200000)
                 .build();
 
+            HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
+                .id(1L)
+                .url("Asdagasd")
+                .build();
+
             Hotel hotel = Hotel.builder()
                 .id(1L)
                 .room(room)
                 .hotelRoomPrice(hotelRoomPrice)
+                .hotelRoomImageList(List.of(hotelRoomImage))
                 .build();
 
             Reservation reservation = Reservation.builder()
                 .id(1L)
                 .hotel(hotel)
-                .startDate(LocalDateTime.now())
+                .startDate(LocalDateTime.now().minusDays(1))
                 .endDate(LocalDateTime.now())
                 .build();
 
@@ -245,6 +253,7 @@ class ProductServiceTest {
                 .settlement(true)
                 .build();
 
+
             Product product = Product.builder()
                 .id(1L)
                 .firstPrice(200000)
@@ -256,20 +265,14 @@ class ProductServiceTest {
                 .paymentHistory(paymentHistory)
                 .build();
 
-            ProductFindResponse ConverterResponse = ProductFindResponse.builder()
-                .hotelName(hotel.getHotelName())
-                .saleStatus(true)
-                .build();
-
             given(productRepository.findById(any())).willReturn(Optional.of(product));
-            given(productDtoConverter.toFindResponse(any())).willReturn(ConverterResponse);
-
+            given(securityUtil.isUserNotAuthenticated()).willReturn(true);
             // when
             ProductFindResponse response = productService.findProduct(product.getId());
 
             // then
             Assertions.assertThat(response).isNotNull();
-            Assertions.assertThat(response.saleStatus()).isEqualTo(true);
+            Assertions.assertThat(response.saleStatus()).isEqualTo(false);
         }
     }
 
