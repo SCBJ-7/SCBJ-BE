@@ -32,10 +32,10 @@ public class TimeValidator {
             changeTime = checkInDateTime.minusHours(changeHour);
 
             if (changeTime.isAfter(LocalDateTime.now())) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
 
