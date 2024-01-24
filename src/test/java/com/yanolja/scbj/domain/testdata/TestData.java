@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.testdata;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.member.entity.Authority;
@@ -88,6 +89,14 @@ public class TestData {
             .firstPrice(firstPrice)
             .secondPrice(secondPrice)
             .secondGrantPeriod(time)
+            .build();
+    }
+
+    public static HotelRoomPrice createHotelRoomPrice(Hotel hotel, int peakPrice, int offPeakPrice) {
+        return HotelRoomPrice.builder()
+            .hotel(hotel)
+            .peakPrice(peakPrice)
+            .offPeakPrice(offPeakPrice)
             .build();
     }
 
