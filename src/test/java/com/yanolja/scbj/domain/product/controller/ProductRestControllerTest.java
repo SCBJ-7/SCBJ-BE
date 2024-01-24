@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
@@ -241,6 +242,29 @@ class ProductRestControllerTest {
                     .param("page", "1"))
                 .andExpect(status().isOk()).andDo(print());
 
+        }
+
+        @Test
+        @DisplayName("안나오는 값을 조회시 200이 반환된다")
+        void _will_success_200() throws Exception {
+            ProductSearchRequest searchRequest =
+                ProductSearchRequest.builder()
+                    .quantityPeople(150)
+                    .build();
+
+            ProductSearchResponse response = ProductSearchResponse.builder().build();
+            Pageable pageable = PageRequest.of(1, 10);
+
+            Page<ProductSearchResponse> expectedResponse = new PageImpl<>(List.of(response), pageable, 1);
+            objectMapper.writeValueAsString(expectedResponse);
+            when(productService.searchByRequest(any(ProductSearchRequest.class), eq(pageable)))
+                .thenReturn(expectedResponse);
+
+            mvc.perform(post("/v1/products/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(searchRequest))
+                    .param("page", "0"))
+                .andExpect(status().isOk()).andDo(print());
         }
     }
 
