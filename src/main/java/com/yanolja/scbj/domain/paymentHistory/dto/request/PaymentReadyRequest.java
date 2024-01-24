@@ -1,6 +1,7 @@
 package com.yanolja.scbj.domain.paymentHistory.dto.request;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yanolja.scbj.domain.member.validation.Phone;
 import com.yanolja.scbj.domain.member.validation.ValidationGroups.NotBlankGroup;
 import com.yanolja.scbj.domain.member.validation.ValidationGroups.PatternGroup;
@@ -22,6 +23,7 @@ public record PaymentReadyRequest(
     @Phone(groups = PatternGroup.class)
     String customerPhoneNumber,
 
+    @JsonProperty("isAgeOver14")
     boolean isAgeOver14,
     boolean useAgree,
     boolean cancelAndRefund,
