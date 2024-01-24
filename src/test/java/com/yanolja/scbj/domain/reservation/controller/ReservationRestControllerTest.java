@@ -120,7 +120,7 @@ class ReservationRestControllerTest {
 
             findResponse.add(reservationFindResponse);
 
-            given(reservationService.findReservation(any(Long.TYPE))).willReturn(findResponse);
+            given(reservationService.getReservation(any(Long.TYPE))).willReturn(findResponse);
 
             // when, then
             mvc.perform(get("/v1/reservations"))
