@@ -246,8 +246,6 @@ public class ProductSearchRepositoryTest {
             List<ProductSearchResponse> content = highSearchResult.getContent();
 
             for (int i = 0; i < 5; i++) {
-//                System.out.println(content.get(i).getSalePrice());
-                System.out.println(content.get(i).getOriginalPrice());
                 assertThat(content.get(i).getSalePercentage()).isEqualTo(0.25);
             }
 
