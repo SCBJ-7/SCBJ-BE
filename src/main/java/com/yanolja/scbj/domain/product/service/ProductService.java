@@ -129,7 +129,7 @@ public class ProductService {
         Page<ProductSearchResponse> responses =
             productRepository.search(pageable, productSearchRequest);
 
-        return responses.isEmpty() ? Page.empty() : responses;
+        return responses.isEmpty() ? Page.empty(pageable) : responses;
     }
 
 
