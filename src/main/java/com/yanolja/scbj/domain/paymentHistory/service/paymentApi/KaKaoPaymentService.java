@@ -211,11 +211,11 @@ public class KaKaoPaymentService implements PaymentApiService {
         String price = (String) redisTemplate.opsForHash().get(key, "price");
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");
         String productName = (String) redisTemplate.opsForHash().get(key, "productName");
-        boolean isAgeOver14 = (boolean) redisTemplate.opsForHash().get(key, "isAgeOver14");
-        boolean useAgree = (boolean) redisTemplate.opsForHash().get(key, "useAgree");
-        boolean cancelAndRefund = (boolean) redisTemplate.opsForHash().get(key, "cancelAndRefund");
-        boolean collectPersonalInfo = (boolean) redisTemplate.opsForHash().get(key, "collectPersonalInfo");
-        boolean thirdPartySharing = (boolean) redisTemplate.opsForHash().get(key, "thirdPartySharing");
+        boolean isAgeOver14 = Boolean.valueOf((String) redisTemplate.opsForHash().get(key, "isAgeOver14"));
+        boolean useAgree = Boolean.valueOf((String)redisTemplate.opsForHash().get(key, "useAgree"));
+        boolean cancelAndRefund = Boolean.valueOf((String)redisTemplate.opsForHash().get(key, "cancelAndRefund"));
+        boolean collectPersonalInfo = Boolean.valueOf((String)redisTemplate.opsForHash().get(key, "collectPersonalInfo"));
+        boolean thirdPartySharing =  Boolean.valueOf((String)redisTemplate.opsForHash().get(key, "thirdPartySharing"));
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
