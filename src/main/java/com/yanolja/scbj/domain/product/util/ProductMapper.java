@@ -1,11 +1,17 @@
 package com.yanolja.scbj.domain.product.util;
 
+import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
+import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
+import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
+import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.entity.ProductAgreement;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -37,6 +43,29 @@ public final class ProductMapper {
 
     public static ProductPostResponse toProductPostResponse(Product savedProduct) {
         return ProductPostResponse.builder().productId(savedProduct.getId()).build();
+    }
+
+
+    public static ProductFindResponse toProductFindResponse(Hotel hotel, List<String> imageList,
+        Room room, LocalDateTime checkIn, LocalDateTime checkOut, int originalPrice, int price,
+        RoomThemeFindResponse roomThemeFindResponse, boolean saleStatus, boolean isSeller) {
+        return ProductFindResponse.builder()
+            .hotelName(hotel.getHotelName())
+            .hotelImageUrlList(imageList)
+            .roomName(room.getRoomName())
+            .checkIn(checkIn)
+            .checkOut(checkOut)
+            .originalPrice(originalPrice)
+            .sellingPrice(price)
+            .standardPeople(room.getStandardPeople())
+            .maxPeople(room.getMaxPeople())
+            .bedType(room.getBedType())
+            .roomTheme(roomThemeFindResponse)
+            .hotelAddress(hotel.getHotelDetailAddress())
+            .saleStatus(saleStatus)
+            .hotelInfoUrl(hotel.getHotelInfoUrl())
+            .isSeller(isSeller)
+            .build();
     }
 
 }
