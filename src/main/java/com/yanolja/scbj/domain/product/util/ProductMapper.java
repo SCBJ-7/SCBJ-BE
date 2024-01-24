@@ -10,7 +10,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ProductMapper {
+public final class ProductMapper {
 
     public static ProductAgreement toProductAgreement(ProductPostRequest productPostRequest) {
         return ProductAgreement.builder()
