@@ -23,9 +23,9 @@ public class ReservationRestController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<List<ReservationFindResponse>> findReservation() {
+    public ResponseDTO<List<ReservationFindResponse>> getReservation() {
         return ResponseDTO.res(
-            reservationService.findReservation(securityUtil.getCurrentMemberId()),
+            reservationService.getReservation(securityUtil.getCurrentMemberId()),
             "예약 내역 조회에 성공했습니다.");
     }
 }
