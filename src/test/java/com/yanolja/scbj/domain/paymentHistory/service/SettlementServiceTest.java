@@ -22,6 +22,7 @@ import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
+import com.yanolja.scbj.global.config.AbstractContainersSupport;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -39,7 +40,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(properties = {
     "schedule.cron = 0/1 * * * * ?",
 })
-class SettlementServiceTest {
+class SettlementServiceTest extends AbstractContainersSupport {
 
     @Autowired
     private SettlementService settlementService;
