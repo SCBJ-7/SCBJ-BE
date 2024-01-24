@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
@@ -50,6 +51,9 @@ public class ProductSearchRepositoryTest {
                 entityManager.persist(roomTheme);
                 Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 2);
                 entityManager.persist(hotel2);
+                HotelRoomPrice hotelRoomPrice =
+                    TestData.createHotelRoomPrice(hotel2, 250000, 350000);
+                entityManager.persist(hotelRoomPrice);
                 HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
                 entityManager.persist(hotelRoomImage);
                 YanoljaMember yanoljaMember =
@@ -77,6 +81,9 @@ public class ProductSearchRepositoryTest {
                 entityManager.persist(roomTheme);
                 Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 4);
                 entityManager.persist(hotel2);
+                HotelRoomPrice hotelRoomPrice =
+                    TestData.createHotelRoomPrice(hotel2, 200000, 300000);
+                entityManager.persist(hotelRoomPrice);
                 HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
                 entityManager.persist(hotelRoomImage);
                 YanoljaMember yanoljaMember =
@@ -103,6 +110,9 @@ public class ProductSearchRepositoryTest {
                 entityManager.persist(roomTheme);
                 Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 3);
                 entityManager.persist(hotel2);
+                HotelRoomPrice hotelRoomPrice =
+                    TestData.createHotelRoomPrice(hotel2, 400000, 500000);
+                entityManager.persist(hotelRoomPrice);
                 HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
                 entityManager.persist(hotelRoomImage);
                 YanoljaMember yanoljaMember =
@@ -236,8 +246,9 @@ public class ProductSearchRepositoryTest {
             List<ProductSearchResponse> content = highSearchResult.getContent();
 
             for (int i = 0; i < 5; i++) {
-                System.out.println(content.get(i).getSalePrice());
-                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.3333333333333333);
+//                System.out.println(content.get(i).getSalePrice());
+                System.out.println(content.get(i).getOriginalPrice());
+                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.25);
             }
 
             assertThat(lowPriceResult).isNotEmpty();
