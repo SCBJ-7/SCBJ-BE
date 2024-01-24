@@ -1,16 +1,21 @@
 package com.yanolja.scbj.domain.paymentHistory.entity;
 
+import com.yanolja.scbj.domain.alarm.dto.CheckInAlarmResponse;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.global.common.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.ColumnResult;
+import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SqlResultSetMapping;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +24,29 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Comment;
 
+
+@NamedNativeQuery(
+    name = "find_check_in_alarm",
+    query =
+        "SELECT ph.id as productHistoryId, m.id as memberId, ph.product_name as productName "+
+            "FROM payment_history ph " +
+            "INNER JOIN member m on ph.member_id = m.id " +
+            "INNER JOIN product p on p.member_id = m.id " +
+            "INNER JOIN reservation r on p.reservation_id = r.id " +
+            "WHERE DATE_FORMAT(r.start_date,'%Y-%m-%d %H:%i') = DATE_FORMAT(DATE_SUB(now(),interval 1 DAY),'%Y-%m-%d %H:%i')",
+    resultSetMapping = "check_in_alarm"
+)
+@SqlResultSetMapping(
+    name = "check_in_alarm",
+    classes = @ConstructorResult(
+        targetClass = CheckInAlarmResponse.class,
+        columns = {
+            @ColumnResult(name = "productHistoryId", type = Long.class),
+            @ColumnResult(name = "memberId", type = Long.class),
+            @ColumnResult(name = "productName", type = String.class)
+        }
+    )
+)
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter

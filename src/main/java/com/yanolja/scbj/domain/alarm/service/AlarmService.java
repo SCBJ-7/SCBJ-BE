@@ -8,7 +8,7 @@ import com.yanolja.scbj.domain.alarm.repository.AlarmRepository;
 import com.yanolja.scbj.domain.alarm.util.AlarmMapper;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.service.MemberService;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.CheckInAlarmResponse;
+import com.yanolja.scbj.domain.alarm.dto.CheckInAlarmResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.PaymentHistoryNotFoundException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
@@ -83,7 +83,8 @@ public class AlarmService {
 
     public AlarmHasNonReadResponse hasNonReadAlarm() {
         return AlarmMapper.toAlarmHasNonReadResponse(
-            alarmRepository.existsAlarmByMemberIdAndCheckedIsFalse(securityUtil.getCurrentMemberId()));
+            alarmRepository.existsAlarmByMemberIdAndCheckedIsFalse(
+                securityUtil.getCurrentMemberId()));
     }
 
 

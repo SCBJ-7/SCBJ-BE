@@ -5,10 +5,9 @@ spring:
     username: ${LOCAL_MYSQL_USERNAME}
     password: ${LOCAL_MYSQL_PASSWORD}
 
-
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
 
   data:
@@ -47,3 +46,6 @@ fcm:
 
 kakao-api:
   api-key : ${API-KEY}
+
+server:
+  url: ${SERVER-URL}

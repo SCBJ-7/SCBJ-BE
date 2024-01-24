@@ -1,12 +1,11 @@
 package com.yanolja.scbj.domain.paymentHistory.repository;
 
-import com.yanolja.scbj.domain.paymentHistory.dto.response.CheckInAlarmResponse;
+import com.yanolja.scbj.domain.alarm.dto.CheckInAlarmResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import jakarta.persistence.SqlResultSetMapping;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,12 +37,6 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     List<PaymentHistory> findPaymentHistoriesWithNotSettlement();
 
 
-    @Query(
-        "SELECT new com.yanolja.scbj.domain.paymentHistory.dto.response.CheckInAlarmResponse(ph.id, m.id ,ph.productName, r.startDate) "+
-            "FROM PaymentHistory ph " +
-            "INNER JOIN ph.member m " +
-            "INNER JOIN ph.product p " +
-            "INNER JOIN p.reservation r " +
-            "WHERE FUNCTION('DATE_FORMAT',r.startDate,'%Y-%m-%d %H:%i') = FUNCTION('DATE_FORMAT',FUNCTION('DATE_SUB', CURRENT_TIMESTAMP, 1, 'DAY'),'%Y-%m-%d %H:%i')")
+    @Query(name ="find_check_in_alarm",nativeQuery = true)
     List<CheckInAlarmResponse> findPurchasedHistoriesNeedForCheckInAlarm();
 }
