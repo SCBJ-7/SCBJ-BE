@@ -53,8 +53,6 @@ class PaymentHistoryServiceTest {
     @Mock
     private ProductRepository productRepository;
 
-    @Mock
-    private PaymentHistoryDtoConverter paymentHistoryDtoConverter;
 
     @Mock
     private SaleHistoryDtoConverter saleHistoryDtoConverter;
@@ -162,20 +160,21 @@ class PaymentHistoryServiceTest {
                 .roomTheme(roomTheme)
                 .build();
 
-            Hotel hotel = Hotel.builder()
-                .id(1L)
-                .room(room)
-                .build();
 
             HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
-                .hotel(hotel)
                 .peakPrice(50000000)
                 .offPeakPrice(40000000)
                 .build();
 
             HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
-                .hotel(hotel)
                 .url("image1")
+                .build();
+
+            Hotel hotel = Hotel.builder()
+                .id(1L)
+                .room(room)
+                .hotelRoomPrice(hotelRoomPrice)
+                .hotelRoomImageList(List.of(hotelRoomImage))
                 .build();
 
             Reservation reservation = Reservation.builder()
@@ -207,30 +206,29 @@ class PaymentHistoryServiceTest {
                 .settlement(false)
                 .build();
 
-            SpecificPurchasedHistoryResponse specificPurchasedHistoryResponse = SpecificPurchasedHistoryResponse.builder()
-                .hotelName(hotel.getHotelName())
-                .roomName(room.getRoomName())
-                .standardPeople(room.getStandardPeople())
-                .maxPeople(room.getMaxPeople())
-                .checkIn("24.01.15 (월) 15:00")
-                .checkOut("24.01.16 (화) 11:00")
-                .customerName(paymentHistory.getCustomerName())
-                .customerPhoneNumber(paymentHistory.getCustomerPhoneNumber())
-                .paymentHistoryId(paymentHistory.getId())
-                .paymentType(paymentHistory.getPaymentType())
-                .originalPrice(50000000)
-                .price(paymentHistory.getPrice())
-                .remainingDays(4)
-                .paymentHistoryDate(
-                    LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd (E) ")))
-                .hotelImage(hotelRoomImage.getUrl())
-                .build();
+            paymentHistoryRepository.save(paymentHistory);
+//
+//            SpecificPurchasedHistoryResponse specificPurchasedHistoryResponse = SpecificPurchasedHistoryResponse.builder()
+//                .hotelName(hotel.getHotelName())
+//                .roomName(room.getRoomName())
+//                .standardPeople(room.getStandardPeople())
+//                .maxPeople(room.getMaxPeople())
+//                .checkIn("24.01.15 (월) 15:00")
+//                .checkOut("24.01.16 (화) 11:00")
+//                .customerName(paymentHistory.getCustomerName())
+//                .customerPhoneNumber(paymentHistory.getCustomerPhoneNumber())
+//                .paymentHistoryId(paymentHistory.getId())
+//                .paymentType(paymentHistory.getPaymentType())
+//                .originalPrice(50000000)
+//                .price(paymentHistory.getPrice())
+//                .remainingDays(4)
+//                .paymentHistoryDate("24.01.24 (월) ")
+//                .hotelImage(hotelRoomImage.getUrl())
+//                .build();
 
             given(paymentHistoryRepository.findByIdAndMemberId(any(Long.TYPE),
                 any(Long.TYPE))).willReturn(Optional.ofNullable(paymentHistory));
-            given(
-                paymentHistoryDtoConverter.toSpecificPurchasedHistoryResponse((any()))).willReturn(
-                specificPurchasedHistoryResponse);
+
 
             // when
             SpecificPurchasedHistoryResponse result = paymentHistoryService.getSpecificPurchasedHistory(
