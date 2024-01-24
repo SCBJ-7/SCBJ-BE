@@ -1,16 +1,15 @@
 package com.yanolja.scbj.domain.product.service;
 
-import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.entity.Member;
-import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.service.MemberService;
+import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.CityResponse;
-import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductStockResponse;
@@ -22,6 +21,7 @@ import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.exception.SecondPriceHigherException;
 import com.yanolja.scbj.domain.product.exception.SecondPricePeriodException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
+import com.yanolja.scbj.domain.product.util.ProductMapper;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.exception.ReservationNotFoundException;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
@@ -54,59 +54,59 @@ public class ProductService {
     public ProductPostResponse postProduct(Long memberId, Long reservationId,
         ProductPostRequest productPostRequest) {
 
-        Member member = memberRepository.findById(memberId)
+        Member currentMember = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-        YanoljaMember yanoljaMember = member.getYanoljaMember();
+        ProductAgreement productAgreement = ProductMapper.toProductAgreement(productPostRequest);
 
-        ProductAgreement productAgreement = ProductAgreement.builder()
-            .standardTimeSellingPolicy(productPostRequest.standardTimeSellingPolicy())
-            .totalAmountPolicy(productPostRequest.totalAmountPolicy())
-            .sellingModificationPolicy(productPostRequest.sellingModificationPolicy())
-            .productAgreement(productPostRequest.productAgreement())
-            .build();
-
-        Reservation reservation = reservationRepository.findByIdAndYanoljaMemberId(reservationId,
-            yanoljaMember.getId()).orElseThrow(
+        Reservation targetReservation = reservationRepository.findByIdAndYanoljaMemberId(
+            reservationId, currentMember.getYanoljaMember().getId()).orElseThrow(
             () -> new ReservationNotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
 
+        checkFirstPrice(productPostRequest, targetReservation);
+        checkSecondPriceAndGrandPeriod(productPostRequest);
+        checkAccountRegisterd(productPostRequest);
+
+        Product savedProduct = productRepository.save(
+            ProductMapper.toProduct(targetReservation, currentMember, productAgreement,
+                productPostRequest));
+
+        return ProductMapper.toProductPostResponse(savedProduct);
+    }
+
+    private void checkFirstPrice(ProductPostRequest productPostRequest, Reservation reservation) {
         if (productPostRequest.firstPrice() > reservation.getPurchasePrice()) {
             throw new FirstPriceHigherException(ErrorCode.FIRST_PRICE_HIGHER);
         }
+    }
+
+    private void checkSecondPriceAndGrandPeriod(ProductPostRequest productPostRequest) {
         if (productPostRequest.secondPrice() != 0
             && productPostRequest.secondGrantPeriod() != 0) {
-            if (productPostRequest.secondPrice() > productPostRequest.firstPrice()) {
-                throw new SecondPriceHigherException(ErrorCode.SECOND_PRICE_HIGHER);
-            }
-            if (productPostRequest.secondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
-                throw new SecondPricePeriodException(ErrorCode.INVALID_SECOND_PRICE_PERIOD);
-            }
+            checkSecondPrice(productPostRequest);
+            checkSecondGrantPeriod(productPostRequest);
         }
-
-        if (productPostRequest.isRegistered()) {
-            MemberUpdateAccountRequest memberUpdateAccountRequest = MemberUpdateAccountRequest.builder()
-                .accountNumber(productPostRequest.accountNumber())
-                .bank(productPostRequest.bank())
-                .build();
-            memberService.updateMemberAccount(memberUpdateAccountRequest);
-        }
-
-        Product product = Product.builder()
-            .reservation(reservation)
-            .member(member)
-            .productAgreement(productAgreement)
-            .firstPrice(productPostRequest.firstPrice())
-            .secondPrice(productPostRequest.secondPrice())
-            .bank(productPostRequest.bank())
-            .accountNumber(productPostRequest.accountNumber())
-            .secondGrantPeriod(productPostRequest.secondGrantPeriod())
-            .build();
-
-        Product savedProduct = productRepository.save(product);
-
-        return ProductPostResponse.builder().productId(savedProduct.getId()).build();
-
     }
+
+    private void checkSecondPrice(ProductPostRequest productPostRequest) {
+        if (productPostRequest.secondPrice() > productPostRequest.firstPrice()) {
+            throw new SecondPriceHigherException(ErrorCode.SECOND_PRICE_HIGHER);
+        }
+    }
+
+    private void checkSecondGrantPeriod(ProductPostRequest productPostRequest) {
+        if (productPostRequest.secondGrantPeriod() < MIN_SECOND_GRANT_PERIOD) {
+            throw new SecondPricePeriodException(ErrorCode.INVALID_SECOND_PRICE_PERIOD);
+        }
+    }
+
+    private void checkAccountRegisterd(ProductPostRequest productPostRequest) {
+        if (productPostRequest.isRegistered()) {
+            memberService.updateMemberAccount(
+                MemberMapper.toUpdateAccountRequest(productPostRequest));
+        }
+    }
+
 
     @Transactional(readOnly = true)
     public ProductFindResponse findProduct(Long productId) {
@@ -148,7 +148,8 @@ public class ProductService {
             .jeju(savedProduct.get("제주"))
             .jeolla(savedProduct.get("전라"))
             .gyeongsang(savedProduct.get("경상"))
-            .weekend(weekendProductResponse.isEmpty() ? Page.empty(pageable) : weekendProductResponse)
+            .weekend(
+                weekendProductResponse.isEmpty() ? Page.empty(pageable) : weekendProductResponse)
             .build();
     }
 
@@ -171,7 +172,7 @@ public class ProductService {
     public ProductStockResponse isProductStockLeft(long productId) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
-        if(product.getStock() > OUT_OF_STOCK){
+        if (product.getStock() > OUT_OF_STOCK) {
             return ProductStockResponse.builder().hasStock(true).build();
         }
         return ProductStockResponse.builder().hasStock(false).build();

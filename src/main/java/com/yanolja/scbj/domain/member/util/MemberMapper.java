@@ -1,12 +1,14 @@
 package com.yanolja.scbj.domain.member.util;
 
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
+import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.MemberAgreement;
+import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import java.util.Collections;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -65,6 +67,14 @@ public class MemberMapper {
             String.valueOf(member.getId()),
             member.getPassword(),
             Collections.singleton(grantedAuthority));
+    }
+
+    public static MemberUpdateAccountRequest toUpdateAccountRequest(
+        ProductPostRequest productPostRequest) {
+        return MemberUpdateAccountRequest.builder()
+            .accountNumber(productPostRequest.accountNumber())
+            .bank(productPostRequest.bank())
+            .build();
     }
 
 }
