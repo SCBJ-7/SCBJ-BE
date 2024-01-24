@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.product.repository;
 
 import static com.yanolja.scbj.domain.hotelRoom.entity.QHotel.hotel;
 import static com.yanolja.scbj.domain.hotelRoom.entity.QHotelRoomImage.hotelRoomImage;
+import static com.yanolja.scbj.domain.hotelRoom.entity.QHotelRoomPrice.hotelRoomPrice;
 import static com.yanolja.scbj.domain.hotelRoom.entity.QRoomTheme.roomTheme;
 import static com.yanolja.scbj.domain.paymentHistory.entity.QPaymentHistory.paymentHistory;
 import static com.yanolja.scbj.domain.product.entity.QProduct.product;
@@ -10,8 +11,10 @@ import static com.yanolja.scbj.domain.reservation.entity.QReservation.reservatio
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
+import com.yanolja.scbj.global.util.TimeValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -41,7 +44,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 product.firstPrice,
                 product.secondPrice,
                 reservation.hotel.room.maxPeople,
-                reservation.purchasePrice,
+                hotelRoomPrice.peakPrice,
+                hotelRoomPrice.offPeakPrice,
                 product.secondGrantPeriod,
                 reservation.startDate,
                 reservation.endDate,
@@ -59,7 +63,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .groupBy(product.id)
             .fetch()
             .stream().map(tuple -> {
-                Integer purchasePrice = tuple.get(reservation.purchasePrice);
+                tuple.get(hotelRoomPrice.peakPrice);
+                Integer originalPrice = checkPeak(tuple.get(hotelRoomPrice.peakPrice), tuple.get(hotelRoomPrice.offPeakPrice));
                 Integer salePrice = getSalePrice(tuple.get(reservation.startDate),
                     tuple.get(product.secondGrantPeriod), tuple.get(product.firstPrice),
                     tuple.get(product.secondPrice));
@@ -68,10 +73,10 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     tuple.get(hotel.hotelName),
                     tuple.get(hotel.room.bedType),
                     tuple.get(hotelRoomImage.url),
-                    purchasePrice,
+                    originalPrice,
                     isFirstPrice(salePrice, tuple.get(product.firstPrice)),
                     salePrice,
-                    getSaleRate(purchasePrice, salePrice),
+                    getSaleRate(originalPrice, salePrice),
                     tuple.get(reservation.startDate),
                     tuple.get(reservation.endDate),
                     tuple.get(product.createdAt)
@@ -86,6 +91,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         return new PageImpl<>(paginatedResponse, pageable, total);
     }
+
+    private int checkPeak( int peak , int offPeak) {
+        if (TimeValidator.isPeakTime(LocalDate.now())) {
+            return peak;
+        }
+        return offPeak;
+    }
+
 
     private List<ProductSearchResponse> doPaginated(List<ProductSearchResponse> response,
                                                     Pageable pageable, int total) {

@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.hotelRoom.entity;
 
+import com.querydsl.core.annotations.QueryInit;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
