@@ -124,7 +124,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     private BooleanExpression betweenDate(LocalDate checkIn, LocalDate checkOut) {
         if (checkIn != null && checkOut != null) {
-            return reservation.startDate.loe(checkOut.minusDays(1).atStartOfDay())
+            return reservation.startDate.loe(checkOut.atStartOfDay())
                 .and(reservation.endDate.goe(checkIn.atStartOfDay()));
         }
         return reservation.startDate.goe(LocalDateTime.now());
