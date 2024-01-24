@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.product.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,8 +20,8 @@ public class ProductSearchResponse {
    private Boolean isFirstPrice;
    private Integer salePrice;
    private Double salePercentage;
-   private LocalDateTime checkIn;
-   private LocalDateTime checkOut;
+   private LocalDate checkIn;
+   private LocalDate checkOut;
    private LocalDateTime createdAt;
 
 
@@ -29,8 +30,8 @@ public class ProductSearchResponse {
    @QueryProjection
    public ProductSearchResponse(Long id, String name, String roomType, String imageUrl,
                                 Integer originalPrice, Boolean isFirstPrice, Integer salePrice, Double salePercentage,
-                                LocalDateTime checkIn,
-                                LocalDateTime checkOut, LocalDateTime localDateTime) {
+                                LocalDate checkIn,
+                                LocalDate checkOut, LocalDateTime localDateTime) {
       this.id = id;
       this.name = name;
       this.roomType = roomType;
