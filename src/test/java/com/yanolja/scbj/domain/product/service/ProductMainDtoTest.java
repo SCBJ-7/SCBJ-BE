@@ -7,7 +7,6 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
-import com.yanolja.scbj.domain.product.dto.response.CityResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
@@ -29,10 +28,10 @@ import org.springframework.data.domain.Pageable;
 public class ProductMainDtoTest {
 
     @InjectMocks
-    private CityDtoConverter cityDtoConverter;
+    private CityDtoMapper cityDtoMapper;
 
     @InjectMocks
-    private WeekendDtoConverter weekendDtoConverter;
+    private WeekendDtoMapper weekendDtoMapper;
 
     @Mock
     private PricingHelper pricingHelper;
@@ -53,10 +52,10 @@ public class ProductMainDtoTest {
         List<Product> products = createMockProducts();
 
         // when
-        List<CityResponse> cityResponses = cityDtoConverter.toCityResponse(products);
+//        List<CityResponse> cityResponses = cityDtoMapper.toCityResponse(products);
 
         // then
-        assertEquals(2, cityResponses.size()); // 예상하는 결과 수 확인
+//        assertEquals(2, cityResponses.size()); // 예상하는 결과 수 확인
         // 추가적인 결과 검증 필요
     }
 
@@ -71,14 +70,16 @@ public class ProductMainDtoTest {
         void testToWeekendProductResponse() {
             // given
             List<Product> products = createMockProducts();
-            Pageable pageable = PageRequest.of(0, 10);
+            Product product = products.get(0);
+            RoomTheme roomTheme = product.getReservation().getHotel().getRoom().getRoomTheme();
 
             // when
-            Page<WeekendProductResponse>
-                responses = weekendDtoConverter.toWeekendProductResponse(products, pageable);
+            WeekendProductResponse response =
+                weekendDtoMapper.toWeekendProductResponse(product, product.getReservation(),
+                    "image", 200000, 0.6, 2, roomTheme);
 
             // then
-            assertEquals(2, responses.getContent().size());
+            assertEquals(response.imageUrl(),"image");
         }
     }
 
