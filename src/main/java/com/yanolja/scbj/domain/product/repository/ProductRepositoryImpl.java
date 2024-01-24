@@ -155,7 +155,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         if (hasBrunch == null) {
             return null;
         }
-        return roomTheme.parkingZone.eq(hasBrunch);
+        return roomTheme.breakfast.eq(hasBrunch);
     }
 
     private BooleanExpression eqPool(Boolean hasPool) {
