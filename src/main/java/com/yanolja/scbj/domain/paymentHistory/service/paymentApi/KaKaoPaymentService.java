@@ -152,6 +152,11 @@ public class KaKaoPaymentService implements PaymentApiService {
             redisMap.put("customerName", paymentReadyRequest.customerName());
             redisMap.put("customerEmail", paymentReadyRequest.customerEmail());
             redisMap.put("customerPhoneNumber", paymentReadyRequest.customerPhoneNumber());
+            redisMap.put("isAgeOver14", String.valueOf(paymentReadyRequest.isAgeOver14()));
+            redisMap.put("useAgree", String.valueOf(paymentReadyRequest.isAgeOver14()));
+            redisMap.put("cancelAndRefund", String.valueOf(paymentReadyRequest.isAgeOver14()));
+            redisMap.put("collectPersonalInfo", String.valueOf(paymentReadyRequest.isAgeOver14()));
+            redisMap.put("thirdPartySharing", String.valueOf(paymentReadyRequest.isAgeOver14()));
             redisMap.put("productName", productName);
 
             HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
@@ -206,6 +211,11 @@ public class KaKaoPaymentService implements PaymentApiService {
         String price = (String) redisTemplate.opsForHash().get(key, "price");
         String tid = (String) redisTemplate.opsForHash().get(key, "tid");
         String productName = (String) redisTemplate.opsForHash().get(key, "productName");
+        boolean isAgeOver14 = (boolean) redisTemplate.opsForHash().get(key, "isAgeOver14");
+        boolean useAgree = (boolean) redisTemplate.opsForHash().get(key, "useAgree");
+        boolean cancelAndRefund = (boolean) redisTemplate.opsForHash().get(key, "cancelAndRefund");
+        boolean collectPersonalInfo = (boolean) redisTemplate.opsForHash().get(key, "collectPersonalInfo");
+        boolean thirdPartySharing = (boolean) redisTemplate.opsForHash().get(key, "thirdPartySharing");
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
@@ -234,6 +244,11 @@ public class KaKaoPaymentService implements PaymentApiService {
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
             PaymentAgreement agreement = PaymentAgreement.builder()
+                .isAgeOver14(isAgeOver14)
+                .useAgree(useAgree)
+                .cancelAndRefund(cancelAndRefund)
+                .collectPersonalInfo(collectPersonalInfo)
+                .thirdPartySharing(thirdPartySharing)
                 .build();
 
             PaymentHistory paymentHistory = PaymentHistory.builder()
