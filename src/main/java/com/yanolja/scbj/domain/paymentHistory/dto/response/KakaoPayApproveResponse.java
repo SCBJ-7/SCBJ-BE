@@ -1,8 +1,8 @@
 package com.yanolja.scbj.domain.paymentHistory.dto.response;
 
-public record PaymentApproveResponse(
+public record KakaoPayApproveResponse(
     String tid,
-    PaymentAmountResponse amount
+    KakaoPayAmountResponse amount
 ) {
 
 }
