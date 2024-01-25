@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public record SaleHistoryResponse(
     Long id,
+    Long productId,
     String name,
     String imageUrl,
     String roomType,
