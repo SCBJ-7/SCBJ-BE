@@ -182,7 +182,7 @@ public class KaKaoPaymentService implements PaymentApiService {
     @Override
     @Transactional
     public PaymentSuccessResponse approvePaymentWithLock(String pgToken) {
-        Long memberId = 11L;
+        Long memberId = securityUtil.getCurrentMemberId();
         String key = REDIS_CACHE_KEY_PREFIX + memberId;
         PaymentRedisDto paymentInfo = getPaymentInfo(key);
 
