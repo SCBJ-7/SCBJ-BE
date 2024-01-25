@@ -112,6 +112,7 @@ class PaymentHistoryServiceTest {
             Pageable pageable = PageRequest.of(1, 10);
             SaleHistoryResponse response = new SaleHistoryResponse(
                 1L,
+                2L,
                 "롯데 시그니엘 호텔",
                 "http://example.com/hotel-room-image1.jpg",
                 "더블 베드",

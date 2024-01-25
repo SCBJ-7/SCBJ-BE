@@ -170,6 +170,7 @@ public class PaymentHistoryRestControllerTest {
             Pageable pageable = PageRequest.of(0, 10);
             List<SaleHistoryResponse> responses = List.of(new SaleHistoryResponse(
                 1L,
+                10L,
                 "롯데 시그니엘 호텔",
                 "http://example.com/hotel-room-image1.jpg",
                 "더블 베드",
@@ -179,6 +180,7 @@ public class PaymentHistoryRestControllerTest {
                 LocalDateTime.of(2024, 1, 2, 1, 0),
                 "판매중"
             ), new SaleHistoryResponse(
+                10L,
                 2L,
                 "신라 호텔",
                 "http://example.com/hotel-room-image2.jpg",

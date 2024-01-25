@@ -15,6 +15,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     @Query("""
        SELECT new com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse(
            ph.id,
+           p.id,
            h.hotelName,
            hImg.url,
            h.room.bedType, 
