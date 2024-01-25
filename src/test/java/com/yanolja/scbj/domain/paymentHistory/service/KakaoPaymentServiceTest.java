@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -16,10 +15,10 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.paymentHistory.dto.redis.PaymentRedisDto;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayReadyResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.redis.PaymentRedisResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.ProductNotForSaleException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
@@ -43,7 +42,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
@@ -96,7 +94,7 @@ public class KakaoPaymentServiceTest {
 
         ResponseEntity responseEntity = new ResponseEntity<>(HttpStatus.OK);
 
-        PaymentRedisResponse paymentInfo = PaymentRedisResponse.builder()
+        PaymentRedisDto paymentInfo = PaymentRedisDto.builder()
             .productId(1L)
             .price(10000)
             .cancelAndRefund(true)
@@ -244,7 +242,7 @@ public class KakaoPaymentServiceTest {
             // given
             ResponseEntity responseEntity = new ResponseEntity<>(HttpStatus.OK);
 
-            PaymentRedisResponse paymentInfo = PaymentRedisResponse.builder()
+            PaymentRedisDto paymentInfo = PaymentRedisDto.builder()
                 .productId(1L)
                 .price(10000)
                 .isAgeOver14(true)
