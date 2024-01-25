@@ -17,6 +17,7 @@ import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.KaKaoPaymentService;
@@ -160,8 +161,13 @@ class PaymentRestControllerTest {
             KaKaoPaymentService kaKaoPaymentService = mock(KaKaoPaymentService.class);
             PaymentApiService paymentApiService = mock(KaKaoPaymentService.class);
 
+            PaymentSuccessResponse paymentSuccessResponse = PaymentSuccessResponse.builder()
+                .paymentHistoryId(1L)
+                .build();
+
             given(paymentApiServiceMap.get(any())).willReturn(kaKaoPaymentService);
-            doNothing().when(kaKaoPaymentService).approvePayment(any(), any());
+            given(kaKaoPaymentService.approvePayment(any(), any())).willReturn(
+                paymentSuccessResponse);
 
             // when
             ResultActions result = mvc.perform(
