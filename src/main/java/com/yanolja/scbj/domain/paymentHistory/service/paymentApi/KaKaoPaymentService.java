@@ -8,6 +8,7 @@ import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentApproveResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentReadyResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
@@ -173,7 +174,7 @@ public class KaKaoPaymentService implements PaymentApiService {
 
     @Override
     @Transactional
-    public void approvePaymentWithLock(String pgToken) {
+    public PaymentSuccessResponse approvePaymentWithLock(String pgToken) {
         Long memberId = securityUtil.getCurrentMemberId();
         String productId = (String) redisTemplate.opsForHash()
             .get(REDIS_CACHE_KEY_PREFIX + memberId, "productId");
@@ -187,7 +188,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             if (targetProduct.getStock() == OUT_OF_STOCK) {
                 throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
             }
-            approvePayment(pgToken, memberId);
+            return approvePayment(pgToken, memberId);
         } catch (InterruptedException e) {
             throw new RuntimeException();
         } finally {
@@ -203,7 +204,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         maxAttempts = RetryConfig.MAX_ATTEMPTS,
         backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
     )
-    public void approvePayment(String pgToken, Long memberId) {
+    public PaymentSuccessResponse approvePayment(String pgToken, Long memberId) {
 
         String key = REDIS_CACHE_KEY_PREFIX + memberId;
         String productId = (String) redisTemplate.opsForHash().get(key, "productId");
@@ -272,6 +273,9 @@ public class KaKaoPaymentService implements PaymentApiService {
             alarmService.createAlarm(product.getMember().getId(), savedPaymentHistory.getId(),
                 new Data("판매완료", productName + "의 판매가 완료되었어요!", LocalDateTime.now()));
 
+            return PaymentSuccessResponse.builder()
+                .paymentHistoryId(savedPaymentHistory.getId())
+                .build();
         } catch (RestClientException | URISyntaxException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_INFO_FAIL);
         }
