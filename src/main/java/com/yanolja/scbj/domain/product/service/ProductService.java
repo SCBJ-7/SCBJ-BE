@@ -236,8 +236,8 @@ public class ProductService {
                     currentPrice, discountRate, getThemeCount(roomTheme), roomTheme);
             })
             .sorted(ascendCheckin()
-                .thenComparing(descendSalePercentage())
-                .thenComparing(descendRoomThemeCount()).reversed())
+                .thenComparing(descendRoomThemeCount())
+                .thenComparing(descendSalePercentage()))
             .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
