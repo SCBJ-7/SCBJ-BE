@@ -39,8 +39,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
        LEFT JOIN p.reservation r
        JOIN r.hotel h 
        LEFT JOIN HotelRoomImage hImg ON hImg.hotel.id = h.id
-       LEFT JOIN p.paymentHistory ph 
-       WHERE ph.member.id = :memberId
+       inner JOIN p.paymentHistory ph 
+       WHERE p.member.id = :memberId
        GROUP BY ph.id 
        """)
     List<SaleHistoryResponse> findSaleHistoriesByMemberId(@Param("memberId") Long memberId);
