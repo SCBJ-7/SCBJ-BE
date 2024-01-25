@@ -9,8 +9,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class PricingHelper {
     public static double calculateDiscountRate(Product product, int currentPrice) {
-        return (double) (product.getReservation().getPurchasePrice() - currentPrice) /
-            (double) product.getReservation().getPurchasePrice();
+        int originalPrice = getOriginalPrice(product.getReservation().getHotel());
+        return (double) (originalPrice - currentPrice) /
+            (double) originalPrice;
     }
 
     public static int getCurrentPrice(Product product) {
