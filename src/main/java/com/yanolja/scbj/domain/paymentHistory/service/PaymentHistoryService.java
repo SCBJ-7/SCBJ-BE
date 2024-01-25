@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class PaymentHistoryService {
-    
+
     private final int RESERVATION_IMAGE = 0;
 
     private final SaleHistoryDtoConverter saleHistoryDtoConverter;
@@ -66,7 +67,7 @@ public class PaymentHistoryService {
         Reservation reservation = targetPaymentHistory.getProduct().getReservation();
 
         Hotel hotel = targetPaymentHistory.getProduct().getReservation().getHotel();
-        
+
         List<HotelRoomImage> hotelRoomImageList = hotel.getHotelRoomImageList();
         String imageUrl = getImageUrl(hotelRoomImageList);
 
@@ -75,18 +76,21 @@ public class PaymentHistoryService {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yy.MM.dd (E) HH:mm");
         String checkIn = reservation.getStartDate().format(dateFormatter);
         String checkOut = reservation.getEndDate().format(dateFormatter);
-        String paymentHistoryDate = targetPaymentHistory.getCreatedAt().format(dateFormatter);
+        String paymentHistoryDate = Optional.ofNullable(targetPaymentHistory.getCreatedAt())
+            .map(date -> date.format(dateFormatter))
+            .orElse(null);
 
         int remainingDays = (int) Duration.between(LocalDateTime.now(),
             reservation.getStartDate()).toDays();
 
         return PaymentHistoryMapper.toSpecificPurchasedHistoryResponse(targetPaymentHistory,
-            hotel, room, checkIn, checkOut, paymentHistoryDate, getOriginalPrice(hotel), remainingDays, imageUrl);
+            hotel, room, checkIn, checkOut, paymentHistoryDate, getOriginalPrice(hotel),
+            remainingDays, imageUrl);
     }
 
-    
-    private int getOriginalPrice(Hotel hotel){
-        
+
+    private int getOriginalPrice(Hotel hotel) {
+
         int originalPrice = hotel.getHotelRoomPrice().getOffPeakPrice();
         if (TimeValidator.isPeakTime(LocalDate.now())) {
             originalPrice = hotel.getHotelRoomPrice().getPeakPrice();
