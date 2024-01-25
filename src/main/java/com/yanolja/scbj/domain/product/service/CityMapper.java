@@ -14,7 +14,7 @@ public class CityMapper {
             .city(reservation.getHotel().getHotelMainAddress())
             .imageUrl(hotelUrl)
             .hotelName(reservation.getHotel().getHotelName())
-            .roomType(reservation.getHotel().getRoom().getBedType())
+            .roomType(reservation.getHotel().getRoom().getRoomName())
             .originalPrice(originalPrice)
             .salePrice(currentPrice)
             .salePercentage(discountRate)

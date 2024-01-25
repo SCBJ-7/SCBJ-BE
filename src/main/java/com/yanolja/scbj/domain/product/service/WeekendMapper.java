@@ -21,7 +21,7 @@ public class WeekendMapper {
         return WeekendProductResponse.builder()
             .id(product.getId())
             .hotelName(reservation.getHotel().getHotelName())
-            .roomType(reservation.getHotel().getRoom().getBedType())
+            .roomType(reservation.getHotel().getRoom().getRoomName())
             .imageUrl(hotelUrl)
             .originalPrice(PricingHelper.getOriginalPrice(reservation.getHotel()))
             .salePrice(currentPrice)
