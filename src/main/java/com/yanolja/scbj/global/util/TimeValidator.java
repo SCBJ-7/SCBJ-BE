@@ -23,7 +23,6 @@ public class TimeValidator {
             || month == JANUARY || month == FEBRUARY;
     }
 
-
     public boolean isOverSecondGrantPeriod(Product product, LocalDateTime checkInDateTime){
         LocalDateTime changeTime = null;
         if(product.getSecondGrantPeriod() != SecondTransferExistence.NOT_EXISTS.getStatus()){
@@ -31,15 +30,11 @@ public class TimeValidator {
             long changeHour = product.getSecondGrantPeriod();
             changeTime = checkInDateTime.minusHours(changeHour);
 
-            if (changeTime.isAfter(LocalDateTime.now())) {
-                return false;
+            if (changeTime.isBefore(LocalDateTime.now())) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
-
-
-
-
 
 }
