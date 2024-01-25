@@ -14,14 +14,14 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
 
     @Query("""
        SELECT new com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse(
-           p.id,  
-           h.hotelName, 
+           ph.id,
+           h.hotelName,
            hImg.url, 
            h.room.bedType, 
            p.firstPrice,
            p.secondPrice, 
            r.startDate, 
-           r.endDate, 
+           r.endDate,
            (CASE 
                 WHEN ph.id IS NOT NULL THEN 
                     (CASE 
