@@ -83,8 +83,10 @@ Infra & ThirdParty</br>
   - `org.quartz-scheduler:quartz:2.3.0`
 
 ## ERD
+![(정리용) 숙취방지 최종 ERD - v1 (1)](https://github.com/SCBJ-7/SCBJ-BE/assets/63856521/8a6a60f0-333e-4569-b217-0b9c514d7389)
 
 
 ## ARCHITECTURE
+![숙취방지 최종 ARCHITECTURE](https://github.com/SCBJ-7/SCBJ-BE/assets/63856521/74661494-beb8-4ae7-a7d5-d864b4ac64dc)
 
 
