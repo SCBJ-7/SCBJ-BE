@@ -3,8 +3,8 @@ package com.yanolja.scbj.domain.paymentHistory.util;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.member.entity.Member;
+import com.yanolja.scbj.domain.paymentHistory.dto.redis.PaymentRedisDto;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.redis.PaymentRedisResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.entity.Product;
@@ -38,7 +38,7 @@ public final class PaymentHistoryMapper {
     }
 
     public static PaymentHistory toPaymentHistory(Member buyer, PaymentAgreement paymentAgreement,
-        PaymentRedisResponse paymentInfo, Product product) {
+        PaymentRedisDto paymentInfo, Product product) {
 
         return PaymentHistory.builder()
             .member(buyer)

@@ -1,8 +1,8 @@
-package com.yanolja.scbj.domain.paymentHistory.dto.request.redis;
+package com.yanolja.scbj.domain.paymentHistory.dto.redis;
 
 import lombok.Builder;
 
-public record PaymentRedisRequest (
+public record PaymentRedisDto (
     Long productId,
     String tid,
     int price,
@@ -18,6 +18,6 @@ public record PaymentRedisRequest (
 ) {
 
     @Builder
-    public PaymentRedisRequest {
+    public PaymentRedisDto {
     }
 }

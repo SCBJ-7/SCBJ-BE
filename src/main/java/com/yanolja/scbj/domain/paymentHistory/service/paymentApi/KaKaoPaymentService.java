@@ -5,13 +5,12 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.paymentHistory.dto.redis.PaymentRedisDto;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
-import com.yanolja.scbj.domain.paymentHistory.dto.request.redis.PaymentRedisRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayApproveResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayReadyResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.redis.PaymentRedisResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.KakaoPayException;
@@ -127,7 +126,7 @@ public class KaKaoPaymentService implements PaymentApiService {
             checkStatus(response.getStatusCode(), ErrorCode.KAKAO_PAY_READY_FAIL);
             KakaoPayReadyResponse kakaoPayReadyResponse = response.getBody();
 
-            PaymentRedisRequest paymentInfo = PaymentRedisMapper.toRedisRequest(productId,
+            PaymentRedisDto paymentInfo = PaymentRedisMapper.toRedisDto(productId,
                 kakaoPayReadyResponse, price, paymentReadyRequest, productName);
 
             String key = REDIS_CACHE_KEY_PREFIX + currentMemberId;
@@ -173,7 +172,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         params.add("quantity", FIXED_QUANTITY);
         params.add("total_amount", price);
         params.add("tax_free_amount", TAX_FREE_AMOUNT);
-        params.add("approval_url", BASE_URL + productId + "/ready?member_id=" + memberId);
+        params.add("approval_url", BASE_URL + "/pay-success?paymentType=kakaoPaymentService");
         params.add("cancel_url", BASE_URL + productId + "/cancel");
         params.add("fail_url", BASE_URL + "/pay-fail");
 
@@ -185,7 +184,7 @@ public class KaKaoPaymentService implements PaymentApiService {
     public PaymentSuccessResponse approvePaymentWithLock(String pgToken) {
         Long memberId = securityUtil.getCurrentMemberId();
         String key = REDIS_CACHE_KEY_PREFIX + memberId;
-        PaymentRedisResponse paymentInfo = getPaymentInfo(key);
+        PaymentRedisDto paymentInfo = getPaymentInfo(key);
 
         RLock lock = redissonClient.getLock(REDIS_LOCK_KEY_PREFIX + paymentInfo.productId());
 
@@ -193,7 +192,8 @@ public class KaKaoPaymentService implements PaymentApiService {
             if (!lock.tryLock(500, 5_000, TimeUnit.MICROSECONDS)) {
                 throw new RuntimeException();
             }
-            Product targetProduct = productRepository.findById(paymentInfo.productId()).orElseThrow();
+            Product targetProduct = productRepository.findById(paymentInfo.productId())
+                .orElseThrow();
             checkOutOfStock(targetProduct);
 
             return approvePayment(pgToken, memberId);
@@ -216,7 +216,7 @@ public class KaKaoPaymentService implements PaymentApiService {
 
         String key = REDIS_CACHE_KEY_PREFIX + memberId;
 
-        PaymentRedisResponse paymentInfo = getPaymentInfo(key);
+        PaymentRedisDto paymentInfo = getPaymentInfo(key);
 
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(
             createApproveParams(paymentInfo, memberId, pgToken), headers);
@@ -255,7 +255,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         }
     }
 
-    private MultiValueMap<String, Object> createApproveParams(PaymentRedisResponse paymentInfo,
+    private MultiValueMap<String, Object> createApproveParams(PaymentRedisDto paymentInfo,
         long memberId, String pgToken) {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
 
@@ -285,7 +285,7 @@ public class KaKaoPaymentService implements PaymentApiService {
 
         String key = REDIS_CACHE_KEY_PREFIX + memberId;
 
-        PaymentRedisResponse paymentInfo = getPaymentInfo(key);
+        PaymentRedisDto paymentInfo = getPaymentInfo(key);
 
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(
             createCancelParams(paymentInfo), headers);
@@ -317,7 +317,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         }
     }
 
-    private MultiValueMap<String, Object> createCancelParams(PaymentRedisResponse paymentInfo) {
+    private MultiValueMap<String, Object> createCancelParams(PaymentRedisDto paymentInfo) {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
         params.add("tid", paymentInfo.tid());
@@ -327,8 +327,8 @@ public class KaKaoPaymentService implements PaymentApiService {
         return params;
     }
 
-    private PaymentRedisResponse getPaymentInfo(String key) {
-        return (PaymentRedisResponse) redisTemplate.opsForValue().get(key);
+    private PaymentRedisDto getPaymentInfo(String key) {
+        return (PaymentRedisDto) redisTemplate.opsForValue().get(key);
     }
 
     @Recover
