@@ -1,7 +1,7 @@
 package com.yanolja.scbj.domain.paymentHistory.controller;
 
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentCancelResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayCancelResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
@@ -62,7 +62,7 @@ public class PaymentRestController {
 
     @GetMapping("/pay-cancel")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<PaymentCancelResponse> cancelPayment(
+    public ResponseDTO<KakaoPayCancelResponse> cancelPayment(
         @RequestParam("paymentType") String paymentType) {
 
         PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
