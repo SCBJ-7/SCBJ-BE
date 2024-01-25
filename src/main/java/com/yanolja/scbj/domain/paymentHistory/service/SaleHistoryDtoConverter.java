@@ -27,7 +27,7 @@ public class SaleHistoryDtoConverter {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yy.MM.dd (E) ");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime createdAt = product.getCreatedAt();
+        LocalDateTime createdAt = paymentHistory.getCreatedAt();
 
         String status = calculateStatus(paymentHistory, reservation);
         String hotelUrl = getHotelUrl(hotel);
