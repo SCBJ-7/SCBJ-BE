@@ -1,14 +1,12 @@
 package com.yanolja.scbj.domain.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.when;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
@@ -24,6 +22,7 @@ import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductStockResponse;
@@ -37,6 +36,8 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -63,6 +64,7 @@ class ProductServiceTest {
     @Mock
     private MemberService memberService;
 
+
     @Mock
     private MemberRepository memberRepository;
 
@@ -74,6 +76,8 @@ class ProductServiceTest {
 
     @Mock
     private SecurityUtil securityUtil;
+
+    ArrayList<Product> arrayList = new ArrayList<>();
 
     @Nested
     @DisplayName("postProduct()는 ")
@@ -321,8 +325,8 @@ class ProductServiceTest {
 
             ProductSearchResponse response = ProductSearchResponse.builder()
                 .id(1L)
-                .checkIn(LocalDateTime.now().plusDays(1))
-                .checkOut(LocalDateTime.now().plusDays(2))
+                .checkIn(LocalDateTime.now().plusDays(1).toLocalDate())
+                .checkOut(LocalDateTime.now().plusDays(2).toLocalDate())
 
                 .salePrice(100000)
                 .name("시그니엘 레지던스 호텔")
@@ -486,6 +490,37 @@ class ProductServiceTest {
             assertThat(result.hasStock()).isEqualTo(false);
         }
     }
+
+    @Nested
+    @DisplayName("메인페이지는 성공시 통과가 된다")
+    class Context_Main {
+
+        @Test
+        @DisplayName("getAllProductForMainPage 메소드는 각 도시 및 주말 상품을 정확히 반환한다")
+        void testGetAllProductForMainPage() {
+            // given
+            List<String> cityNames = Arrays.asList("서울", "강원", "부산", "제주", "전라", "경상");
+
+            cityNames.forEach(city -> {
+                List<Product> cityProducts = arrayList;
+                when(productRepository.findProductByCity(city)).thenReturn(cityProducts);
+            });
+
+            List<Product> weekendProducts = arrayList;
+            when(productRepository.findProductByWeekend()).thenReturn(weekendProducts);
+
+            Pageable pageable = PageRequest.of(0, 3);
+
+            //when
+            ProductMainResponse result =
+                productService.getAllProductForMainPage(cityNames, pageable);
+
+            // then
+            assertNotNull(result);
+        }
+
+    }
+
 }
 
 

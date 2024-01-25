@@ -4,6 +4,7 @@ import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
+import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.hotelRoom.util.RoomThemeMapper;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
@@ -35,11 +36,13 @@ import com.yanolja.scbj.global.util.SecurityUtil;
 import com.yanolja.scbj.global.util.TimeValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,16 +55,17 @@ public class ProductService {
     private final ReservationRepository reservationRepository;
     private final ProductRepository productRepository;
     private final MemberService memberService;
-    private final CityDtoConverter cityDtoConverter;
-    private final WeekendDtoConverter weekendDtoConverter;
     private final SecurityUtil securityUtil;
 
     private static final int MIN_SECOND_GRANT_PERIOD = 3;
     private final int OUT_OF_STOCK = 0;
 
+    private static final long PRODUCT_QUANTITY = 2;
+    private static final int FIRST_HOTEL_IMAGE = 0;
+
     @Transactional
     public ProductPostResponse postProduct(Long memberId, Long reservationId,
-        ProductPostRequest productPostRequest) {
+                                           ProductPostRequest productPostRequest) {
 
         Member currentMember = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -189,6 +193,7 @@ public class ProductService {
 
     public Page<ProductSearchResponse> searchByRequest(ProductSearchRequest productSearchRequest,
         Pageable pageable) {
+
         Page<ProductSearchResponse> responses =
             productRepository.search(pageable, productSearchRequest);
 
@@ -218,17 +223,67 @@ public class ProductService {
 
     private Page<WeekendProductResponse> getWeekendProducts(Pageable pageable) {
         List<Product> productByWeekend = productRepository.findProductByWeekend();
-        Page<WeekendProductResponse> weekendProductResponse =
-            weekendDtoConverter.toWeekendProductResponse(productByWeekend, pageable);
-        return weekendProductResponse;
+
+        List<WeekendProductResponse> responses = productByWeekend.stream()
+            .map(product -> {
+                Reservation reservation = product.getReservation();
+                RoomTheme roomTheme = reservation.getHotel().getRoom().getRoomTheme();
+                String hotelUrl = getHotelUrl(product.getReservation().getHotel());
+                int currentPrice = PricingHelper.getCurrentPrice(product);
+                double discountRate = PricingHelper.calculateDiscountRate(product, currentPrice);
+
+                return WeekendMapper.toWeekendProductResponse(product, reservation, hotelUrl,
+                    currentPrice, discountRate, getThemeCount(roomTheme), roomTheme);
+            })
+            .sorted(ascendCheckin()
+                .thenComparing(descendSalePercentage())
+                .thenComparing(descendRoomThemeCount()))
+            .collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), responses.size());
+
+        return new PageImpl<>(responses.subList(start, end), pageable, responses.size());
+    }
+
+    private Comparator<WeekendProductResponse> ascendCheckin() {
+        return Comparator
+            .comparing(WeekendProductResponse::checkInDate);
+    }
+    private Comparator<WeekendProductResponse> descendSalePercentage() {
+        return Comparator.comparing(WeekendProductResponse::salePercentage, Comparator.reverseOrder());
+    }
+
+    private Comparator<WeekendProductResponse> descendRoomThemeCount() {
+        return Comparator.comparing(WeekendProductResponse::roomThemeCount, Comparator.reverseOrder());
+    }
+
+    private int getThemeCount(RoomTheme roomTheme) {
+        return (roomTheme.isBreakfast() ? 1 : 0) +
+            (roomTheme.isPool() ? 1 : 0) +
+            (roomTheme.isOceanView() ? 1 : 0);
     }
 
     private void getEachCity(List<String> cities,
-        HashMap<String, List<CityResponse>> savedProduct) {
+                             HashMap<String, List<CityResponse>> savedProduct
+    ) {
         cities.forEach(city -> {
             List<Product> productsByCity = productRepository.findProductByCity(city);
-            List<CityResponse> cityResponses = cityDtoConverter.toCityResponse(productsByCity);
-            savedProduct.put(city, cityResponses);
+            List<CityResponse> getCityResponse = productsByCity.stream()
+                .map(product -> {
+                    Reservation reservation = product.getReservation();
+                    int currentPrice = PricingHelper.getCurrentPrice(product);
+                    int originalPrice = PricingHelper.getOriginalPrice(reservation.getHotel());
+                    double discountRate = PricingHelper.calculateDiscountRate(product, currentPrice);
+                    String hotelUrl = getHotelUrl(product.getReservation().getHotel());
+
+                    return CityMapper.toCityResponse(product, hotelUrl, reservation,
+                        currentPrice, discountRate, originalPrice);
+                }).sorted(Comparator.comparingDouble(CityResponse::salePercentage))
+                .limit(PRODUCT_QUANTITY)
+                .collect(Collectors.toList());
+
+            savedProduct.put(city, getCityResponse);
         });
     }
 
@@ -239,5 +294,10 @@ public class ProductService {
             return ProductStockResponse.builder().hasStock(true).build();
         }
         return ProductStockResponse.builder().hasStock(false).build();
+    }
+
+    private String getHotelUrl(Hotel hotel) {
+        return hotel.getHotelRoomImageList().isEmpty() ? null :
+            hotel.getHotelRoomImageList().get(FIRST_HOTEL_IMAGE).getUrl();
     }
 }

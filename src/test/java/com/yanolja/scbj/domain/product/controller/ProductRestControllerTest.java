@@ -222,8 +222,8 @@ class ProductRestControllerTest {
 
             ProductSearchResponse response = ProductSearchResponse.builder()
                 .id(1L)
-                .checkIn(LocalDateTime.now().plusDays(1))
-                .checkOut(LocalDateTime.now().plusDays(2))
+                .checkIn(LocalDateTime.now().plusDays(1).toLocalDate())
+                .checkOut(LocalDateTime.now().plusDays(2).toLocalDate())
                 .salePrice(100000)
                 .name("시그니엘 레지던스 호텔")
                 .build();

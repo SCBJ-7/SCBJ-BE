@@ -9,9 +9,6 @@ import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.util.List;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +23,8 @@ public class PaymentHistoryRestController {
     private final PaymentHistoryService paymentHistoryService;
     private final SecurityUtil securityUtil;
 
-    public PaymentHistoryRestController(PaymentHistoryService paymentHistoryService, SecurityUtil securityUtil) {
+    public PaymentHistoryRestController(PaymentHistoryService paymentHistoryService,
+                                        SecurityUtil securityUtil) {
         this.paymentHistoryService = paymentHistoryService;
         this.securityUtil = securityUtil;
     }
