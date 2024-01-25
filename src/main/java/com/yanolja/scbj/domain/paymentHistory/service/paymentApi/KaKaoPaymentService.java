@@ -172,7 +172,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         params.add("quantity", FIXED_QUANTITY);
         params.add("total_amount", price);
         params.add("tax_free_amount", TAX_FREE_AMOUNT);
-        params.add("approval_url", BASE_URL + "/pay-success?paymentType=kakaoPaymentService");
+        params.add("approval_url", BASE_URL + productId + "/ready");
         params.add("cancel_url", BASE_URL + productId + "/cancel");
         params.add("fail_url", BASE_URL + "/pay-fail");
 
