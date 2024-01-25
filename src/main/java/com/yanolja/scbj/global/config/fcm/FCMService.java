@@ -52,7 +52,7 @@ public class FCMService {
         this.mailService = mailService;
     }
 
-    @Async
+    @Async("asyncExecutor")
     @Retryable(
         retryFor = FirebaseServerException.class,
         maxAttempts = RetryConfig.MAX_ATTEMPTS,
@@ -122,7 +122,6 @@ public class FCMService {
         }
     }
 
-    @Async
     public void saveToken(String email, String token) {
         fcmTokenRepository.saveToken(email, token);
     }
