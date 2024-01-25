@@ -232,7 +232,7 @@ public class ProductService {
                 int currentPrice = PricingHelper.getCurrentPrice(product);
                 double discountRate = PricingHelper.calculateDiscountRate(product, currentPrice);
 
-                return WeekendDtoMapper.toWeekendProductResponse(product, reservation, hotelUrl,
+                return WeekendMapper.toWeekendProductResponse(product, reservation, hotelUrl,
                     currentPrice, discountRate, getThemeCount(roomTheme), roomTheme);
             })
             .sorted(ascendCheckin()
@@ -277,7 +277,7 @@ public class ProductService {
                     double discountRate = PricingHelper.calculateDiscountRate(product, currentPrice);
                     String hotelUrl = getHotelUrl(product.getReservation().getHotel());
 
-                    return CityDtoMapper.toCityResponse(product, hotelUrl, reservation,
+                    return CityMapper.toCityResponse(product, hotelUrl, reservation,
                         currentPrice, discountRate, originalPrice);
                 }).sorted(Comparator.comparingDouble(CityResponse::salePercentage))
                 .limit(PRODUCT_QUANTITY)

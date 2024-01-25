@@ -6,10 +6,9 @@ import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class WeekendDtoMapper {
+public class WeekendMapper {
 
 
     public static WeekendProductResponse toWeekendProductResponse(Product product,

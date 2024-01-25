@@ -7,6 +7,7 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
+import com.yanolja.scbj.domain.product.dto.response.CityResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
@@ -21,17 +22,14 @@ import org.junit.jupiter.api.Nested;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 public class ProductMainDtoTest {
 
     @InjectMocks
-    private CityDtoMapper cityDtoMapper;
+    private CityMapper cityMapper;
 
     @InjectMocks
-    private WeekendDtoMapper weekendDtoMapper;
+    private WeekendMapper weekendMapper;
 
     @Mock
     private PricingHelper pricingHelper;
@@ -41,25 +39,6 @@ public class ProductMainDtoTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Nested
-    @DisplayName("도시별 할인률은")
-    public class Context_cityDtoConverterTest{
-
-        @Test
-        @DisplayName("값을 넣으면 그만큼의 size가 뜬다")
-        void testToCityResponse() {
-        // given
-        List<Product> products = createMockProducts();
-
-        // when
-//        List<CityResponse> cityResponses = cityDtoMapper.toCityResponse(products);
-
-        // then
-//        assertEquals(2, cityResponses.size()); // 예상하는 결과 수 확인
-        // 추가적인 결과 검증 필요
-    }
-
-    }
 
     @Nested
     @DisplayName("주말 상품은")
@@ -75,7 +54,7 @@ public class ProductMainDtoTest {
 
             // when
             WeekendProductResponse response =
-                weekendDtoMapper.toWeekendProductResponse(product, product.getReservation(),
+                weekendMapper.toWeekendProductResponse(product, product.getReservation(),
                     "image", 200000, 0.6, 2, roomTheme);
 
             // then
