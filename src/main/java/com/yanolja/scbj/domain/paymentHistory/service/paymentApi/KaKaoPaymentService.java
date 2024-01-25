@@ -184,18 +184,18 @@ public class KaKaoPaymentService implements PaymentApiService {
     @Transactional
     public PaymentSuccessResponse approvePaymentWithLock(String pgToken) {
         Long memberId = securityUtil.getCurrentMemberId();
-        String productId = (String) redisTemplate.opsForHash()
-            .get(REDIS_CACHE_KEY_PREFIX + memberId, "productId");
+        String key = REDIS_CACHE_KEY_PREFIX + memberId;
+        PaymentRedisResponse paymentInfo = getPaymentInfo(key);
 
-        RLock lock = redissonClient.getLock(REDIS_LOCK_KEY_PREFIX + productId);
-        Product targetProduct = productRepository.findById(Long.valueOf(productId)).orElseThrow();
+        RLock lock = redissonClient.getLock(REDIS_LOCK_KEY_PREFIX + paymentInfo.productId());
+
         try {
             if (!lock.tryLock(500, 5_000, TimeUnit.MICROSECONDS)) {
                 throw new RuntimeException();
             }
-            if (targetProduct.getStock() == OUT_OF_STOCK) {
-                throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-            }
+            Product targetProduct = productRepository.findById(paymentInfo.productId()).orElseThrow();
+            checkOutOfStock(targetProduct);
+
             return approvePayment(pgToken, memberId);
         } catch (InterruptedException e) {
             throw new RuntimeException();
