@@ -3,6 +3,7 @@ package com.yanolja.scbj.domain.paymentHistory.controller;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentCancelResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.PaymentApiService;
@@ -51,13 +52,12 @@ public class PaymentRestController {
 
     @GetMapping("/pay-success")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<Void> successPayment(@RequestParam("pg_token") String pgToken,
+    public ResponseDTO<PaymentSuccessResponse> successPayment(@RequestParam("pg_token") String pgToken,
         @RequestParam("paymentType") String paymentType) {
 
         PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
-        paymentApiService.approvePaymentWithLock(pgToken);
 
-        return ResponseDTO.res("결제에 성공했습니다.");
+        return ResponseDTO.res(paymentApiService.approvePaymentWithLock(pgToken), "결제에 성공했습니다.");
     }
 
     @GetMapping("/pay-cancel")
