@@ -39,7 +39,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .select(
                 product.id,
                 hotel.hotelName,
-                hotel.room.bedType,
+                hotel.room.roomName,
                 hotelRoomImage.url,
                 product.firstPrice,
                 product.secondPrice,
@@ -64,8 +64,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .fetch()
             .stream().map(tuple -> {
                 tuple.get(hotelRoomPrice.peakPrice);
-                LocalDateTime checkIn = tuple.get(reservation.startDate);
-                LocalDateTime checkOut = tuple.get(reservation.endDate);
                 Integer originalPrice = checkPeak(tuple.get(hotelRoomPrice.peakPrice), tuple.get(hotelRoomPrice.offPeakPrice));
                 Integer salePrice = getSalePrice(tuple.get(reservation.startDate),
                     tuple.get(product.secondGrantPeriod), tuple.get(product.firstPrice),
@@ -73,14 +71,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 return new ProductSearchResponse(
                     tuple.get(product.id),
                     tuple.get(hotel.hotelName),
-                    tuple.get(hotel.room.bedType),
+                    tuple.get(hotel.room.roomName),
                     tuple.get(hotelRoomImage.url),
                     originalPrice,
                     isFirstPrice(salePrice, tuple.get(product.firstPrice)),
                     salePrice,
                     getSaleRate(originalPrice, salePrice),
-                    checkIn.toLocalDate(),
-                    checkOut.toLocalDate(),
+                    tuple.get(reservation.startDate).toLocalDate(),
+                    tuple.get(reservation.endDate).toLocalDate(),
                     tuple.get(product.createdAt)
                 );
             })
