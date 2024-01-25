@@ -15,6 +15,9 @@ public class PricingHelper {
     }
 
     public static int getCurrentPrice(Product product) {
+        if (product.getSecondPrice() == 0) {
+            return product.getFirstPrice();
+        }
         return TimeValidator.isOverSecondGrantPeriod(product,
             product.getReservation().getStartDate()) ? product.getSecondPrice() :
             product.getFirstPrice();
