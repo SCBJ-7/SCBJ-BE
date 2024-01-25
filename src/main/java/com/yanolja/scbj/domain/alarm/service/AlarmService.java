@@ -71,7 +71,6 @@ public class AlarmService {
      */
 
     @Transactional
-    @Async("asyncExecutor")
     public void createAlarm(long memberId, long paymentHistoryId, Data data) {
         Member memberToAlarm = memberService.getMember(memberId);
 
