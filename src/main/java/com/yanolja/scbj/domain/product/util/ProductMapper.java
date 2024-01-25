@@ -4,6 +4,7 @@ import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.member.entity.Member;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.redis.PaymentRedisResponse;
 import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;

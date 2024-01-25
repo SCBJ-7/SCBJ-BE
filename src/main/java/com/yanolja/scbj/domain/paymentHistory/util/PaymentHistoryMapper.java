@@ -2,13 +2,19 @@ package com.yanolja.scbj.domain.paymentHistory.util;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
+import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.redis.PaymentRedisResponse;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import com.yanolja.scbj.domain.product.entity.Product;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PaymentHistoryMapper {
+
+    private static final String PAYMENT_TYPE = "카카오페이";
 
     public static SpecificPurchasedHistoryResponse toSpecificPurchasedHistoryResponse(
         PaymentHistory paymentHistory, Hotel hotel, Room room, String checkIn, String checkOut,
@@ -30,5 +36,22 @@ public final class PaymentHistoryMapper {
             .hotelImage(imageUrl)
             .build();
     }
+
+    public static PaymentHistory toPaymentHistory(Member buyer, PaymentAgreement paymentAgreement,
+        PaymentRedisResponse paymentInfo, Product product) {
+
+        return PaymentHistory.builder()
+            .member(buyer)
+            .productName(paymentInfo.productName())
+            .product(product)
+            .customerName(paymentInfo.customerName())
+            .customerEmail(paymentInfo.customerEmail())
+            .customerPhoneNumber(paymentInfo.customerPhoneNumber())
+            .paymentAgreement(paymentAgreement)
+            .price(paymentInfo.price())
+            .paymentType(PAYMENT_TYPE)
+            .build();
+    }
+
 
 }
