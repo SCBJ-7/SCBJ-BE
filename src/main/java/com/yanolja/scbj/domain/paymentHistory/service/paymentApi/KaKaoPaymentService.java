@@ -136,7 +136,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         params.add("approval_url",
             BASE_URL + productId +"/ready?member_id=" + memberId);
         params.add("cancel_url",
-            BASE_URL + productId + "?member_id=" + memberId);
+            BASE_URL + productId + "?member_id=" + memberId +"/cancel");
         params.add("fail_url", BASE_URL + "/pay-fail");
 
         HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
