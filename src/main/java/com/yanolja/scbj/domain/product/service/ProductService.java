@@ -237,7 +237,7 @@ public class ProductService {
             })
             .sorted(ascendCheckin()
                 .thenComparing(descendSalePercentage())
-                .thenComparing(descendRoomThemeCount()))
+                .thenComparing(descendRoomThemeCount()).reversed())
             .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
@@ -279,7 +279,7 @@ public class ProductService {
 
                     return CityMapper.toCityResponse(product, hotelUrl, reservation,
                         currentPrice, discountRate, originalPrice);
-                }).sorted(Comparator.comparingDouble(CityResponse::salePercentage))
+                }).sorted(Comparator.comparingDouble(CityResponse::salePercentage).reversed())
                 .limit(PRODUCT_QUANTITY)
                 .collect(Collectors.toList());
 

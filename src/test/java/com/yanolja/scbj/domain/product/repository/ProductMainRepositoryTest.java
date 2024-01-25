@@ -134,11 +134,11 @@ public class ProductMainRepositoryTest {
             List<Product> products = productRepository.findProductByCity(city);
 
             // then
+
             assertFalse(products.isEmpty());
             assertEquals(products.size(), 5);
             products.forEach(product -> {
-                assertTrue(
-                    product.getReservation().getHotel().getHotelMainAddress().contains(city));
+                assertTrue(product.getReservation().getHotel().getHotelMainAddress().contains(city));
             });
         }
     }
