@@ -16,7 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
        SELECT new com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse(
            ph.id,
            h.hotelName,
-           hImg.url, 
+           hImg.url,
            h.room.bedType, 
            p.firstPrice,
            p.secondPrice, 
@@ -36,12 +36,12 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
            END)
        ) 
        FROM Product p 
-       LEFT JOIN p.reservation r 
+       LEFT JOIN p.reservation r
        JOIN r.hotel h 
        LEFT JOIN HotelRoomImage hImg ON hImg.hotel.id = h.id
        LEFT JOIN p.paymentHistory ph 
-       WHERE p.member.id = :memberId
-       GROUP BY p.id 
+       WHERE ph.member.id = :memberId
+       GROUP BY ph.id 
        """)
     List<SaleHistoryResponse> findSaleHistoriesByMemberId(@Param("memberId") Long memberId);
 
