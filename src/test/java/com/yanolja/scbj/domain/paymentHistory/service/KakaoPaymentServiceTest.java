@@ -17,8 +17,9 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentReadyResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayReadyResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.redis.PaymentRedisResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.ProductNotForSaleException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
@@ -44,6 +45,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -74,7 +76,7 @@ public class KakaoPaymentServiceTest {
     private RestTemplate restTemplate;
 
     @Mock
-    private HashOperations hashOperations;
+    private ValueOperations valueOperations;
 
     @Mock
     private SecurityUtil securityUtil;
@@ -92,11 +94,20 @@ public class KakaoPaymentServiceTest {
             .email("yang980329@naver.com").password("yang8126042").name("양유림")
             .phone("010-3996-6042").build();
 
-        HashOperations hashOperations = mock(HashOperations.class);
         ResponseEntity responseEntity = new ResponseEntity<>(HttpStatus.OK);
 
-        given(redisTemplate.opsForHash()).willReturn(hashOperations);
-        given(redisTemplate.opsForHash().get(any(), any())).willReturn("1");
+        PaymentRedisResponse paymentInfo = PaymentRedisResponse.builder()
+            .productId(1L)
+            .price(10000)
+            .cancelAndRefund(true)
+            .isAgeOver14(true)
+            .useAgree(true)
+            .productName("Asdasdasd")
+            .tid("Asgfasdafsfas")
+            .build();
+
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
+        given(redisTemplate.opsForValue().get(any())).willReturn(paymentInfo);
         given(restTemplate.postForEntity(any(), any(), any())).willReturn(
             responseEntity);
 
@@ -179,7 +190,7 @@ public class KakaoPaymentServiceTest {
                 .customerPhoneNumber("010-3996-6042")
                 .build();
 
-            PaymentReadyResponse paymentReadyResponse = PaymentReadyResponse.builder()
+            KakaoPayReadyResponse paymentReadyResponse = KakaoPayReadyResponse.builder()
                 .tid(tid)
                 .redirectPcUrl(
                     "http://3.34.147.187.nip.io/v1/products/1/payments?paymentType=kakaoPaymentService")
@@ -191,7 +202,7 @@ public class KakaoPaymentServiceTest {
             given(productRepository.findById(any(Long.TYPE))).willReturn(
                 Optional.ofNullable(product));
             given(restTemplate.postForEntity(any(), any(), any())).willReturn(responseEntity);
-            given(redisTemplate.opsForHash()).willReturn(hashOperations);
+            given(redisTemplate.opsForValue()).willReturn(valueOperations);
 
             // when
             PreparePaymentResponse result = kaKaoPaymentService.preparePayment(productId,
@@ -231,11 +242,20 @@ public class KakaoPaymentServiceTest {
         @DisplayName("approvePayment로 승인 요청을 한다.")
         void approvePayment_willSuccess() throws Exception {
             // given
-            HashOperations hashOperations = mock(HashOperations.class);
             ResponseEntity responseEntity = new ResponseEntity<>(HttpStatus.OK);
 
-            given(redisTemplate.opsForHash()).willReturn(hashOperations);
-            given(redisTemplate.opsForHash().get(any(), any())).willReturn("1");
+            PaymentRedisResponse paymentInfo = PaymentRedisResponse.builder()
+                .productId(1L)
+                .price(10000)
+                .isAgeOver14(true)
+                .tid("12234")
+                .productName("양양")
+                .useAgree(true)
+                .cancelAndRefund(true)
+                .build();
+
+            given(redisTemplate.opsForValue()).willReturn(valueOperations);
+            given(redisTemplate.opsForValue().get(any())).willReturn(paymentInfo);
             given(productRepository.findById(anyLong())).willReturn(Optional.of(product));
             given(restTemplate.postForEntity(any(), any(), any())).willReturn(
                 responseEntity);
