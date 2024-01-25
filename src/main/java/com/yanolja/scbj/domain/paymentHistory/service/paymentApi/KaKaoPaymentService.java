@@ -6,16 +6,21 @@ import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentApproveResponse;
-import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentReadyResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.request.redis.PaymentRedisRequest;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayApproveResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayReadyResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.redis.PaymentRedisResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.KakaoPayException;
 import com.yanolja.scbj.domain.paymentHistory.exception.ProductNotForSaleException;
 import com.yanolja.scbj.domain.paymentHistory.exception.ProductOutOfStockException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
+import com.yanolja.scbj.domain.paymentHistory.util.PaymentAgreementMapper;
+import com.yanolja.scbj.domain.paymentHistory.util.PaymentHistoryMapper;
+import com.yanolja.scbj.domain.paymentHistory.util.PaymentRedisMapper;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
@@ -26,22 +31,16 @@ import com.yanolja.scbj.global.exception.ErrorCode;
 import com.yanolja.scbj.global.exception.InternalServerException;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import com.yanolja.scbj.global.util.TimeValidator;
-import io.lettuce.core.RedisClient;
 import jakarta.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -67,33 +66,30 @@ public class KaKaoPaymentService implements PaymentApiService {
 
     private final String REDIS_CACHE_KEY_PREFIX = "kakaoPay:";
     private final String REDIS_LOCK_KEY_PREFIX = "redis:lock:productId:";
-    private final String PAYMENT_TYPE = "카카오페이";
-
-//  private final String BASE_URL = "http:/localhost:8080/v1/products";
-    @Value("${server.url}")
-    private String BASE_URL;
+    private final int FIXED_QUANTITY = 1;
+    private final int TAX_FREE_AMOUNT = 0;
+    private final int REDIS_CACHE_TIME_OUT = 16;
     private final String KAKAO_BASE_URL = "https://kapi.kakao.com/v1/payment";
-
     private final int OUT_OF_STOCK = 0;
-
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final AlarmService alarmService;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final RestTemplate restTemplate;
     private final RedissonClient redissonClient;
     private final SecurityUtil securityUtil;
-
+    @Value("${server.url}")
+    private String BASE_URL;
     private HttpHeaders headers;
 
     @Value("${kakao-api.api-key}")
-    private String key;
+    private String kakaoPayKey;
 
     @PostConstruct
     protected void init() {
         headers = new HttpHeaders();
-        headers.add("Authorization", "KakaoAK " + key);
+        headers.add("Authorization", "KakaoAK " + kakaoPayKey);
         headers.add("Accept", MediaType.APPLICATION_JSON_UTF8_VALUE);
         headers.add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE + ";charset=UTF-8");
     }
@@ -105,71 +101,83 @@ public class KaKaoPaymentService implements PaymentApiService {
         maxAttempts = RetryConfig.MAX_ATTEMPTS,
         backoff = @Backoff(delay = RetryConfig.MAX_DELAY)
     )
-    public PreparePaymentResponse preparePayment(Long productId, PaymentReadyRequest paymentReadyRequest) {
-        Long memberId = securityUtil.getCurrentMemberId();
+    public PreparePaymentResponse preparePayment(Long productId,
+        PaymentReadyRequest paymentReadyRequest) {
+
+        Long currentMemberId = securityUtil.getCurrentMemberId();
+
         Product targetProduct = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
                 ErrorCode.PRODUCT_NOT_FOUND));
 
-        if (targetProduct.getMember().getId().equals(memberId)) {
-            throw new ProductNotForSaleException(ErrorCode.PRODUCT_NOT_FOR_SALE);
-        }
+        checkProductNotForSale(targetProduct, currentMemberId);
 
         Hotel targetHotel = targetProduct.getReservation().getHotel();
-        Reservation targetReservation = targetProduct.getReservation();
 
-        int price = targetProduct.getFirstPrice();
-        if (TimeValidator.isOverSecondGrantPeriod(targetProduct,
-            targetReservation.getStartDate())) {
-            price = targetProduct.getSecondPrice();
-        }
+        int price = getPrice(targetProduct, targetProduct.getReservation());
 
-        String productName = targetHotel.getHotelName() + " " + targetHotel.getRoom().getRoomName();
+        String productName = createProductName(targetHotel);
 
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("cid", "TC0ONETIME");
-        params.add("partner_order_id", String.valueOf(productId));
-        params.add("partner_user_id", String.valueOf(memberId));
-        params.add("item_name", productName);
-        params.add("quantity", 1);
-        params.add("total_amount", price);
-        params.add("tax_free_amount", 0);
-        params.add("approval_url",
-            BASE_URL + productId +"/ready?member_id=" + memberId);
-        params.add("cancel_url",
-            BASE_URL + productId +"/cancel");
-        params.add("fail_url", BASE_URL + "/pay-fail");
-
-        HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
+        HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(
+            createPrepareParams(productId, currentMemberId, productName, price), headers);
         try {
-            ResponseEntity<PaymentReadyResponse> response = restTemplate.postForEntity(
-                new URI(KAKAO_BASE_URL + "/ready"), body, PaymentReadyResponse.class);
+            ResponseEntity<KakaoPayReadyResponse> response = restTemplate.postForEntity(
+                new URI(KAKAO_BASE_URL + "/ready"), body, KakaoPayReadyResponse.class);
 
             checkStatus(response.getStatusCode(), ErrorCode.KAKAO_PAY_READY_FAIL);
-            PaymentReadyResponse paymentReadyResponse = response.getBody();
+            KakaoPayReadyResponse kakaoPayReadyResponse = response.getBody();
 
-            Map<String, String> redisMap = new HashMap<>();
-            redisMap.put("productId", String.valueOf(productId));
-            redisMap.put("tid", paymentReadyResponse.tid());
-            redisMap.put("price", String.valueOf(price));
-            redisMap.put("customerName", paymentReadyRequest.customerName());
-            redisMap.put("customerEmail", paymentReadyRequest.customerEmail());
-            redisMap.put("customerPhoneNumber", paymentReadyRequest.customerPhoneNumber());
-            redisMap.put("isAgeOver14", String.valueOf(paymentReadyRequest.isAgeOver14()));
-            redisMap.put("useAgree", String.valueOf(paymentReadyRequest.isAgeOver14()));
-            redisMap.put("cancelAndRefund", String.valueOf(paymentReadyRequest.isAgeOver14()));
-            redisMap.put("collectPersonalInfo", String.valueOf(paymentReadyRequest.isAgeOver14()));
-            redisMap.put("thirdPartySharing", String.valueOf(paymentReadyRequest.isAgeOver14()));
-            redisMap.put("productName", productName);
+            PaymentRedisRequest paymentInfo = PaymentRedisMapper.toRedisRequest(productId,
+                kakaoPayReadyResponse, price, paymentReadyRequest, productName);
 
-            HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
-            String key = REDIS_CACHE_KEY_PREFIX + memberId;
-            hashOperations.putAll(key, redisMap);
+            String key = REDIS_CACHE_KEY_PREFIX + currentMemberId;
+            redisTemplate.opsForValue()
+                .set(key, paymentInfo, Duration.ofMinutes(REDIS_CACHE_TIME_OUT));
 
-            return PreparePaymentResponse.builder().url(paymentReadyResponse.redirectPcUrl()).build();
-        } catch (URISyntaxException e) {
+            return PreparePaymentResponse.builder()
+                .url(kakaoPayReadyResponse.redirectPcUrl())
+                .build();
+        } catch (URISyntaxException | NullPointerException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_READY_FAIL);
         }
+    }
+
+    private void checkProductNotForSale(Product product, long memberId) {
+        if (product.getMember().getId().equals(memberId)) {
+            throw new ProductNotForSaleException(ErrorCode.PRODUCT_NOT_FOR_SALE);
+        }
+    }
+
+    private int getPrice(Product product, Reservation reservation) {
+        int price = product.getFirstPrice();
+        if (TimeValidator.isOverSecondGrantPeriod(product,
+            reservation.getStartDate())) {
+            price = product.getSecondPrice();
+        }
+        return price;
+    }
+
+    private String createProductName(Hotel hotel) {
+        return hotel.getHotelName() + " " + hotel.getRoom().getRoomName();
+    }
+
+    private MultiValueMap<String, Object> createPrepareParams(Long productId, Long memberId,
+        String productName, int price) {
+
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+
+        params.add("cid", "TC0ONETIME");
+        params.add("partner_order_id", productId);
+        params.add("partner_user_id", memberId);
+        params.add("item_name", productName);
+        params.add("quantity", FIXED_QUANTITY);
+        params.add("total_amount", price);
+        params.add("tax_free_amount", TAX_FREE_AMOUNT);
+        params.add("approval_url", BASE_URL + productId + "/ready?member_id=" + memberId);
+        params.add("cancel_url", BASE_URL + productId + "/cancel");
+        params.add("fail_url", BASE_URL + "/pay-fail");
+
+        return params;
     }
 
     @Override
@@ -207,77 +215,62 @@ public class KaKaoPaymentService implements PaymentApiService {
     public PaymentSuccessResponse approvePayment(String pgToken, Long memberId) {
 
         String key = REDIS_CACHE_KEY_PREFIX + memberId;
-        String productId = (String) redisTemplate.opsForHash().get(key, "productId");
-        String customerName = (String) redisTemplate.opsForHash().get(key, "customerName");
-        String customerEmail = (String) redisTemplate.opsForHash().get(key, "customerEmail");
-        String customerPhoneNumber = (String) redisTemplate.opsForHash()
-            .get(key, "customerPhoneNumber");
-        String price = (String) redisTemplate.opsForHash().get(key, "price");
-        String tid = (String) redisTemplate.opsForHash().get(key, "tid");
-        String productName = (String) redisTemplate.opsForHash().get(key, "productName");
-        boolean isAgeOver14 = Boolean.valueOf((String) redisTemplate.opsForHash().get(key, "isAgeOver14"));
-        boolean useAgree = Boolean.valueOf((String)redisTemplate.opsForHash().get(key, "useAgree"));
-        boolean cancelAndRefund = Boolean.valueOf((String)redisTemplate.opsForHash().get(key, "cancelAndRefund"));
-        boolean collectPersonalInfo = Boolean.valueOf((String)redisTemplate.opsForHash().get(key, "collectPersonalInfo"));
-        boolean thirdPartySharing =  Boolean.valueOf((String)redisTemplate.opsForHash().get(key, "thirdPartySharing"));
 
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("cid", "TC0ONETIME");
-        params.add("tid", tid);
-        params.add("partner_order_id", productId);
-        params.add("partner_user_id", String.valueOf(memberId));
-        params.add("pg_token", pgToken);
+        PaymentRedisResponse paymentInfo = getPaymentInfo(key);
 
-        HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
+        HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(
+            createApproveParams(paymentInfo, memberId, pgToken), headers);
 
-        Product product = productRepository.findById(Long.valueOf(productId))
+        Product targetProduct = productRepository.findById(paymentInfo.productId())
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        if (product.getStock() == OUT_OF_STOCK) {
-            throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-        }
+        checkOutOfStock(targetProduct);
 
         try {
-            ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
+            ResponseEntity<KakaoPayApproveResponse> response = restTemplate.postForEntity(
                 new URI(KAKAO_BASE_URL + "/approve"), body,
-                PaymentApproveResponse.class);
+                KakaoPayApproveResponse.class);
 
             checkStatus(response.getStatusCode(), ErrorCode.KAKAO_PAY_INFO_FAIL);
 
-            Member member = memberRepository.findById(memberId)
+            Member buyer = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-            PaymentAgreement agreement = PaymentAgreement.builder()
-                .isAgeOver14(isAgeOver14)
-                .useAgree(useAgree)
-                .cancelAndRefund(cancelAndRefund)
-                .collectPersonalInfo(collectPersonalInfo)
-                .thirdPartySharing(thirdPartySharing)
-                .build();
+            PaymentAgreement agreement = PaymentAgreementMapper.toPaymentAgreement(paymentInfo);
 
-            PaymentHistory paymentHistory = PaymentHistory.builder()
-                .member(member)
-                .productName(productName)
-                .product(product)
-                .customerName(customerName)
-                .customerEmail(customerEmail)
-                .customerPhoneNumber(customerPhoneNumber)
-                .paymentAgreement(agreement)
-                .price(Integer.parseInt(price))
-                .paymentType(PAYMENT_TYPE)
-                .build();
+            PaymentHistory paymentHistory = PaymentHistoryMapper.toPaymentHistory(buyer,
+                agreement, paymentInfo, targetProduct);
 
-            product.sell();
+            targetProduct.sell();
             PaymentHistory savedPaymentHistory = paymentHistoryRepository.save(paymentHistory);
 
-            alarmService.createAlarm(product.getMember().getId(), savedPaymentHistory.getId(),
-                new Data("판매완료", productName + "의 판매가 완료되었어요!", LocalDateTime.now()));
+            alarmService.createAlarm(targetProduct.getMember().getId(), savedPaymentHistory.getId(),
+                new Data("판매완료", paymentInfo.productName() + "의 판매가 완료되었어요!", LocalDateTime.now()));
 
             return PaymentSuccessResponse.builder()
                 .paymentHistoryId(savedPaymentHistory.getId())
                 .build();
         } catch (RestClientException | URISyntaxException e) {
             throw new KakaoPayException(ErrorCode.KAKAO_PAY_INFO_FAIL);
+        }
+    }
+
+    private MultiValueMap<String, Object> createApproveParams(PaymentRedisResponse paymentInfo,
+        long memberId, String pgToken) {
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+
+        params.add("cid", "TC0ONETIME");
+        params.add("tid", paymentInfo.tid());
+        params.add("partner_order_id", paymentInfo.productId());
+        params.add("partner_user_id", memberId);
+        params.add("pg_token", pgToken);
+
+        return params;
+    }
+
+    private void checkOutOfStock(Product product) {
+        if (product.getStock() == OUT_OF_STOCK) {
+            throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
     }
 
@@ -291,20 +284,15 @@ public class KaKaoPaymentService implements PaymentApiService {
         Long memberId = securityUtil.getCurrentMemberId();
 
         String key = REDIS_CACHE_KEY_PREFIX + memberId;
-        String tid = (String) redisTemplate.opsForHash().get(key, "tid");
-        String price = (String) redisTemplate.opsForHash().get(key, "price");
 
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("cid", "TC0ONETIME");
-        params.add("tid", tid);
-        params.add("cancel_amount", Integer.parseInt(price));
-        params.add("cancel_tax_free_amount", 0);
+        PaymentRedisResponse paymentInfo = getPaymentInfo(key);
 
-        HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(params, headers);
+        HttpEntity<MultiValueMap<String, Object>> body = new HttpEntity<>(
+            createCancelParams(paymentInfo), headers);
 
         try {
-            ResponseEntity<PaymentApproveResponse> response = restTemplate.postForEntity(
-                new URI(KAKAO_BASE_URL + "/cancel"), body, PaymentApproveResponse.class);
+            ResponseEntity<KakaoPayApproveResponse> response = restTemplate.postForEntity(
+                new URI(KAKAO_BASE_URL + "/cancel"), body, KakaoPayApproveResponse.class);
 
             checkStatus(response.getStatusCode(), ErrorCode.KAKAO_PAY_CANCEL_FAIL);
 
@@ -314,7 +302,7 @@ public class KaKaoPaymentService implements PaymentApiService {
         }
     }
 
-    private void checkStatus(HttpStatusCode statusCode, ErrorCode errorCode){
+    private void checkStatus(HttpStatusCode statusCode, ErrorCode errorCode) {
         if (statusCode.equals(HttpStatus.BAD_REQUEST) || statusCode.equals(
             HttpStatus.UNAUTHORIZED) || statusCode.equals(HttpStatus.FORBIDDEN)
             || statusCode.equals(HttpStatus.NOT_FOUND)) {
@@ -329,9 +317,22 @@ public class KaKaoPaymentService implements PaymentApiService {
         }
     }
 
+    private MultiValueMap<String, Object> createCancelParams(PaymentRedisResponse paymentInfo) {
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("cid", "TC0ONETIME");
+        params.add("tid", paymentInfo.tid());
+        params.add("cancel_amount", paymentInfo.price());
+        params.add("cancel_tax_free_amount", TAX_FREE_AMOUNT);
+
+        return params;
+    }
+
+    private PaymentRedisResponse getPaymentInfo(String key) {
+        return (PaymentRedisResponse) redisTemplate.opsForValue().get(key);
+    }
+
     @Recover
     private void sendExceptionForPayFailure(KakaoPayException e) {
         throw new KakaoPayException(e.getErrorCode());
     }
-
 }

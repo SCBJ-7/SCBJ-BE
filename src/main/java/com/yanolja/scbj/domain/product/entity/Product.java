@@ -100,7 +100,9 @@ public class Product extends BaseEntity {
     }
 
     public void sell(){
-        this.stock--;
+        if (this.stock == 1) {
+            this.stock--;
+        }
     }
 
 }
