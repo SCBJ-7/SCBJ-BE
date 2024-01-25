@@ -53,8 +53,6 @@ class PaymentHistoryServiceTest {
     @Mock
     private ProductRepository productRepository;
 
-    @Mock
-    private PaymentHistoryDtoConverter paymentHistoryDtoConverter;
 
     @Mock
     private SaleHistoryDtoConverter saleHistoryDtoConverter;
@@ -84,11 +82,12 @@ class PaymentHistoryServiceTest {
                 LocalDateTime.now().plusDays(5) // checkOutDate
             );
 
-            given(paymentHistoryRepository.findPurchasedHistoriesByMemberId(memberId)).willReturn(List.of(response));
+            given(paymentHistoryRepository.findPurchasedHistoriesByMemberId(memberId)).willReturn(
+                List.of(response));
 
             // when
             List<PurchasedHistoryResponse> result =
-                paymentHistoryService.getUsersPurchasedHistory( memberId);
+                paymentHistoryService.getUsersPurchasedHistory(memberId);
 
             //then
             assertThat(result).containsExactly(response);
@@ -118,10 +117,9 @@ class PaymentHistoryServiceTest {
                 "더블 베드",
                 200000,
                 100000,
-                LocalDateTime.of(2024, 1, 1,15,0),
-                LocalDateTime.of(2024, 1, 2,11,0),
+                LocalDateTime.of(2024, 1, 1, 15, 0),
+                LocalDateTime.of(2024, 1, 2, 11, 0),
                 "판매중");
-
 
             given(productRepository.findSaleHistoriesByMemberId(memberId)).willReturn(
                 List.of(response));
@@ -162,27 +160,27 @@ class PaymentHistoryServiceTest {
                 .roomTheme(roomTheme)
                 .build();
 
-            Hotel hotel = Hotel.builder()
-                .id(1L)
-                .room(room)
-                .build();
-
             HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
-                .hotel(hotel)
                 .peakPrice(50000000)
                 .offPeakPrice(40000000)
                 .build();
 
             HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
-                .hotel(hotel)
                 .url("image1")
+                .build();
+
+            Hotel hotel = Hotel.builder()
+                .id(1L)
+                .room(room)
+                .hotelRoomPrice(hotelRoomPrice)
+                .hotelRoomImageList(List.of(hotelRoomImage))
                 .build();
 
             Reservation reservation = Reservation.builder()
                 .hotel(hotel)
                 .purchasePrice(50000000)
-                .startDate(LocalDateTime.of(2024, 1, 15,15,0))
-                .endDate(LocalDateTime.of(2024, 1, 16,11,0))
+                .startDate(LocalDateTime.of(2024, 1, 15, 15, 0))
+                .endDate(LocalDateTime.of(2024, 1, 16, 11, 0))
                 .build();
 
             Product product = Product.builder()
@@ -207,30 +205,10 @@ class PaymentHistoryServiceTest {
                 .settlement(false)
                 .build();
 
-            SpecificPurchasedHistoryResponse specificPurchasedHistoryResponse = SpecificPurchasedHistoryResponse.builder()
-                .hotelName(hotel.getHotelName())
-                .roomName(room.getRoomName())
-                .standardPeople(room.getStandardPeople())
-                .maxPeople(room.getMaxPeople())
-                .checkIn("24.01.15 (월) 15:00")
-                .checkOut("24.01.16 (화) 11:00")
-                .customerName(paymentHistory.getCustomerName())
-                .customerPhoneNumber(paymentHistory.getCustomerPhoneNumber())
-                .paymentHistoryId(paymentHistory.getId())
-                .paymentType(paymentHistory.getPaymentType())
-                .originalPrice(50000000)
-                .price(paymentHistory.getPrice())
-                .remainingDays(4)
-                .paymentHistoryDate(
-                    LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd (E) ")))
-                .hotelImage(hotelRoomImage.getUrl())
-                .build();
+            paymentHistoryRepository.save(paymentHistory);
 
             given(paymentHistoryRepository.findByIdAndMemberId(any(Long.TYPE),
                 any(Long.TYPE))).willReturn(Optional.ofNullable(paymentHistory));
-            given(
-                paymentHistoryDtoConverter.toSpecificPurchasedHistoryResponse((any()))).willReturn(
-                specificPurchasedHistoryResponse);
 
             // when
             SpecificPurchasedHistoryResponse result = paymentHistoryService.getSpecificPurchasedHistory(
@@ -253,7 +231,6 @@ class PaymentHistoryServiceTest {
             // given
             Long memberId = 1L;
             Long saleHistoryId = 1L;
-
 
             Member member = Member.builder()
                 .id(1L)
@@ -309,7 +286,8 @@ class PaymentHistoryServiceTest {
                 .bank("신한은행")
                 .accountNumber("123-456-7890")
                 .firstPrice(new SpecificSaleHistoryResponse.firstPriceResponse(200000, 180000))
-                .secondPrice(new SpecificSaleHistoryResponse.secondPriceResponse("2024-01-15 09:00", 180000))
+                .secondPrice(
+                    new SpecificSaleHistoryResponse.secondPriceResponse("2024-01-15 09:00", 180000))
                 .build();
 
             given(paymentHistoryRepository.findByIdAndMemberId(saleHistoryId, memberId))
@@ -318,7 +296,8 @@ class PaymentHistoryServiceTest {
                 .willReturn(specificSaleHistoryResponse);
 
             // when
-            SpecificSaleHistoryResponse result = paymentHistoryService.getSpecificSaleHistory(memberId, saleHistoryId);
+            SpecificSaleHistoryResponse result = paymentHistoryService.getSpecificSaleHistory(
+                memberId, saleHistoryId);
 
             // then
             assertThat(result).isNotNull();
