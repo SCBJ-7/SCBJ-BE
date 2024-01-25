@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.paymentHistory.repository;
 
+import com.yanolja.scbj.domain.alarm.dto.CheckInAlarmResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import java.util.List;
@@ -35,4 +36,8 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     """
     )
     List<PaymentHistory> findPaymentHistoriesWithNotSettlement();
+
+
+    @Query(name ="find_check_in_alarm",nativeQuery = true)
+    List<CheckInAlarmResponse> findPurchasedHistoriesNeedForCheckInAlarm();
 }

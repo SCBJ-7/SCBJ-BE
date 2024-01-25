@@ -52,3 +52,6 @@ server:
 
 schedule:
   cron : ${SCHEDULE-CRON}
+
+check-in:
+  expiration: 60000
