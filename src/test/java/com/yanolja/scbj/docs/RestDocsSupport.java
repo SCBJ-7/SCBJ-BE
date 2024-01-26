@@ -6,6 +6,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yanolja.scbj.global.config.AbstractContainersSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +27,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @ExtendWith({RestDocumentationExtension.class})
 @Import(RestDocsConfig.class)
 @SpringBootTest
-public abstract class RestDocsSupport {
+public abstract class RestDocsSupport extends AbstractContainersSupport {
 
     @Autowired
     protected ObjectMapper objectMapper;
