@@ -111,7 +111,7 @@ public class PaymentHistoryService {
         if (isPaymentId) {
 
             PaymentHistory paymentHistory =
-                paymentHistoryRepository.findSaleHistoryInformationById(saleHistoryId, memberId).orElseThrow(
+                paymentHistoryRepository.findSaleHistoryInformationById(memberId,saleHistoryId).orElseThrow(
                     () -> new SaleHistoryNotFoundException(ErrorCode.SALE_DETAIL_LOAD_FAIL));
 
             return saleHistoryDtoConverter.toSpecificSaleHistoryResponse(paymentHistory.getProduct(),isPaymentId);
