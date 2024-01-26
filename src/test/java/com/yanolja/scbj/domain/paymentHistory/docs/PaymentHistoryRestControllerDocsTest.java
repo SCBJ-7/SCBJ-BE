@@ -12,9 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.yanolja.scbj.docs.RestDocsSupport;
 import com.yanolja.scbj.domain.alarm.service.AlarmService;
 import com.yanolja.scbj.domain.paymentHistory.controller.PaymentHistoryRestController;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
+import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.global.util.SecurityUtil;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,6 +25,9 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
 public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
+
+    @MockBean
+    private PaymentService paymentService;
 
     @MockBean
     PaymentHistoryService paymentHistoryService;
@@ -101,5 +107,41 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
                         .description("이미지")
                 )
             ));
+    }
+
+    @Test
+    @DisplayName("결제 페이지 조회 API 문서화")
+    void findPaymentPage() throws Exception {
+        // given
+        PaymentPageFindResponse findResponse = PaymentPageFindResponse.builder()
+            .hotelName("양도 호텔")
+            .hotelImage("https://yaimg.yanolja.com/v5/2023/03/23/15/1280/641c76db5ab761.18136153.jpg")
+            .roomName("호텔 인 나인 강남")
+            .standardPeople(2)
+            .maxPeople(4)
+            .checkInDateTime(LocalDateTime.now())
+            .checkOutDateTime(LocalDateTime.now().plusDays(1))
+            .originalPrice(200000)
+            .salePrice(150000)
+            .build();
+
+        given(paymentService.getPaymentPage(1L)).willReturn(findResponse);
+
+        // when
+        mockMvc.perform(get("/v1/products/{product_id}/payments", 1L))
+            .andDo(restDoc.document(
+                pathParameters(parameterWithName("product_id").description("상품 식별자")),
+                responseFields(responseCommon()).and(
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                    fieldWithPath("data.hotelImage").type(JsonFieldType.STRING).description("호텔 이미지"),
+                    fieldWithPath("data.hotelName").type(JsonFieldType.STRING).description("호텔 이름"),
+                    fieldWithPath("data.roomName").type(JsonFieldType.STRING).description("객실 이름"),
+                    fieldWithPath("data.standardPeople").type(JsonFieldType.NUMBER).description("기준 인원"),
+                    fieldWithPath("data.maxPeople").type(JsonFieldType.NUMBER).description("최대 인원"),
+                    fieldWithPath("data.checkInDateTime").type(JsonFieldType.STRING).description("체크 인"),
+                    fieldWithPath("data.checkOutDateTime").type(JsonFieldType.STRING).description("체크 아웃"),
+                    fieldWithPath("data.originalPrice").type(JsonFieldType.NUMBER).description("원가"),
+                    fieldWithPath("data.salePrice").type(JsonFieldType.NUMBER).description("판매가")
+                )));
     }
 }
