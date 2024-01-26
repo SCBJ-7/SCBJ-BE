@@ -116,7 +116,8 @@ public class PaymentHistoryService {
             return saleHistoryDtoConverter.toSpecificSaleHistoryResponse(responseByPayment.getProduct(),isPaymentId);
         }
 
-        Product responseFromProduct = productRepository.findByIdAndMemberId(saleHistoryId, memberId);
+        Product responseFromProduct = productRepository.findByIdAndMemberId(saleHistoryId, memberId)
+            .orElseThrow(() -> new SaleHistoryNotFoundException(ErrorCode.SALE_DETAIL_LOAD_FAIL));
 
         return saleHistoryDtoConverter.toSpecificSaleHistoryResponse(responseFromProduct,isPaymentId);
     }

@@ -84,5 +84,5 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     Optional<Product> findByReservationId(@Param("reservationId") Long reservationId);
 
 
-    Product findByIdAndMemberId(Long productId, Long memberId);
+    Optional<Product> findByIdAndMemberId(Long productId, Long memberId);
 }
