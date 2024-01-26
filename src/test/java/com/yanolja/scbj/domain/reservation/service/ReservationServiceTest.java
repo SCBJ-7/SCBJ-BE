@@ -96,8 +96,8 @@ class ReservationServiceTest {
                 .hotel(hotel)
                 .yanoljaMember(yanoljaMember)
                 .purchasePrice(5000000)
-                .startDate(LocalDateTime.of(2024, 1, 26, 16, 0))
-                .endDate(LocalDateTime.of(2024, 1, 28, 11, 0))
+                .startDate(LocalDateTime.of(2024, 2, 26, 16, 0))
+                .endDate(LocalDateTime.of(2024, 2, 28, 11, 0))
                 .build();
 
             Reservation reservation2 = Reservation.builder()
@@ -139,6 +139,8 @@ class ReservationServiceTest {
                 .reservation(reservation1)
                 .build();
 
+            product.delete(LocalDateTime.of(2024,1,26,17,0));
+
             given(productRepository.findByReservationId(reservation1.getId())).willReturn(
                 java.util.Optional.ofNullable(product));
 
@@ -153,11 +155,12 @@ class ReservationServiceTest {
 
             // then
             Assertions.assertThat(reservationFindResponse).isNotNull();
-            Assertions.assertThat(reservationFindResponse.get(0).purchasePrice())
+            Assertions.assertThat(reservationFindResponse.size()).isEqualTo(2);
+            Assertions.assertThat(reservationFindResponse.get(1).purchasePrice())
                 .isEqualTo(4500000);
-            Assertions.assertThat(reservationFindResponse.get(0).hotelName())
+            Assertions.assertThat(reservationFindResponse.get(1).hotelName())
                 .isEqualTo("신라호텔");
-            Assertions.assertThat(reservationFindResponse.get(0).refundPrice()).isEqualTo(4500000);
+            Assertions.assertThat(reservationFindResponse.get(1).refundPrice()).isEqualTo(4500000);
         }
     }
 }
