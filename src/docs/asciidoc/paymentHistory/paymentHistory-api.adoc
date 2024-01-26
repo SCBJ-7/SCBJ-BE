@@ -18,3 +18,18 @@ include::{snippets}/payment-history-rest-controller-docs-test/get-specific-purch
 include::{snippets}/payment-history-rest-controller-docs-test/get-specific-purchased-history/http-response.adoc[]
 include::{snippets}/payment-history-rest-controller-docs-test/get-specific-purchased-history/response-fields.adoc[]
 
+
+[[find-payment-page]]
+== 결제 페이지 조회
+
+결제 페이지를 조회하는 API입니다.
+
+=== HttpRequest
+include::{snippets}/payment-history-rest-controller-docs-test/find-payment-page/http-request.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/find-payment-page/path-parameters.adoc[]
+
+=== HttpResponse
+include::{snippets}/payment-history-rest-controller-docs-test/find-payment-page/http-response.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/find-payment-page/response-fields.adoc[]
+
+
