@@ -6,6 +6,7 @@
 상품 상세 조회 API입니다.
 
 === HttpRequest
+include::{snippets}/product-rest-controller-docs-test/get-detail-product/http-request.adoc[]
 include::{snippets}/product-rest-controller-docs-test/get-detail-product/path-parameters.adoc[]
 
 
@@ -13,5 +14,16 @@ include::{snippets}/product-rest-controller-docs-test/get-detail-product/path-pa
 include::{snippets}/product-rest-controller-docs-test/get-detail-product/http-response.adoc[]
 include::{snippets}/product-rest-controller-docs-test/get-detail-product/response-fields.adoc[]
 
+[[delete-produt]]
+== 상품 삭제
 
+상품 삭제 API입니다.
+
+=== HttpRequest
+include::{snippets}/product-rest-controller-docs-test/delete-product/http-request.adoc[]
+include::{snippets}/product-rest-controller-docs-test/delete-product/path-parameters.adoc[]
+
+
+=== HttpResponse
+include::{snippets}/product-rest-controller-docs-test/delete-product/http-response.adoc[]
 
