@@ -42,7 +42,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
        JOIN r.hotel h 
        LEFT JOIN HotelRoomImage hImg ON hImg.hotel.id = h.id
        LEFT JOIN p.paymentHistory ph 
-       WHERE p.member.id = :memberId
+       WHERE p.member.id = :memberId AND p.deletedAt is null
        group by p.id
        """)
     List<SaleHistoryResponse> findSaleHistoriesByMemberId(@Param("memberId") Long memberId);
@@ -62,7 +62,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     JOIN FETCH p.reservation r
     JOIN FETCH r.hotel h
     LEFT JOIN FETCH p.paymentHistory ph
-    WHERE h.hotelMainAddress = :city AND ph.id IS NULL
+    WHERE h.hotelMainAddress = :city
 """)
     List<Product> findProductByCity(@Param("city") String city);
 

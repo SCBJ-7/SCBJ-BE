@@ -291,7 +291,7 @@ class PaymentHistoryServiceTest {
                     new SpecificSaleHistoryResponse.secondPriceResponse("2024-01-15 09:00", 180000))
                 .build();
 
-            given(paymentHistoryRepository.findByIdAndMemberId(saleHistoryId, memberId))
+            given(paymentHistoryRepository.findSaleHistoryInformationById(saleHistoryId, memberId))
                 .willReturn(Optional.of(paymentHistory));
             given(saleHistoryDtoConverter.toSpecificSaleHistoryResponse(paymentHistory.getProduct(),true))
                 .willReturn(specificSaleHistoryResponse);
