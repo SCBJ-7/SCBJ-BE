@@ -109,11 +109,12 @@ public class PaymentHistoryService {
     public SpecificSaleHistoryResponse getSpecificSaleHistory(Long memberId, Long saleHistoryId, boolean isPaymentId) {
 
         if (isPaymentId) {
-            PaymentHistory responseByPayment =
-                paymentHistoryRepository.findByIdAndMemberId(saleHistoryId, memberId).orElseThrow(
+
+            PaymentHistory paymentHistory =
+                paymentHistoryRepository.findSaleHistoryInformationById(saleHistoryId, memberId).orElseThrow(
                     () -> new SaleHistoryNotFoundException(ErrorCode.SALE_DETAIL_LOAD_FAIL));
 
-            return saleHistoryDtoConverter.toSpecificSaleHistoryResponse(responseByPayment.getProduct(),isPaymentId);
+            return saleHistoryDtoConverter.toSpecificSaleHistoryResponse(paymentHistory.getProduct(),isPaymentId);
         }
 
         Product responseFromProduct = productRepository.findByIdAndMemberId(saleHistoryId, memberId)
