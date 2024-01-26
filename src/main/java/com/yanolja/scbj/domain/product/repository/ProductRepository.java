@@ -62,7 +62,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     JOIN FETCH p.reservation r
     JOIN FETCH r.hotel h
     LEFT JOIN FETCH p.paymentHistory ph
-    WHERE h.hotelMainAddress = :city AND ph.id IS NULL
+    WHERE h.hotelMainAddress = :city
 """)
     List<Product> findProductByCity(@Param("city") String city);
 
