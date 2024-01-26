@@ -89,4 +89,11 @@ Infra & ThirdParty</br>
 ## ARCHITECTURE
 ![숙취방지 최종 ARCHITECTURE](https://github.com/SCBJ-7/SCBJ-BE/assets/63856521/74661494-beb8-4ae7-a7d5-d864b4ac64dc)
 
+## 결제도메인 with 동시성제어
+- 카카오페이 로직
 
+  ![숙취방지-결제도메인 drawio](https://github.com/SCBJ-7/SCBJ-BE/assets/63856521/e4cce2d3-3c1d-42d6-9f51-caa34b0a6e06)
+- Optimisitc Lock을 활용한 동시성 제어 : https://github.com/SCBJ-7/SCBJ-BE/discussions/309
+- Pessimistic Lock을 활용한 동시성 제어 : https://github.com/SCBJ-7/SCBJ-BE/discussions/310
+- Lettuce(Redis)를 활용한 동시성 제어 : https://github.com/SCBJ-7/SCBJ-BE/discussions/312
+- Redisson(Redis)을 활용한 동시성 제어 : https://github.com/SCBJ-7/SCBJ-BE/discussions/311
