@@ -93,7 +93,7 @@ public class SaleHistoryDtoConverter {
 
     private String formatCheckIn(Reservation reservation, DateTimeFormatter dateFormatter,
                                  Hotel hotel, DateTimeFormatter timeFormatter) {
-        return reservation.getStartDate().format(dateFormatter) + hotel.getRoom().getCheckIn()
+        return reservation.getStartDate().minusDays(1).format(dateFormatter) + hotel.getRoom().getCheckIn()
             .format(timeFormatter);
 
 
@@ -101,7 +101,7 @@ public class SaleHistoryDtoConverter {
 
     private String formatCheckOut(Reservation reservation, DateTimeFormatter dateFormatter,
                                   Hotel hotel, DateTimeFormatter timeFormatter) {
-        return reservation.getEndDate().format(dateFormatter) + hotel.getRoom().getCheckOut()
+        return reservation.getEndDate().minusDays(1).format(dateFormatter) + hotel.getRoom().getCheckOut()
             .format(timeFormatter);
     }
 
