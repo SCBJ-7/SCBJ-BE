@@ -5,6 +5,7 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
+import com.yanolja.scbj.domain.paymentHistory.util.PaymentHistoryMapper;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
@@ -14,6 +15,7 @@ import com.yanolja.scbj.global.util.TimeValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,31 +33,44 @@ public class PaymentService {
         Product targetProduct = productRepository.findProductById(productId)
             .orElseThrow(() -> new ProductNotFoundException(
                 ErrorCode.PRODUCT_NOT_FOUND));
-        Reservation targetReservation = targetProduct.getReservation();
-        Hotel targetHotel = targetReservation.getHotel();
-        Room targetRoom = targetHotel.getRoom();
-        HotelRoomPrice targetHotelRoomPrice = targetHotel.getHotelRoomPrice();
-        List<HotelRoomImage> targetHotelRoomImageList = targetHotel.getHotelRoomImageList();
+
+        Hotel targetHotel = targetProduct.getReservation().getHotel();
+
+        int originalPrice = getOriginalPrice(targetHotel);
+        int salePrice = getSalePrice(targetProduct);
+
+        return PaymentHistoryMapper.toPaymentPageFindResponse(
+            getFirstImageUrl(targetHotel), targetHotel, targetProduct, originalPrice,
+            salePrice);
+    }
+
+    private int getOriginalPrice(Hotel hotel){
+        HotelRoomPrice targetHotelRoomPrice = hotel.getHotelRoomPrice();
         int originalPrice = targetHotelRoomPrice.getOffPeakPrice();
         if (TimeValidator.isPeakTime(LocalDate.now())) {
             originalPrice = targetHotelRoomPrice.getPeakPrice();
         }
-        LocalDateTime checkInDateTime = targetReservation.getStartDate();
-        LocalDateTime checkOutDateTime = targetReservation.getEndDate();
-        int price = targetProduct.getFirstPrice();
-        if (TimeValidator.isOverSecondGrantPeriod(targetProduct, checkInDateTime)) {
-            price = targetProduct.getSecondPrice();
+
+        return originalPrice;
+    }
+
+    private int getSalePrice(Product product){
+        LocalDateTime checkInDateTime = product.getReservation().getStartDate();
+
+        int price = product.getFirstPrice();
+        if (TimeValidator.isOverSecondGrantPeriod(product, checkInDateTime)) {
+            price = product.getSecondPrice();
         }
-        return PaymentPageFindResponse.builder()
-            .hotelImage(targetHotelRoomImageList.get(FIRST_IMAGE).getUrl())
-            .hotelName(targetHotel.getHotelName())
-            .roomName(targetRoom.getRoomName())
-            .standardPeople(targetRoom.getStandardPeople())
-            .maxPeople(targetRoom.getMaxPeople())
-            .checkInDateTime(checkInDateTime)
-            .checkOutDateTime(checkOutDateTime)
-            .originalPrice(originalPrice)
-            .salePrice(price)
-            .build();
+
+        return price;
+    }
+
+    private String getFirstImageUrl(Hotel hotel){
+        List<HotelRoomImage> hotelRoomImageList = hotel.getHotelRoomImageList();
+        String url = StringUtil.EMPTY_STRING;
+        if (!hotelRoomImageList.isEmpty()) {
+            url = hotelRoomImageList.get(FIRST_IMAGE).getUrl();
+        }
+        return url;
     }
 }
