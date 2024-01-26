@@ -106,12 +106,19 @@ public class PaymentHistoryService {
         return hotelRoomImageList.get(RESERVATION_IMAGE).getUrl();
     }
 
-    public SpecificSaleHistoryResponse getSpecificSaleHistory(Long memberId, Long saleHistoryId) {
+    public SpecificSaleHistoryResponse getSpecificSaleHistory(Long memberId, Long saleHistoryId, boolean isPaymentId) {
 
-        PaymentHistory saleHistoryDetail =
-            paymentHistoryRepository.findByIdAndMemberId(saleHistoryId, memberId).orElseThrow(
-                () -> new SaleHistoryNotFoundException(ErrorCode.SALE_DETAIL_LOAD_FAIL));
+        if (isPaymentId) {
+            PaymentHistory responseByPayment =
+                paymentHistoryRepository.findByIdAndMemberId(saleHistoryId, memberId).orElseThrow(
+                    () -> new SaleHistoryNotFoundException(ErrorCode.SALE_DETAIL_LOAD_FAIL));
 
-        return saleHistoryDtoConverter.toSpecificSaleHistoryResponse(saleHistoryDetail);
+            return saleHistoryDtoConverter.toSpecificSaleHistoryResponse(responseByPayment.getProduct(),isPaymentId);
+        }
+
+        Product responseFromProduct = productRepository.findByIdAndMemberId(saleHistoryId, memberId)
+            .orElseThrow(() -> new SaleHistoryNotFoundException(ErrorCode.SALE_DETAIL_LOAD_FAIL));
+
+        return saleHistoryDtoConverter.toSpecificSaleHistoryResponse(responseFromProduct,isPaymentId);
     }
 }

@@ -16,10 +16,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class SaleHistoryDtoConverter {
     public SpecificSaleHistoryResponse toSpecificSaleHistoryResponse(
-        PaymentHistory paymentHistory
+        Product product , boolean isPaymentId
     ) {
-
-        Product product = paymentHistory.getProduct();
+        PaymentHistory paymentHistory = product.getPaymentHistory();
         Reservation reservation = product.getReservation();
         Hotel hotel = product.getReservation().getHotel();
         Room room = hotel.getRoom();
@@ -27,9 +26,13 @@ public class SaleHistoryDtoConverter {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yy.MM.dd (E) ");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime createdAt = paymentHistory.getCreatedAt();
+        LocalDateTime createdAt = null;
+        String status = calculateStatusInProduct(reservation);
+        if (isPaymentId) {
+            createdAt = paymentHistory.getCreatedAt();
+            status = calculateStatusInPaymentHistory(paymentHistory, reservation);
+        }
 
-        String status = calculateStatus(paymentHistory, reservation);
         String hotelUrl = getHotelUrl(hotel);
         String hotelName = hotel.getHotelName();
         String roomName = room.getRoomName();
@@ -74,12 +77,13 @@ public class SaleHistoryDtoConverter {
             .createdAt(createdAt)
             .build();
     }
-    private String calculateStatus(PaymentHistory paymentHistory, Reservation reservation) {
+    private String calculateStatusInPaymentHistory(PaymentHistory paymentHistory, Reservation reservation) {
         return Optional.ofNullable(paymentHistory)
-            .map(ph -> paymentHistory.isSettlement() ? "정산완료" : "거래완료")
-            .orElseGet(() ->
-                reservation.getEndDate().isBefore(LocalDateTime.now()) ? "판매만료" : "판매중"
-            );
+            .map(ph -> paymentHistory.isSettlement() ? "정산완료" : "거래완료").get();
+    }
+
+    private String calculateStatusInProduct(Reservation reservation) {
+        return reservation.getEndDate().isBefore(LocalDateTime.now()) ? "판매만료" : "판매중";
     }
 
     private String getHotelUrl(Hotel hotel) {

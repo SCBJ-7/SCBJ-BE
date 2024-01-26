@@ -58,13 +58,14 @@ public class PaymentHistoryRestController {
     }
 
 
-    @GetMapping("/sale-history/{saleHistory_id}")
+    @GetMapping("/sale-history/{saleHistory_id}/{isPaymentId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<SpecificSaleHistoryResponse> getSpecificSaleHistory(
-        @PathVariable("saleHistory_id") Long saleHistoryId
+        @PathVariable("saleHistory_id") Long saleId,
+        @PathVariable("isPaymentId") boolean isPaymentId
     ) {
         return ResponseDTO.res(
             paymentHistoryService.getSpecificSaleHistory(securityUtil.getCurrentMemberId(),
-                saleHistoryId), "판매 내역 상세 조회를 성공했습니다");
+                saleId, isPaymentId), "판매 내역 상세 조회를 성공했습니다");
     }
 }

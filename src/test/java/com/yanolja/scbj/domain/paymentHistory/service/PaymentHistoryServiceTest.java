@@ -293,12 +293,12 @@ class PaymentHistoryServiceTest {
 
             given(paymentHistoryRepository.findByIdAndMemberId(saleHistoryId, memberId))
                 .willReturn(Optional.of(paymentHistory));
-            given(saleHistoryDtoConverter.toSpecificSaleHistoryResponse(paymentHistory))
+            given(saleHistoryDtoConverter.toSpecificSaleHistoryResponse(paymentHistory.getProduct(),true))
                 .willReturn(specificSaleHistoryResponse);
 
             // when
             SpecificSaleHistoryResponse result = paymentHistoryService.getSpecificSaleHistory(
-                memberId, saleHistoryId);
+                memberId, saleHistoryId,true);
 
             // then
             assertThat(result).isNotNull();

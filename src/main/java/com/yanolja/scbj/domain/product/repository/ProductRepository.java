@@ -1,6 +1,7 @@
 package com.yanolja.scbj.domain.product.repository;
 
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.entity.Product;
 import java.util.List;
 import java.util.Optional;
@@ -82,4 +83,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     @Query("SELECT p FROM Product p JOIN FETCH p.reservation r WHERE r.id = :reservationId")
     Optional<Product> findByReservationId(@Param("reservationId") Long reservationId);
 
+
+    Optional<Product> findByIdAndMemberId(Long productId, Long memberId);
 }
