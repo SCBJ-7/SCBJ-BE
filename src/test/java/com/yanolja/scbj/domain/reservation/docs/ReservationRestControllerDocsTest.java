@@ -2,7 +2,6 @@ package com.yanolja.scbj.domain.reservation.docs;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -36,7 +35,7 @@ public class ReservationRestControllerDocsTest extends RestDocsSupport {
 
     @Override
     public Object initController() {
-        return new ReservationRestController(reservationService,securityUtil);
+        return new ReservationRestController(reservationService, securityUtil);
     }
 
     @Test
