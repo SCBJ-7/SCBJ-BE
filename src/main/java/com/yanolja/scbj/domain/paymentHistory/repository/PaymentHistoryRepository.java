@@ -21,7 +21,10 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
             "JOIN pr.reservation r " +
             "JOIN r.hotel h " +
             "LEFT JOIN HotelRoomImage hp ON hp.hotel.id = h.id " +
-            "WHERE p.member.id = :memberId "
+            "WHERE p.member.id = :memberId " +
+            "AND p.deletedAt IS NULL " +
+            "GROUP BY p.id"
+
     )
     List<PurchasedHistoryResponse> findPurchasedHistoriesByMemberId(
         @Param("memberId") Long memberId);
