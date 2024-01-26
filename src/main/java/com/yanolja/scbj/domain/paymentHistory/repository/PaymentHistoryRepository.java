@@ -40,9 +40,8 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
         where ph.id = :paymentId and m.id = :memberId
         """
     )
-    Optional<PaymentHistory> findSaleHistoryInformationById(
-        @Param("memberId") Long memberId,
-        @Param("paymentId") Long paymentId
+    Optional<PaymentHistory> findSaleHistoryInformationById(@Param("memberId") Long memberId,
+                                                            @Param("paymentId") Long paymentId
     );
 
     @Query(
