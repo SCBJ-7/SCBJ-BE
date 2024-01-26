@@ -23,9 +23,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @Disabled
-@SpringBootTest
 @ExtendWith({RestDocumentationExtension.class})
 @Import(RestDocsConfig.class)
+@SpringBootTest
 public abstract class RestDocsSupport {
 
     @Autowired
@@ -55,7 +55,6 @@ public abstract class RestDocsSupport {
 
     protected FieldDescriptor[] responseCommon() {
         return new FieldDescriptor[]{
-            fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지")};
     }
 }

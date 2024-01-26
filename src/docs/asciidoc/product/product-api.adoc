@@ -1,1 +1,17 @@
 = product v1 API 문서
+
+[[Get-detail-produt]]
+== 상품 상세 조회
+
+상품 상세 조회 API입니다.
+
+=== HttpRequest
+include::{snippets}/product-rest-controller-docs-test/get-detail-product/path-parameters.adoc[]
+
+
+=== HttpResponse
+include::{snippets}/product-rest-controller-docs-test/get-detail-product/http-response.adoc[]
+include::{snippets}/product-rest-controller-docs-test/get-detail-product/response-fields.adoc[]
+
+
+
