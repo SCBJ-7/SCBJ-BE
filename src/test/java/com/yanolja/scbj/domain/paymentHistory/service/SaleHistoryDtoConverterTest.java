@@ -10,6 +10,8 @@ import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.service.SaleHistoryDtoConverter;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
+import com.yanolja.scbj.domain.testdata.TestData;
+import com.yanolja.scbj.global.common.BaseEntity;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -66,6 +68,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
         Product product = Product.builder()
             .reservation(reservation)
             .member(member)
+            .paymentHistory(PaymentHistory.builder()
+                .id(1L)
+                .customerName("김정훈")
+                .build())
             .firstPrice(200000)
             .secondPrice(180000)
             .bank("신한은행")
@@ -73,14 +79,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
             .secondGrantPeriod(6)
             .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
-            .id(1L)
-            .product(product)
-            .build();
+
+
 
         // when
         SpecificSaleHistoryResponse result =
-            saleHistoryDtoConverter.toSpecificSaleHistoryResponse(paymentHistory);
+            saleHistoryDtoConverter.toSpecificSaleHistoryResponse(product, true);
 
         // then
         Assertions.assertThat(result).isNotNull();

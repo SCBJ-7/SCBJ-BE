@@ -259,6 +259,7 @@ public class PaymentHistoryRestControllerTest {
             Long memberId = 1L;
             Long saleHistoryId = 1L;
 
+
             SpecificSaleHistoryResponse.firstPriceResponse firstPriceObject =
                 SpecificSaleHistoryResponse.firstPriceResponse.builder()
                     .originalPrice(212000)
@@ -289,11 +290,11 @@ public class PaymentHistoryRestControllerTest {
                 .build();
 
             given(securityUtil.getCurrentMemberId()).willReturn(memberId);
-            given(paymentHistoryService.getSpecificSaleHistory(memberId, saleHistoryId)).willReturn(
+            given(paymentHistoryService.getSpecificSaleHistory(memberId, saleHistoryId,true)).willReturn(
                 response);
 
             // 실행 (When)
-            mockMvc.perform(get("/v1/members/sale-history/" + saleHistoryId))
+            mockMvc.perform(get("/v1/members/sale-history/" + saleHistoryId+"/"+true))
                 .andExpect(status().isOk())
                 .andDo(print())
 
