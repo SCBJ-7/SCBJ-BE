@@ -1,22 +1,17 @@
 package com.yanolja.scbj.domain.product.docs;
 
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.yanolja.scbj.docs.RestDocsSupport;
-import com.yanolja.scbj.domain.alarm.service.AlarmService;
 import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
@@ -29,7 +24,6 @@ import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -74,7 +68,8 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
 
         ProductFindResponse findResponse = ProductFindResponse.builder()
             .hotelName(hotel.getHotelName())
-            .hotelImageUrlList(List.of("https://yaimg.yanolja.com/v5/2023/03/23/15/1280/641c76db5ab761.18136153.jpg"))
+            .hotelImageUrlList(List.of(
+                "https://yaimg.yanolja.com/v5/2023/03/23/15/1280/641c76db5ab761.18136153.jpg"))
             .roomName(room.getRoomName())
             .checkIn(LocalDateTime.now())
             .checkOut(LocalDateTime.now())
@@ -102,24 +97,54 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data").type(JsonFieldType.OBJECT).optional()
                         .description("응답 데이터"),
                     fieldWithPath("data.hotelName").type(JsonFieldType.STRING).description("호텔 이름"),
-                    fieldWithPath("data.hotelImageUrlList[]").type(JsonFieldType.ARRAY).description("호텔 사진 리스트"),
+                    fieldWithPath("data.hotelImageUrlList[]").type(JsonFieldType.ARRAY)
+                        .description("호텔 사진 리스트"),
                     fieldWithPath("data.roomName").type(JsonFieldType.STRING).description("객실 명"),
                     fieldWithPath("data.checkIn").type(JsonFieldType.STRING).description("체크인"),
                     fieldWithPath("data.checkOut").type(JsonFieldType.STRING).description("체크아웃"),
-                    fieldWithPath("data.originalPrice").type(JsonFieldType.NUMBER).description("원가"),
-                    fieldWithPath("data.sellingPrice").type(JsonFieldType.NUMBER).description("판매가"),
-                    fieldWithPath("data.standardPeople").type(JsonFieldType.NUMBER).description("기준 인원"),
+                    fieldWithPath("data.originalPrice").type(JsonFieldType.NUMBER)
+                        .description("원가"),
+                    fieldWithPath("data.sellingPrice").type(JsonFieldType.NUMBER)
+                        .description("판매가"),
+                    fieldWithPath("data.standardPeople").type(JsonFieldType.NUMBER)
+                        .description("기준 인원"),
                     fieldWithPath("data.maxPeople").type(JsonFieldType.NUMBER).description("최대 인원"),
                     fieldWithPath("data.bedType").type(JsonFieldType.STRING).description("침대 타입"),
                     fieldWithPath("data.roomTheme").type(JsonFieldType.OBJECT).description("객실 테마"),
-                    fieldWithPath("data.roomTheme.parkingZone").type(JsonFieldType.BOOLEAN).description("주차 가능"),
-                    fieldWithPath("data.roomTheme.breakfast").type(JsonFieldType.BOOLEAN).description("조식 제공"),
-                    fieldWithPath("data.roomTheme.pool").type(JsonFieldType.BOOLEAN).description("수영장"),
-                    fieldWithPath("data.roomTheme.oceanView").type(JsonFieldType.BOOLEAN).description("오션 뷰"),
-                    fieldWithPath("data.hotelAddress").type(JsonFieldType.STRING).description("호텔 주소"),
-                    fieldWithPath("data.hotelInfoUrl").type(JsonFieldType.STRING).description("호텔 상세 정보 Url"),
-                    fieldWithPath("data.saleStatus").type(JsonFieldType.BOOLEAN).description("판매 상태"),
+                    fieldWithPath("data.roomTheme.parkingZone").type(JsonFieldType.BOOLEAN)
+                        .description("주차 가능"),
+                    fieldWithPath("data.roomTheme.breakfast").type(JsonFieldType.BOOLEAN)
+                        .description("조식 제공"),
+                    fieldWithPath("data.roomTheme.pool").type(JsonFieldType.BOOLEAN)
+                        .description("수영장"),
+                    fieldWithPath("data.roomTheme.oceanView").type(JsonFieldType.BOOLEAN)
+                        .description("오션 뷰"),
+                    fieldWithPath("data.hotelAddress").type(JsonFieldType.STRING)
+                        .description("호텔 주소"),
+                    fieldWithPath("data.hotelInfoUrl").type(JsonFieldType.STRING)
+                        .description("호텔 상세 정보 Url"),
+                    fieldWithPath("data.saleStatus").type(JsonFieldType.BOOLEAN)
+                        .description("판매 상태"),
                     fieldWithPath("data.isSeller").type(JsonFieldType.BOOLEAN).description("판매자 여부")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("상품 삭제 API 문서화")
+    void deleteProduct() throws Exception {
+        // given
+        doNothing().when(productService).deleteProduct(any());
+
+        // when, then
+        mockMvc.perform(delete("/v1/products/{productId}", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNoContent())
+            .andDo(restDoc.document(
+                pathParameters(parameterWithName("productId").description("상품 식별자")),
+                responseFields(this.responseCommon()).and(
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).optional()
+                        .description("응답 데이터")
                 )
             ));
 
