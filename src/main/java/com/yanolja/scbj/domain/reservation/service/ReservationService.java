@@ -7,6 +7,7 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
+import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.dto.response.ReservationFindResponse;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
@@ -18,6 +19,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,11 +63,22 @@ public class ReservationService {
 
         List<Reservation> reservationListOfNotProduct = new ArrayList<>();
         for (Reservation reservation : reservationList) {
-            if (!productRepository.findByReservationId(reservation.getId()).isPresent()) {
+            if(checkProduct(reservation)){
                 reservationListOfNotProduct.add(reservation);
             }
         }
         return reservationListOfNotProduct;
+    }
+
+    private boolean checkProduct(Reservation reservation){
+        Optional<Product> getProduct = productRepository.findByReservationId(reservation.getId());
+        if(getProduct.isPresent()){
+            if(getProduct.get().isDeleted()){
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 
     private String getImageUrl(List<HotelRoomImage> hotelRoomImageList) {
