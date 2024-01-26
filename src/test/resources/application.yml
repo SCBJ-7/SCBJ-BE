@@ -54,6 +54,8 @@ kakao-api:
 server:
   url : ${SERVER-URL}
 
+check-in:
+  expiration: ${CHECK-IN-EXPIRATION}
 
 schedule:
   cron: ${SCHEDULE-CRON}
