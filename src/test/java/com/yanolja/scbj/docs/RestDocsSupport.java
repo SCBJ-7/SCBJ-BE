@@ -24,7 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @Disabled
-@SpringBootTest()
+@SpringBootTest
 @ExtendWith({RestDocumentationExtension.class})
 @Import(RestDocsConfig.class)
 public abstract class RestDocsSupport extends AbstractContainersSupport {
