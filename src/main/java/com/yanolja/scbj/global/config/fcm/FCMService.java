@@ -85,6 +85,7 @@ public class FCMService {
             }
 
         } catch (HttpClientErrorException ex) {
+            log.error(ex.getMessage());
             throw new FirebaseServerException(ErrorCode.FIREBASE_SERVER_ERROR);
         }
 

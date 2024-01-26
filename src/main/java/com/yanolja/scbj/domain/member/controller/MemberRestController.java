@@ -51,8 +51,8 @@ public class MemberRestController {
     @PostMapping("/signin")
     public ResponseEntity<ResponseDTO<MemberSignInResponse>> signIn(
         @Validated(ValidationSequence.class) @RequestBody MemberSignInRequest memberSignInRequest) {
-        log.info("email:{}, password:{}", memberSignInRequest.email(),
-            memberSignInRequest.password());
+        log.info("email:{}, password:{}, token:{}", memberSignInRequest.email(),
+            memberSignInRequest.password(), memberSignInRequest.fcmToken());
         return ResponseEntity.ok()
             .body(ResponseDTO.res(memberService.signIn(memberSignInRequest), "로그인에 성공했습니다."));
     }
