@@ -5,6 +5,7 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -298,14 +299,13 @@ class ProductServiceTest {
                 .secondGrantPeriod(24)
                 .build();
 
-            given(productRepository.findById(any())).willReturn(Optional.of(product));
+            doNothing().when(productRepository).deleteById(any());
 
             // when
             productService.deleteProduct(1L);
 
             // then
-            verify(productRepository, atLeastOnce()).findById(any());
-            Assertions.assertThat(product.getDeletedAt()).isNotNull();
+            verify(productRepository, atLeastOnce()).deleteById(any());
         }
     }
 
