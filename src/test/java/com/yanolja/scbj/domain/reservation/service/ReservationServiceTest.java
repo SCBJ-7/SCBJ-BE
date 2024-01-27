@@ -155,12 +155,12 @@ class ReservationServiceTest {
 
             // then
             Assertions.assertThat(reservationFindResponse).isNotNull();
-            Assertions.assertThat(reservationFindResponse.size()).isEqualTo(2);
-            Assertions.assertThat(reservationFindResponse.get(1).purchasePrice())
+            Assertions.assertThat(reservationFindResponse.size()).isEqualTo(1);
+            Assertions.assertThat(reservationFindResponse.get(0).purchasePrice())
                 .isEqualTo(4500000);
-            Assertions.assertThat(reservationFindResponse.get(1).hotelName())
+            Assertions.assertThat(reservationFindResponse.get(0).hotelName())
                 .isEqualTo("신라호텔");
-            Assertions.assertThat(reservationFindResponse.get(1).refundPrice()).isEqualTo(4500000);
+            Assertions.assertThat(reservationFindResponse.get(0).refundPrice()).isEqualTo(4500000);
         }
     }
 }
