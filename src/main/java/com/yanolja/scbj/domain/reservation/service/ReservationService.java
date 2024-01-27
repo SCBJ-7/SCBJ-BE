@@ -73,9 +73,6 @@ public class ReservationService {
     private boolean checkProduct(Reservation reservation){
         Optional<Product> getProduct = productRepository.findByReservationId(reservation.getId());
         if(getProduct.isPresent()){
-            if(getProduct.get().isDeleted()){
-                return true;
-            }
             return false;
         }
         return true;

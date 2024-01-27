@@ -185,10 +185,7 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long productId) {
-        Product targetProduct = productRepository.findById(productId)
-            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
-
-        targetProduct.delete(LocalDateTime.now());
+        productRepository.deleteById(productId);
     }
 
     public Page<ProductSearchResponse> searchByRequest(ProductSearchRequest productSearchRequest,
