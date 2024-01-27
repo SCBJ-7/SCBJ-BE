@@ -32,7 +32,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
                      END) 
                 ELSE 
                     (CASE 
-                         WHEN r.endDate < CURRENT_DATE THEN '판매만료' 
+                         WHEN r.endDate <= CURRENT_DATE THEN '판매만료' 
                          ELSE '판매중' 
                      END) 
            END)
@@ -63,6 +63,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     JOIN FETCH r.hotel h
     LEFT JOIN FETCH p.paymentHistory ph
     WHERE h.hotelMainAddress = :city
+    AND p.deletedAt IS NULL
 """)
     List<Product> findProductByCity(@Param("city") String city);
 
@@ -76,7 +77,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
         LEFT JOIN payment_history ph ON p.id = ph.product_id
         WHERE DAYOFWEEK(r.start_date) IN (6, 7, 1)
         AND r.start_date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 21 DAY)
+        AND DATE_SUB(r.end_date, INTERVAL 1 DAY) > NOW()
         AND ph.id IS NULL
+        ANd p.deleted_at IS NULL
         """, nativeQuery = true)
     List<Product> findProductByWeekend();
 
