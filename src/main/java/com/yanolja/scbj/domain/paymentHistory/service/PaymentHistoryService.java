@@ -85,7 +85,7 @@ public class PaymentHistoryService {
 
         return PaymentHistoryMapper.toSpecificPurchasedHistoryResponse(targetPaymentHistory,
             hotel, room, checkIn, checkOut, paymentHistoryDate, getOriginalPrice(hotel),
-            remainingDays, imageUrl);
+            remainingDays == 0 ? -1 : remainingDays, imageUrl);
     }
 
 
