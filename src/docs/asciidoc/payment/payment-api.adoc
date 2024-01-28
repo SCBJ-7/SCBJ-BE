@@ -1,4 +1,4 @@
-= Payment REST API Docs
+== Payment REST API Docs
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
@@ -42,4 +42,5 @@ include::{snippets}/payment-history-rest-controller-docs-test/cancel-payment/htt
 
 === HttpResponse
 include::{snippets}/payment-history-rest-controller-docs-test/cancel-payment/http-response.adoc[]
+
 
