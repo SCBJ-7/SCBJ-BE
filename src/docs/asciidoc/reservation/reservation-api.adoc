@@ -1,4 +1,4 @@
-= Reservation REST API Docs
+== Reservation REST API Docs
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs

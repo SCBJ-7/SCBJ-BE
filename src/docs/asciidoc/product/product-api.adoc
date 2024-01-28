@@ -1,4 +1,4 @@
-= Product REST API DOCS
+== Product REST API DOCS
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs

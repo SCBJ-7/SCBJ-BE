@@ -1,8 +1,11 @@
 package com.yanolja.scbj.domain.paymentHistory.docs;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -11,7 +14,10 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 import com.yanolja.scbj.docs.RestDocsSupport;
 import com.yanolja.scbj.domain.alarm.service.AlarmService;
@@ -21,13 +27,17 @@ import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PurchasedHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.SaleHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificSaleHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.KaKaoPaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.PaymentApiService;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -263,5 +273,162 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(restDoc.document());
+    }
+
+    @Test
+    @DisplayName("구매 내역 목록 조회 API 문서화")
+    void getPurchasedHistory() throws Exception {
+        // given
+        List<PurchasedHistoryResponse> responses = List.of(
+            new PurchasedHistoryResponse(1L, LocalDateTime.now(), "wwww.yanolja.com", "A 호텔",
+                "디럭스", 20000,
+                LocalDateTime.now(), LocalDateTime.now().plusDays(2)),
+            new PurchasedHistoryResponse(2L, LocalDateTime.now().minusDays(3),
+                "wwww.yanolja.com", "B 호텔", "스텐다드",
+                15000, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1))
+        );
+        // when
+        given(paymentHistoryService.getUsersPurchasedHistory(anyLong())).willReturn(responses);
+
+        // then
+        mockMvc.perform(get("/v1/members/purchased-history")
+                .param("page", "0")
+                .param("pageSize", "10"))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("payment-history/purchase-history",
+                responseFields(this.responseCommon()).and(
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                    fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("구매 내역 식별자"),
+                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("생성 날짜 및 시간"),
+                    fieldWithPath("data[].imageUrl").type(JsonFieldType.STRING).description("이미지 URL"),
+                    fieldWithPath("data[].name").type(JsonFieldType.STRING).description("호텔/객실 이름"),
+                    fieldWithPath("data[].roomType").type(JsonFieldType.STRING).description("객실 유형"),
+                    fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("가격"),
+                    fieldWithPath("data[].checkInDate").type(JsonFieldType.STRING).description("체크인 날짜 및 시간"),
+                    fieldWithPath("data[].checkOutDate").type(JsonFieldType.STRING).description("체크아웃 날짜 및 시간")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("판매 내역 목록 조회 API 문서화")
+    void getSaleHistories() throws Exception {
+        // given
+        List<SaleHistoryResponse> responses = List.of(new SaleHistoryResponse(
+            1L,
+            10L,
+            "롯데 시그니엘 호텔",
+            "http://example.com/hotel-room-image1.jpg",
+            "더블 베드",
+            200000,
+            100000,
+            LocalDateTime.of(2024, 1, 1, 15, 0),
+            LocalDateTime.of(2024, 1, 2, 1, 0),
+            "판매중"
+        ), new SaleHistoryResponse(
+            10L,
+            2L,
+            "신라 호텔",
+            "http://example.com/hotel-room-image2.jpg",
+            "트윈 베드",
+            150000,
+            80000,
+            LocalDateTime.of(2024, 1, 3, 15, 0),
+            LocalDateTime.of(2024, 1, 4, 11, 0),
+            "거래완료"
+        ));
+        given(paymentHistoryService.getUsersSaleHistory(anyLong())).willReturn(responses);
+
+        // when & then
+        mockMvc.perform(get("/v1/members/sale-history")
+                .param("page", "0")
+                .param("pageSize", "10")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(restDoc.document(
+                responseFields(this.responseCommon()).andWithPrefix("data[].",
+                    fieldWithPath("id").type(JsonFieldType.NUMBER).description("판매 내역 식별자"),
+                    fieldWithPath("productId").type(JsonFieldType.NUMBER).description("상품 id"),
+                    fieldWithPath("name").type(JsonFieldType.STRING).description("호텔 이름"),
+                    fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("호텔 이미지 URL"),
+                    fieldWithPath("roomType").type(JsonFieldType.STRING).description("객실 유형"),
+                    fieldWithPath("firstPrice").type(JsonFieldType.NUMBER).description("1차 판매가"),
+                    fieldWithPath("secondPrice").type(JsonFieldType.NUMBER).description("2차 판매가"),
+                    fieldWithPath("checkInDate").type(JsonFieldType.STRING).description("체크인 날짜"),
+                    fieldWithPath("checkOutDate").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+                    fieldWithPath("saleStatus").type(JsonFieldType.STRING).description("판매 상태")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("판매내역 상세 조회 API 문서화")
+    public void testGetSpecificSaleHistory() throws Exception {
+        //given
+        Long memberId = 1L;
+        Long saleHistoryId = 1L;
+        boolean isPaymentId = true;
+
+
+        SpecificSaleHistoryResponse.firstPriceResponse firstPriceObject =
+            SpecificSaleHistoryResponse.firstPriceResponse.builder()
+                .originalPrice(212000)
+                .firstSalePrice(139000)
+                .build();
+
+
+        SpecificSaleHistoryResponse.secondPriceResponse secondPriceObject =
+            SpecificSaleHistoryResponse.secondPriceResponse.builder()
+                .secondPrice(20000)
+                .secondPriceStartDate("20203")
+                .build();
+
+        SpecificSaleHistoryResponse response = SpecificSaleHistoryResponse.builder()
+            .saleStatus("판매중")
+            .checkIn("24.01.15 (월) 15:00")
+            .checkOut("24.01.16 (화) 15:00")
+            .hotelImage("image.url")
+            .standardPeople(2)
+            .maxPeople(4)
+            .hotelName("호텔 인 나인 강남")
+            .roomName("디럭스 킹 시티뷰")
+            .bank("신한")
+            .accountNumber("110472321")
+            .firstPrice(firstPriceObject)
+            .secondPrice(secondPriceObject)
+            .createdAt(LocalDateTime.now().minusDays(6))
+            .build();
+
+        given(paymentHistoryService.getSpecificSaleHistory(anyLong(),anyLong(),anyBoolean())).willReturn(response);
+
+        //When& Then
+            mockMvc.perform(get("/v1/members/sale-history/{saleHistory_id}/{isPaymentId}", saleHistoryId, isPaymentId))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("payment-history/specific-sale-history",
+                pathParameters(
+                    parameterWithName("saleHistory_id").description("판매 내역 식별자"),
+                    parameterWithName("isPaymentId").description("결제 ID 여부")
+                ),
+                responseFields(this.responseCommon()).and(
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                    fieldWithPath("data.saleStatus").type(JsonFieldType.STRING).description("판매 상태"),
+                    fieldWithPath("data.checkIn").type(JsonFieldType.STRING).description("체크인 시간"),
+                    fieldWithPath("data.checkOut").type(JsonFieldType.STRING).description("체크아웃 시간"),
+                    fieldWithPath("data.hotelImage").type(JsonFieldType.STRING).description("호텔 이미지"),
+                    fieldWithPath("data.standardPeople").type(JsonFieldType.NUMBER).description("기준 인원"),
+                    fieldWithPath("data.maxPeople").type(JsonFieldType.NUMBER).description("최대 인원"),
+                    fieldWithPath("data.hotelName").type(JsonFieldType.STRING).description("호텔 이름"),
+                    fieldWithPath("data.roomName").type(JsonFieldType.STRING).description("객실 이름"),
+                    fieldWithPath("data.bank").type(JsonFieldType.STRING).description("은행 이름"),
+                    fieldWithPath("data.accountNumber").type(JsonFieldType.STRING).description("계좌 번호"),
+                    fieldWithPath("data.firstPrice.originalPrice").type(JsonFieldType.NUMBER).description("원래 가격"),
+                    fieldWithPath("data.firstPrice.firstSalePrice").type(JsonFieldType.NUMBER).description("첫 번째 판매 가격"),
+                    fieldWithPath("data.secondPrice.secondPriceStartDate").type(JsonFieldType.STRING).description("두 번째 가격 시작 날짜"),
+                    fieldWithPath("data.secondPrice.secondPrice").type(JsonFieldType.NUMBER).description("두 번째 가격"),
+                    fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 시간")
+                )
+            ));
     }
 }
