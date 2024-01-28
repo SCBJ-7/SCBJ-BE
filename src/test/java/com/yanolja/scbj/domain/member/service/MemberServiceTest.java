@@ -17,7 +17,7 @@ import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
-import com.yanolja.scbj.domain.member.helper.TestConstants;
+import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;

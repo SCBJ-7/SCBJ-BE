@@ -6,7 +6,7 @@ import static org.mockito.BDDMockito.given;
 
 import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
-import com.yanolja.scbj.domain.member.helper.TestConstants;
+import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.global.config.CustomUserDetailsService;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;

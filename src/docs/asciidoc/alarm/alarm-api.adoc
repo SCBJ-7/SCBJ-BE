@@ -1,0 +1,36 @@
+== Alarm REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[get-alarms]]
+== 알람 조회
+
+알람를 조회하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/alarm-docs-rest-controller-test/get-alarms/http-request.adoc[]
+include::{snippets}/alarm-docs-rest-controller-test/get-alarms/request-headers.adoc[]
+
+=== HttpResponse
+include::{snippets}/alarm-docs-rest-controller-test/get-alarms/http-response.adoc[]
+include::{snippets}/alarm-docs-rest-controller-test/get-alarms/response-fields.adoc[]
+
+
+
+[[has-non-read-alarm]]
+== 안 읽은 알림 있는지 여부
+
+안 읽은 알림이 있는지 확인하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/alarm-docs-rest-controller-test/has-non-read-alarm/http-request.adoc[]
+include::{snippets}/alarm-docs-rest-controller-test/has-non-read-alarm/request-headers.adoc[]
+
+=== HttpResponse
+include::{snippets}/alarm-docs-rest-controller-test/has-non-read-alarm/http-response.adoc[]
+include::{snippets}/alarm-docs-rest-controller-test/has-non-read-alarm/response-fields.adoc[]
+
+

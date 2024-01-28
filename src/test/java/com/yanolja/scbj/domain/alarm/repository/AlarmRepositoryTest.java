@@ -115,15 +115,6 @@ public class AlarmRepositoryTest extends AbstractContainersSupport {
         assertEquals(alarms.size(),1);
     }
 
-//    @Test
-//    @DisplayName("알람이 필요한 결제내역을 조회할 수 있다.")
-//    void findPurchasedHistoriesNeedForCheckInAlarm() {
-//        // when
-//        List<CheckInAlarmResponse> checkInAlarmResponses = paymentHistoryRepository.findPurchasedHistoriesNeedForCheckInAlarm();
-//        // then
-//        assertEquals(1, checkInAlarmResponses.size());
-//    }
-
     private Member createMember(YanoljaMember yanoljaMember) {
         Member member = Member.builder()
             .email("user@example.com")
