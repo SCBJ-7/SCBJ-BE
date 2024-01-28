@@ -1,5 +1,7 @@
 package com.yanolja.scbj.docs;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.headers.RequestHeadersSnippet;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -57,5 +60,11 @@ public abstract class RestDocsSupport extends AbstractContainersSupport {
     protected FieldDescriptor[] responseCommon() {
         return new FieldDescriptor[]{
             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지")};
+    }
+
+    protected RequestHeadersSnippet jwtHeader() {
+        return requestHeaders(headerWithName("Authorization").description("JWT 액세스 토큰"));
+
+
     }
 }
