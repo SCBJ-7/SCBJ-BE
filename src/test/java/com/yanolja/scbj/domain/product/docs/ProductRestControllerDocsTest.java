@@ -3,20 +3,25 @@ package com.yanolja.scbj.domain.product.docs;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.yanolja.scbj.docs.RestDocsSupport;
+import com.yanolja.scbj.domain.alarm.service.AlarmService;
 import com.yanolja.scbj.domain.hotelRoom.dto.response.RoomThemeFindResponse;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.product.controller.ProductRestController;
+import com.yanolja.scbj.domain.product.dto.request.ProductPostRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductFindResponse;
+import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
@@ -24,6 +29,7 @@ import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -36,9 +42,67 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
     @MockBean
     private SecurityUtil securityUtil;
 
+    @MockBean
+    private AlarmService alarmService;
+
     @Override
     public Object initController() {
         return new ProductRestController(productService, securityUtil);
+    }
+
+    @Test
+    @DisplayName("상품(양도글) 작성 API 문서화")
+    void postProduct() throws Exception {
+        // given
+        ProductPostRequest productPostRequest = ProductPostRequest.builder()
+            .firstPrice(250000)
+            .secondPrice(200000)
+            .bank("신한은행")
+            .accountNumber("110-499-519198")
+            .secondGrantPeriod(5)
+            .isRegistered(true)
+            .standardTimeSellingPolicy(true)
+            .totalAmountPolicy(true)
+            .sellingModificationPolicy(true)
+            .productAgreement(true)
+            .build();
+
+        ProductPostResponse productPostResponse = ProductPostResponse.builder()
+            .productId(1L)
+            .build();
+
+        given(productService.postProduct(any(Long.TYPE), any(Long.TYPE),
+            any(ProductPostRequest.class))).willReturn(productPostResponse);
+
+        // when, then
+        mockMvc.perform(post("/v1/products/{reservation_id}", 1L)
+                .content(objectMapper.writeValueAsString(productPostRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andDo(restDoc.document(
+                pathParameters(parameterWithName("reservation_id").description("예약내역 식별자")),
+                requestFields(
+                    fieldWithPath("firstPrice").type(JsonFieldType.NUMBER).description("1차 양도 가격"),
+                    fieldWithPath("secondPrice").type(JsonFieldType.NUMBER).description("2차 양도 가격"),
+                    fieldWithPath("bank").type(JsonFieldType.STRING).description("정산 은행"),
+                    fieldWithPath("accountNumber").type(JsonFieldType.STRING).description("정산 계좌"),
+                    fieldWithPath("secondGrantPeriod").type(JsonFieldType.NUMBER)
+                        .description("2차 양도 시점"),
+                    fieldWithPath("isRegistered").type(JsonFieldType.BOOLEAN)
+                        .description("2차 양도 가격 설정 여부"),
+                    fieldWithPath("standardTimeSellingPolicy").type(JsonFieldType.BOOLEAN)
+                        .description("체크인 기준 판매 자동 완료 방침"),
+                    fieldWithPath("totalAmountPolicy").type(JsonFieldType.BOOLEAN)
+                        .description("정산 총액 확인 방침"),
+                    fieldWithPath("sellingModificationPolicy").type(JsonFieldType.BOOLEAN)
+                        .description("판매가 수정 불가 방침"),
+                    fieldWithPath("productAgreement").type(JsonFieldType.BOOLEAN)
+                        .description("판매 진행 동의 방침")
+                ),
+                responseFields(responseCommon()).and(
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                    fieldWithPath("data.productId").type(JsonFieldType.NUMBER).description("상품 식별자")
+                )));
     }
 
     @Test
