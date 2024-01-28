@@ -23,16 +23,12 @@ public class TimeValidator {
             || month == JANUARY || month == FEBRUARY;
     }
 
-    public boolean isOverSecondGrantPeriod(Product product, LocalDateTime checkInDateTime){
-        LocalDateTime changeTime = null;
-        if(product.getSecondGrantPeriod() != SecondTransferExistence.NOT_EXISTS.getStatus()){
-
+    public boolean isOverSecondGrantPeriod(Product product, LocalDateTime checkInDateTime) {
+        if (product.getSecondGrantPeriod() != SecondTransferExistence.NOT_EXISTS.getStatus()) {
             long changeHour = product.getSecondGrantPeriod();
-            changeTime = checkInDateTime.minusHours(changeHour);
+            LocalDateTime changeTime = checkInDateTime.minusHours(changeHour);
 
-            if (changeTime.isBefore(LocalDateTime.now())) {
-                return true;
-            }
+            return changeTime.isBefore(LocalDateTime.now());
         }
         return false;
     }
