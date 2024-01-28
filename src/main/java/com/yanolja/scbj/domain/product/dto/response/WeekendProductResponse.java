@@ -1,6 +1,7 @@
 package com.yanolja.scbj.domain.product.dto.response;
 
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,8 +15,8 @@ public record WeekendProductResponse(
     int originalPrice,
     int salePrice,
     double salePercentage,
-    LocalDateTime checkInDate,
-    LocalDateTime checkOutDate,
+    LocalDate checkInDate,
+    LocalDate checkOutDate,
     boolean isBrunchIncluded,
     boolean isPoolIncluded,
     boolean isOceanViewIncluded,
