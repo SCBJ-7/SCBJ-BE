@@ -2,11 +2,15 @@ package com.yanolja.scbj.domain.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yanolja.scbj.docs.RestDocsSupport;
 import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.helper.TestConstants;
@@ -25,24 +29,16 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@ExtendWith(MockitoExtension.class)
-@WebMvcTest(
-    controllers = MemberAuthRestController.class,
-    excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)
-    },
-    excludeAutoConfiguration = SecurityAutoConfiguration.class
-)
-class MemberAuthRestControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+class MemberAuthRestControllerDocsTest extends RestDocsSupport {
 
     @MockBean
     private MemberAuthService memberAuthService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Override
+    public Object initController() {
+        return new MemberAuthRestController(memberAuthService);
+    }
 
     @Test
     @DisplayName("리프레쉬 토큰 재발급할 때")
@@ -64,7 +60,16 @@ class MemberAuthRestControllerTest {
                 .content(objectMapper.writeValueAsString(refreshRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andDo(print());
+            .andDo(restDoc.document(
+                requestFields(
+                    fieldWithPath("accessToken").type(String.class).description("만료된 액세스 토큰"),
+                    fieldWithPath("refreshToken").type(String.class).description("리프레쉬 토큰")
+                ),
+                responseFields(responseCommon()).and(
+                    fieldWithPath("data.accessToken").type(Number.class).description("재발급된 액세스 토큰"),
+                    fieldWithPath("data.refreshToken").type(Number.class).description("리프레쉬 토큰")
+                )
+            ));
 
 
     }
