@@ -4,18 +4,23 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.yanolja.scbj.docs.RestDocsSupport;
 import com.yanolja.scbj.domain.alarm.service.AlarmService;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.paymentHistory.controller.PaymentHistoryRestController;
+import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
@@ -161,6 +166,59 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.originalPrice").type(JsonFieldType.NUMBER)
                         .description("원가"),
                     fieldWithPath("data.salePrice").type(JsonFieldType.NUMBER).description("판매가")
+                )));
+    }
+
+
+    @Test
+    @DisplayName("결제 요청 API 문서화")
+    void preparePayment() throws Exception {
+        // given
+        PaymentReadyRequest paymentReadyRequest = PaymentReadyRequest.builder()
+            .customerName("김양도")
+            .customerEmail("email@naver.com")
+            .customerPhoneNumber("010-1234-1234")
+            .isAgeOver14(true)
+            .useAgree(true)
+            .collectPersonalInfo(true)
+            .cancelAndRefund(true)
+            .thirdPartySharing(true)
+            .build();
+
+        PreparePaymentResponse preparePaymentResponse = PreparePaymentResponse.builder()
+            .url("https://percenthotel.web.app/payment/66/cancel")
+            .build();
+
+        given(paymentApiServiceMap.get(any())).willReturn(kaKaoPaymentService);
+        given(kaKaoPaymentService.preparePayment(any(), any())).willReturn(preparePaymentResponse);
+
+        // when, then
+        mockMvc.perform(post("/v1/products/{product_id}/payments?paymentType={paymentType}", 1L, "kakaoPaymentService")
+                .content(objectMapper.writeValueAsString(paymentReadyRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(restDoc.document(
+                pathParameters(parameterWithName("product_id").description("상품 식별자")),
+                queryParameters(parameterWithName("paymentType").description("결제 타입")),
+                requestFields(
+                    fieldWithPath("customerName").type(JsonFieldType.STRING).description("구매자 명"),
+                    fieldWithPath("customerEmail").type(JsonFieldType.STRING)
+                        .description("구매자 이메일"),
+                    fieldWithPath("customerPhoneNumber").type(JsonFieldType.STRING)
+                        .description("구매자 전화번호"),
+                    fieldWithPath("isAgeOver14").type(JsonFieldType.BOOLEAN)
+                        .description("만 14세 이상 이용 동의"),
+                    fieldWithPath("useAgree").type(JsonFieldType.BOOLEAN).description("이용규칙 동의"),
+                    fieldWithPath("collectPersonalInfo").type(JsonFieldType.BOOLEAN)
+                        .description("개인정 수집 및 이용 동의"),
+                    fieldWithPath("cancelAndRefund").type(JsonFieldType.BOOLEAN)
+                        .description("취소 및 환불 규칙 동의"),
+                    fieldWithPath("thirdPartySharing").type(JsonFieldType.BOOLEAN)
+                        .description("개인정보 제 3자 제공 동의")
+                ),
+                responseFields(responseCommon()).and(
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                    fieldWithPath("data.url").type(JsonFieldType.STRING).description("카카오페이 결제 url")
                 )));
     }
 
