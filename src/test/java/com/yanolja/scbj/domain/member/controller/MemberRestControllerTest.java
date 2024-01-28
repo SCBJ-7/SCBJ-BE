@@ -5,9 +5,12 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yanolja.scbj.docs.RestDocsSupport;
 import com.yanolja.scbj.domain.member.dto.request.MemberEmailRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignInRequest;
 import com.yanolja.scbj.domain.member.dto.request.MemberSignUpRequest;
@@ -22,43 +25,29 @@ import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.helper.TestConstants;
 import com.yanolja.scbj.domain.member.service.MailService;
 import com.yanolja.scbj.domain.member.service.MemberService;
-import com.yanolja.scbj.global.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(
-    controllers = MemberRestController.class,
-    excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)
-    },
-    excludeAutoConfiguration = SecurityAutoConfiguration.class
-)
-class MemberRestControllerTest {
+class MemberRestControllerTest extends RestDocsSupport {
 
-    @Autowired
-    private MockMvc mockMvc;
     @MockBean
     private MemberService memberService;
 
     @MockBean
     private MailService mailService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Override
+    public Object initController() {
+        return null;
+    }
 
 
     @Nested
@@ -98,7 +87,28 @@ class MemberRestControllerTest {
                     .content(objectMapper.writeValueAsString(memberSignUpRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                    requestFields(
+                        fieldWithPath("email").type(String.class).description("사용자 이메일"),
+                        fieldWithPath("name").type(String.class).description("사용자 이름"),
+                        fieldWithPath("password").type(String.class).description("사용자 비밀번호"),
+                        fieldWithPath("phone").type(String.class).description("사용자 핸드폰 번호"),
+                        fieldWithPath("privacyPolicy").type(Boolean.class)
+                            .description("개인정보 처리 방침 여부"),
+                        fieldWithPath("termOfUse").type(Boolean.class).description("이용 약관 여부")
+                    ),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data.id").type(Number.class).description("사용자 식별자"),
+                        fieldWithPath("data.email").type(Number.class).description("사용자 이메일"),
+                        fieldWithPath("data.name").type(Number.class).description("사용자 이름"),
+                        fieldWithPath("data.phone").type(Number.class).description("사용자 핸드폰 번호"),
+                        fieldWithPath("data.accountNumber").type(Number.class)
+                            .description("사용자 계좌 번호"),
+                        fieldWithPath("data.bank").type(Number.class).description("사용자 계좌"),
+                        fieldWithPath("data.linkedToYanolja").type(Number.class)
+                            .description("야놀자 연동 여부")
+                    )
+                ));
 
         }
 
@@ -115,7 +125,35 @@ class MemberRestControllerTest {
                     .content(objectMapper.writeValueAsString(memberSignInRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                    requestFields(
+                        fieldWithPath("email").type(String.class).description("사용자 이메일"),
+                        fieldWithPath("password").type(String.class).description("사용자 비밀번호"),
+                        fieldWithPath("fcmToken").type(String.class).description("사용자 기기 식별자 토큰")
+                            .optional()
+                    ),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data.memberResponse.id").type(Number.class)
+                            .description("사용자 식별자"),
+                        fieldWithPath("data.memberResponse.email").type(Number.class)
+                            .description("사용자 이메일"),
+                        fieldWithPath("data.memberResponse.name").type(Number.class)
+                            .description("사용자 이름"),
+                        fieldWithPath("data.memberResponse.phone").type(Number.class)
+                            .description("사용자 핸드폰 번호"),
+                        fieldWithPath("data.memberResponse.accountNumber").type(Number.class)
+                            .description("사용자 계좌 번호"),
+                        fieldWithPath("data.memberResponse.bank").type(Number.class)
+                            .description("사용자 계좌"),
+                        fieldWithPath("data.memberResponse.linkedToYanolja").type(Number.class)
+                            .description("야놀자 연동 여부"),
+                        fieldWithPath("data.tokenResponse.accessToken").type(String.class)
+                            .description("액세스 토큰"),
+                        fieldWithPath("data.tokenResponse.refreshToken").type(String.class)
+                            .description("리프레쉬 토큰")
+                    )
+                ));
+
         }
 
         @Test
@@ -128,10 +166,16 @@ class MemberRestControllerTest {
                 .build();
             //when & then
             mockMvc.perform(post("/v1/members/logout")
+                    .header("Authorization", "")
                     .content(objectMapper.writeValueAsString(refreshRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                    jwtHeader(),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data").type(Object.class).description("응답 데이터")
+                    )
+                ));
         }
 
         @Test
@@ -142,10 +186,20 @@ class MemberRestControllerTest {
                 .builder().password(testPassword).build();
             //when & then
             mockMvc.perform(patch("/v1/members/password")
+                    .header("Authorization", "")
                     .content(objectMapper.writeValueAsString(memberUpdatePasswordRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                    jwtHeader(),
+                    requestFields(
+                        fieldWithPath("password").type(String.class).description("사용자 비밀번호"),
+                        fieldWithPath("email").type(String.class).description("사용자 이메일")
+                    ),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data").type(Object.class).description("응답 데이터")
+                    )
+                ));
         }
 
         @Test
@@ -156,10 +210,20 @@ class MemberRestControllerTest {
                 .builder().accountNumber("1233456783").bank("농협").build();
             //when & then
             mockMvc.perform(patch("/v1/members/account")
+                    .header("Authorization", "")
                     .content(objectMapper.writeValueAsString(memberUpdateAccountRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                    jwtHeader(),
+                    requestFields(
+                        fieldWithPath("accountNumber").type(String.class).description("사용자 계좌 번호"),
+                        fieldWithPath("bank").type(String.class).description("사용자 계좌")
+                    ),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data").type(Object.class).description("응답 데이터")
+                    )
+                ));
         }
 
         @Test
@@ -170,10 +234,19 @@ class MemberRestControllerTest {
                 .name(memberResponse.getName()).build();
             //when & then
             mockMvc.perform(patch("/v1/members/name")
+                    .header("Authorization","")
                     .content(objectMapper.writeValueAsString(memberUpdateNameRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                    jwtHeader(),
+                    requestFields(
+                        fieldWithPath("name").type(String.class).description("사용자 이름")
+                    ),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data").type(Object.class).description("응답 데이터")
+                    )
+                ));
         }
 
         @Test
@@ -188,7 +261,15 @@ class MemberRestControllerTest {
                     .content(objectMapper.writeValueAsString(memberEmailRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                    requestFields(
+                        fieldWithPath("email").type(String.class).description("사용자 이메일")
+                    ),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data").type(String.class)
+                            .description("이메일 인증 번호")
+                    )
+                ));
         }
 
         @Test
@@ -199,10 +280,20 @@ class MemberRestControllerTest {
                 .email(memberResponse.getEmail()).build();
             //when & then
             mockMvc.perform(post("/v1/members/yanolja")
+                    .header("Authorization", "")
                     .content(objectMapper.writeValueAsString(memberEmailRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                    jwtHeader(),
+                    requestFields(
+                        fieldWithPath("email").type(String.class).description("사용자 이메일")
+                    ),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data").type(Object.class)
+                            .description("응답 데이터")
+                    )
+                ));
         }
 
         @Test
@@ -214,10 +305,20 @@ class MemberRestControllerTest {
                 .build();
             //when & then
             mockMvc.perform(patch("/v1/members/phone")
+                    .header("Authorization", "")
                     .content(objectMapper.writeValueAsString(memberUpdatePhoneRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                    jwtHeader(),
+                    requestFields(
+                        fieldWithPath("phone").type(String.class).description("사용자 핸드폰 번호")
+                    ),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data").type(Object.class)
+                            .description("응답 데이터")
+                    )
+                ));
         }
 
         @Test
@@ -226,10 +327,26 @@ class MemberRestControllerTest {
             //given
             given(memberService.getMemberInfo()).willReturn(memberResponse);
             //when & then
-            mockMvc.perform(get("/v1/members"))
+            mockMvc.perform(get("/v1/members")
+                    .header("Authorization",""))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(restDoc.document(
+                        jwtHeader(),
+                    responseFields(responseCommon()).and(
+                        fieldWithPath("data.id").type(Number.class).description("사용자 식별자"),
+                        fieldWithPath("data.email").type(Number.class).description("사용자 이메일"),
+                        fieldWithPath("data.name").type(Number.class).description("사용자 이름"),
+                        fieldWithPath("data.phone").type(Number.class).description("사용자 핸드폰 번호"),
+                        fieldWithPath("data.accountNumber").type(Number.class)
+                            .description("사용자 계좌 번호"),
+                        fieldWithPath("data.bank").type(Number.class).description("사용자 계좌"),
+                        fieldWithPath("data.linkedToYanolja").type(Number.class)
+                            .description("야놀자 연동 여부")
+                    )
+                ));
         }
+
+
     }
 
 }
