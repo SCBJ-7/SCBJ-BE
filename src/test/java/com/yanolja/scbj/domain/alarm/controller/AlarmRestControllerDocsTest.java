@@ -14,6 +14,7 @@ import com.yanolja.scbj.domain.alarm.dto.AlarmHasNonReadResponse;
 import com.yanolja.scbj.domain.alarm.dto.AlarmResponse;
 import com.yanolja.scbj.domain.alarm.service.AlarmService;
 import com.yanolja.scbj.domain.alarm.util.AlarmMapper;
+import com.yanolja.scbj.global.helper.TestConstants;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ class AlarmRestControllerDocsTest extends RestDocsSupport {
 
     @Nested
     @DisplayName("알림 관련 API 사용시")
-    class SuccessTests {
+    class AlarmDocsRestControllerTest {
         AlarmResponse alarmResponse = AlarmResponse.builder()
             .title("알림 TEST 제목입니다.")
             .content("알림 TEST 내용입니다.")
@@ -52,7 +53,7 @@ class AlarmRestControllerDocsTest extends RestDocsSupport {
 
             // when & then
             mockMvc.perform(get("/v1/alarms")
-                    .header("Authorization",""))
+                    .header("Authorization", TestConstants.ACCESS_TOKEN))
                 .andExpect(status().isOk())
                 .andDo(restDoc.document(
                     jwtHeader(),
@@ -75,7 +76,7 @@ class AlarmRestControllerDocsTest extends RestDocsSupport {
 
             // when & then
             mockMvc.perform(get("/v1/alarms/status")
-                    .header("Authorization", ""))
+                    .header("Authorization", TestConstants.ACCESS_TOKEN))
                 .andExpect(status().isOk())
                 .andDo(restDoc.document(
                     jwtHeader(),

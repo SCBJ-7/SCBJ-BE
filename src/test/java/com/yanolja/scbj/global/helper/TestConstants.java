@@ -1,8 +1,9 @@
-package com.yanolja.scbj.domain.member.helper;
+package com.yanolja.scbj.global.helper;
 
 public enum TestConstants {
     GRANT_TYPE("Bearer "),
-    REFRESH_PREFIX("Refresh");
+    REFRESH_PREFIX("Refresh"),
+    ACCESS_TOKEN("ACCESS_TOKEN");
 
     private String value;
 

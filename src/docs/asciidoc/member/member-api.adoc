@@ -1,0 +1,146 @@
+== Member REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[sign-up]]
+== 회원 가입
+
+회원 가입하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-docs-rest-controller-test/sign-up/http-request.adoc[]
+include::{snippets}/member-docs-rest-controller-test/sign-up/response-fields.adoc[]
+
+
+=== HttpResponse
+include::{snippets}/member-docs-rest-controller-test/sign-up/http-response.adoc[]
+include::{snippets}/member-docs-rest-controller-test/sign-up/response-fields.adoc[]
+
+
+[[sign-in]]
+== 로그인
+
+로그인하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-docs-rest-controller-test/sign-in/http-request.adoc[]
+include::{snippets}/member-docs-rest-controller-test/sign-in/request-fields.adoc[]
+
+=== HttpResponse
+include::{snippets}/member-docs-rest-controller-test/sign-in/http-response.adoc[]
+include::{snippets}/member-docs-rest-controller-test/sign-in/response-fields.adoc[]
+
+[[logout]]
+== 로그아웃
+
+로그아웃 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-docs-rest-controller-test/logout/http-request.adoc[]
+include::{snippets}/member-docs-rest-controller-test/logout/request-headers.adoc[]
+
+
+=== HttpResponse
+include::{snippets}/member-docs-rest-controller-test/logout/http-response.adoc[]
+include::{snippets}/member-docs-rest-controller-test/logout/response-fields.adoc[]
+
+[[get-current-member]]
+== 회원 정보 조회
+
+사용자 본인의 회원 정보를 조회하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-docs-rest-controller-test/get-member-info/http-request.adoc[]
+include::{snippets}/member-docs-rest-controller-test/get-member-info/request-headers.adoc[]
+
+
+=== HttpResponse
+include::{snippets}/member-docs-rest-controller-test/get-member-info/http-response.adoc[]
+include::{snippets}/member-docs-rest-controller-test/get-member-info/response-fields.adoc[]
+
+
+[[link-up-yanolja]]
+== 야놀자 계정 연동
+
+야놀자 계정을 연동하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-docs-rest-controller-test/link-up-yanolja/http-request.adoc[]
+include::{snippets}/member-docs-rest-controller-test/link-up-yanolja/request-headers.adoc[]
+include::{snippets}/member-docs-rest-controller-test/link-up-yanolja/request-fields.adoc[]
+
+=== HttpResponse
+include::{snippets}/member-docs-rest-controller-test/link-up-yanolja/http-response.adoc[]
+include::{snippets}/member-docs-rest-controller-test/link-up-yanolja/response-fields.adoc[]
+
+[[update-password]]
+== 비밀번호 업데이트
+
+비밀번호를 업데이트하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-docs-rest-controller-test/update-member-password/http-request.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-password/request-headers.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-password/request-fields.adoc[]
+
+=== HttpResponse
+include::{snippets}/member-docs-rest-controller-test/update-member-password/http-response.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-password/response-fields.adoc[]
+
+[[update-account]]
+== 계좌번호 등록/ 수정
+
+계좌번호를 등록/ 수정하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-docs-rest-controller-test/update-member-account/http-request.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-account/request-headers.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-account/request-fields.adoc[]
+
+=== HttpResponse
+include::{snippets}/member-docs-rest-controller-test/update-member-account/http-response.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-account/response-fields.adoc[]
+
+[[update-phone]]
+== 핸드폰 번호 업데이트
+
+핸드폰 번호를 업데이트하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-docs-rest-controller-test/update-member-phone/http-request.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-phone/request-headers.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-phone/request-fields.adoc[]
+
+=== HttpResponse
+include::{snippets}/member-docs-rest-controller-test/update-member-phone/http-response.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-phone/response-fields.adoc[]
+
+[[update-name]]
+== 이름 업데이트
+
+이름을 업데이트하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-docs-rest-controller-test/update-member-name/http-request.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-name/request-headers.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-name/request-fields.adoc[]
+
+=== HttpResponse
+include::{snippets}/member-docs-rest-controller-test/update-member-name/http-response.adoc[]
+include::{snippets}/member-docs-rest-controller-test/update-member-name/response-fields.adoc[]
+
+[[refresh-access-token]]
+== 액세스 토큰 재발급
+
+액세스 토큰을 재발급하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/member-auth-rest-controller-docs-test/refresh-access-token/http-request.adoc[]
+include::{snippets}/member-auth-rest-controller-docs-test/refresh-access-token/request-fields.adoc[]
+
+=== HttpResponse
+include::{snippets}/member-auth-rest-controller-docs-test/refresh-access-token/http-response.adoc[]
+include::{snippets}/member-auth-rest-controller-docs-test/refresh-access-token/response-fields.adoc[]
