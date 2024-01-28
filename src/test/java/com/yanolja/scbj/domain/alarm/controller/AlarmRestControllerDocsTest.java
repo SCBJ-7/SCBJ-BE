@@ -55,6 +55,7 @@ class AlarmRestControllerDocsTest extends RestDocsSupport {
                     .header("Authorization",""))
                 .andExpect(status().isOk())
                 .andDo(restDoc.document(
+                    jwtHeader(),
                     responseFields(responseCommon()).and(
                         fieldWithPath("data[].id").type(Number.class).description("사용자 식별자"),
                         fieldWithPath("data[].title").type(String.class).description("알림 제목"),
@@ -73,9 +74,11 @@ class AlarmRestControllerDocsTest extends RestDocsSupport {
             given(alarmService.hasNonReadAlarm()).willReturn(alarmHasNonReadResponse);
 
             // when & then
-            mockMvc.perform(get("/v1/alarms/status"))
+            mockMvc.perform(get("/v1/alarms/status")
+                    .header("Authorization", ""))
                 .andExpect(status().isOk())
                 .andDo(restDoc.document(
+                    jwtHeader(),
                     responseFields(responseCommon()).and(
                         fieldWithPath("data.hasNonReadAlarm").type(Boolean.class).description("안 읽음 알림 있는지 여부")
                     )
