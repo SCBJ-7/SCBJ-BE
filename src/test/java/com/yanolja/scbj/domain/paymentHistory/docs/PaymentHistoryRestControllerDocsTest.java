@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.paymentHistory.docs;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -11,13 +12,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.yanolja.scbj.docs.RestDocsSupport;
 import com.yanolja.scbj.domain.alarm.service.AlarmService;
+import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.paymentHistory.controller.PaymentHistoryRestController;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
+import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.KaKaoPaymentService;
+import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.PaymentApiService;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,6 +39,12 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
     PaymentHistoryService paymentHistoryService;
 
     @MockBean
+    private Map<String, PaymentApiService> paymentApiServiceMap;
+
+    @MockBean
+    private KaKaoPaymentService kaKaoPaymentService;
+
+    @MockBean
     SecurityUtil securityUtil;
 
     @MockBean
@@ -40,7 +52,7 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
 
     @Override
     public Object initController() {
-        return new PaymentHistoryRestController(paymentHistoryService,securityUtil);
+        return new PaymentHistoryRestController(paymentHistoryService, securityUtil);
     }
 
     @Test
@@ -63,7 +75,8 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
                 .price(180000)
                 .remainingDays(10)
                 .paymentHistoryDate("24.01.26 (금)")
-                .hotelImage("https://yaimg.yanolja.com/v5/2022/09/20/13/1280/6329c608da8fb4.46198346.jpg")
+                .hotelImage(
+                    "https://yaimg.yanolja.com/v5/2022/09/20/13/1280/6329c608da8fb4.46198346.jpg")
                 .build();
 
         given(paymentHistoryService.getSpecificPurchasedHistory(any(Long.TYPE),
@@ -115,7 +128,8 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
         // given
         PaymentPageFindResponse findResponse = PaymentPageFindResponse.builder()
             .hotelName("양도 호텔")
-            .hotelImage("https://yaimg.yanolja.com/v5/2023/03/23/15/1280/641c76db5ab761.18136153.jpg")
+            .hotelImage(
+                "https://yaimg.yanolja.com/v5/2023/03/23/15/1280/641c76db5ab761.18136153.jpg")
             .roomName("호텔 인 나인 강남")
             .standardPeople(2)
             .maxPeople(4)
@@ -133,15 +147,63 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
                 pathParameters(parameterWithName("product_id").description("상품 식별자")),
                 responseFields(responseCommon()).and(
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                    fieldWithPath("data.hotelImage").type(JsonFieldType.STRING).description("호텔 이미지"),
+                    fieldWithPath("data.hotelImage").type(JsonFieldType.STRING)
+                        .description("호텔 이미지"),
                     fieldWithPath("data.hotelName").type(JsonFieldType.STRING).description("호텔 이름"),
                     fieldWithPath("data.roomName").type(JsonFieldType.STRING).description("객실 이름"),
-                    fieldWithPath("data.standardPeople").type(JsonFieldType.NUMBER).description("기준 인원"),
+                    fieldWithPath("data.standardPeople").type(JsonFieldType.NUMBER)
+                        .description("기준 인원"),
                     fieldWithPath("data.maxPeople").type(JsonFieldType.NUMBER).description("최대 인원"),
-                    fieldWithPath("data.checkInDateTime").type(JsonFieldType.STRING).description("체크 인"),
-                    fieldWithPath("data.checkOutDateTime").type(JsonFieldType.STRING).description("체크 아웃"),
-                    fieldWithPath("data.originalPrice").type(JsonFieldType.NUMBER).description("원가"),
+                    fieldWithPath("data.checkInDateTime").type(JsonFieldType.STRING)
+                        .description("체크 인"),
+                    fieldWithPath("data.checkOutDateTime").type(JsonFieldType.STRING)
+                        .description("체크 아웃"),
+                    fieldWithPath("data.originalPrice").type(JsonFieldType.NUMBER)
+                        .description("원가"),
                     fieldWithPath("data.salePrice").type(JsonFieldType.NUMBER).description("판매가")
                 )));
+    }
+
+    @Test
+    @DisplayName("결제 성공 API 문서화")
+    void successPayment() throws Exception {
+        // given
+        Member member = Member.builder()
+            .id(1L)
+            .build();
+        String pg_token = "pg_token1234567890";
+        PaymentSuccessResponse paymentSuccessResponse = PaymentSuccessResponse.builder()
+            .paymentHistoryId(1L)
+            .build();
+
+        given(paymentApiServiceMap.get(any())).willReturn(kaKaoPaymentService);
+        given(kaKaoPaymentService.approvePayment(any(), any())).willReturn(
+            paymentSuccessResponse);
+
+        // when, then
+        mockMvc.perform(get("/v1/products/pay-success?memberId=" + member.getId()
+                + "&paymentType=kakaoPaymentService&pg_token=" + pg_token)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(restDoc.document());
+    }
+
+    @Test
+    @DisplayName("결제 실패 API 문서화")
+    void cancelPayment() throws Exception {
+        // given
+        Member member = Member.builder()
+            .id(1L)
+            .build();
+
+        given(paymentApiServiceMap.get(any())).willReturn(kaKaoPaymentService);
+        doNothing().when(kaKaoPaymentService).cancelPayment();
+
+        // when, then
+        mockMvc.perform(get("/v1/products/pay-cancel?memberId=" + member.getId()
+                + "&paymentType=kakaoPaymentService")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(restDoc.document());
     }
 }
