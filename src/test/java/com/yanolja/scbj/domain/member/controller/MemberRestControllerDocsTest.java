@@ -32,11 +32,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 
 @ExtendWith(MockitoExtension.class)
-class MemberRestControllerTest extends RestDocsSupport {
+class MemberRestControllerDocsTest extends RestDocsSupport {
 
     @MockBean
     private MemberService memberService;
@@ -46,7 +45,7 @@ class MemberRestControllerTest extends RestDocsSupport {
 
     @Override
     public Object initController() {
-        return null;
+        return new MemberRestController(memberService, mailService);
     }
 
 
