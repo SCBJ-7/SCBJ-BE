@@ -1,4 +1,25 @@
-= product v1 API 문서
+= Product REST API DOCS
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[Product-Post]]
+== 상품(양도글) 작성
+
+상품(양도글)을 작성하는 API입니다.
+
+=== HttpRequest
+include::{snippets}/product-rest-controller-docs-test/post-product/http-request.adoc[]
+include::{snippets}/product-rest-controller-docs-test/post-product/path-parameters.adoc[]
+include::{snippets}/product-rest-controller-docs-test/post-product/request-fields.adoc[]
+
+
+=== HttpResponse
+include::{snippets}/product-rest-controller-docs-test/post-product/http-response.adoc[]
+include::{snippets}/product-rest-controller-docs-test/post-product/response-fields.adoc[]
+
 
 [[Get-detail-produt]]
 == 상품 상세 조회
