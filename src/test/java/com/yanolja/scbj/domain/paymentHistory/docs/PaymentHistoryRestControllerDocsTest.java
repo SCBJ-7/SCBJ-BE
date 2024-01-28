@@ -297,7 +297,7 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("payment-history/purchase-history",
-                responseFields(
+                responseFields(this.responseCommon()).and(
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                     fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("구매 내역 식별자"),
                     fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("생성 날짜 및 시간"),
@@ -411,7 +411,7 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
                     parameterWithName("saleHistory_id").description("판매 내역 식별자"),
                     parameterWithName("isPaymentId").description("결제 ID 여부")
                 ),
-                responseFields(
+                responseFields(this.responseCommon()).and(
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                     fieldWithPath("data.saleStatus").type(JsonFieldType.STRING).description("판매 상태"),
                     fieldWithPath("data.checkIn").type(JsonFieldType.STRING).description("체크인 시간"),
