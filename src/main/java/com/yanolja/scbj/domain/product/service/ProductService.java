@@ -39,7 +39,9 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -78,7 +80,7 @@ public class ProductService {
 
         checkFirstPrice(productPostRequest, targetReservation);
         checkSecondPriceAndGrandPeriod(productPostRequest);
-        checkAccountRegisterd(productPostRequest);
+        checkAccountRegistered(productPostRequest);
 
         Product savedProduct = productRepository.save(
             ProductMapper.toProduct(targetReservation, currentMember, productAgreement,
@@ -113,7 +115,7 @@ public class ProductService {
         }
     }
 
-    private void checkAccountRegisterd(ProductPostRequest productPostRequest) {
+    private void checkAccountRegistered(ProductPostRequest productPostRequest) {
         if (productPostRequest.isRegistered()) {
             memberService.updateMemberAccount(
                 MemberMapper.toUpdateAccountRequest(productPostRequest));
@@ -143,7 +145,7 @@ public class ProductService {
     }
 
     private boolean getSaleStatus(Product product, LocalDateTime checkIn) {
-        if (product.getStock() == OUT_OF_STOCK){
+        if (product.getStock() == OUT_OF_STOCK) {
             return false;
         }
         return LocalDateTime.now().isBefore(checkIn);
@@ -156,7 +158,7 @@ public class ProductService {
         return product.getMember().getId() == securityUtil.getCurrentMemberId();
     }
 
-    private int getOriginalPrice(Hotel hotel){
+    private int getOriginalPrice(Hotel hotel) {
         int originalPrice = hotel.getHotelRoomPrice().getOffPeakPrice();
 
         if (TimeValidator.isPeakTime(LocalDate.now())) {
@@ -166,7 +168,7 @@ public class ProductService {
         return originalPrice;
     }
 
-    private int getSalePrice(Product product, LocalDateTime checkInDateTime){
+    private int getSalePrice(Product product, LocalDateTime checkInDateTime) {
         int price = product.getFirstPrice();
 
         if (TimeValidator.isOverSecondGrantPeriod(product, checkInDateTime)) {
@@ -176,7 +178,7 @@ public class ProductService {
         return price;
     }
 
-    private List<String> getHotelRoomImageUrlList(List<HotelRoomImage> hotelRoomImageList){
+    private List<String> getHotelRoomImageUrlList(List<HotelRoomImage> hotelRoomImageList) {
         return hotelRoomImageList.stream()
             .map(HotelRoomImage::getUrl)
             .collect(Collectors.toList());
@@ -189,7 +191,7 @@ public class ProductService {
     }
 
     public Page<ProductSearchResponse> searchByRequest(ProductSearchRequest productSearchRequest,
-        Pageable pageable) {
+                                                       Pageable pageable) {
 
         Page<ProductSearchResponse> responses =
             productRepository.search(pageable, productSearchRequest);
@@ -198,44 +200,32 @@ public class ProductService {
     }
 
 
-    public ProductMainResponse getAllProductForMainPage(List<String> cityNames,
+    public ProductMainResponse getAllProductForMainPage(
+        List<String> cityNames,
         Pageable pageable
     ) {
-        HashMap<String, List<CityResponse>> savedProduct = new HashMap<>();
-
-        getEachCity(cityNames, savedProduct);
+        Map<String, List<CityResponse>> eachCity = getEachCity(cityNames);
         Page<WeekendProductResponse> weekendProductResponse = getWeekendProducts(pageable);
 
         return ProductMainResponse.builder()
-            .seoul(savedProduct.get("서울"))
-            .gangwon(savedProduct.get("강원"))
-            .busan(savedProduct.get("부산"))
-            .jeju(savedProduct.get("제주"))
-            .jeolla(savedProduct.get("전라"))
-            .gyeongsang(savedProduct.get("경상"))
-            .weekend(
-                weekendProductResponse.isEmpty() ? Page.empty(pageable) : weekendProductResponse)
+            .seoul(eachCity.get("서울"))
+            .gangwon(eachCity.get("강원"))
+            .busan(eachCity.get("부산"))
+            .jeju(eachCity.get("제주"))
+            .jeolla(eachCity.get("전라"))
+            .gyeongsang(eachCity.get("경상"))
+            .weekend(weekendProductResponse.isEmpty() ? Page.empty(pageable) : weekendProductResponse)
             .build();
     }
 
     private Page<WeekendProductResponse> getWeekendProducts(Pageable pageable) {
         List<Product> productByWeekend = productRepository.findProductByWeekend();
-
         List<WeekendProductResponse> responses = productByWeekend.stream()
-            .map(product -> {
-                Reservation reservation = product.getReservation();
-                RoomTheme roomTheme = reservation.getHotel().getRoom().getRoomTheme();
-                String hotelUrl = getHotelUrl(product.getReservation().getHotel());
-                int currentPrice = PricingHelper.getCurrentPrice(product);
-                double discountRate = PricingHelper.calculateDiscountRate(product, currentPrice);
-
-                return WeekendMapper.toWeekendProductResponse(product, reservation, hotelUrl,
-                    currentPrice, discountRate, getThemeCount(roomTheme), roomTheme);
-            })
-            .sorted(ascendCheckin()
+                .flatMap(this::getProductResponses)
+                .sorted(ascendCheckin()
                 .thenComparing(descendRoomThemeCount())
                 .thenComparing(descendSalePercentage()))
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), responses.size());
@@ -243,16 +233,30 @@ public class ProductService {
         return new PageImpl<>(responses.subList(start, end), pageable, responses.size());
     }
 
+    private Stream<WeekendProductResponse> getProductResponses(Product product) {
+        Reservation reservation = product.getReservation();
+        RoomTheme roomTheme = reservation.getHotel().getRoom().getRoomTheme();
+        String hotelUrl = getHotelUrl(product.getReservation().getHotel());
+        int currentPrice = PricingHelper.getCurrentPrice(product);
+        double discountRate = PricingHelper.calculateDiscountRate(product, currentPrice);
+
+        return Stream.of(WeekendMapper.toWeekendProductResponse(product, reservation, hotelUrl,
+            currentPrice, discountRate, getThemeCount(roomTheme), roomTheme));
+    }
+
     private Comparator<WeekendProductResponse> ascendCheckin() {
         return Comparator
             .comparing(WeekendProductResponse::checkInDate);
     }
+
     private Comparator<WeekendProductResponse> descendSalePercentage() {
-        return Comparator.comparing(WeekendProductResponse::salePercentage, Comparator.reverseOrder());
+        return Comparator.comparing(WeekendProductResponse::salePercentage,
+            Comparator.reverseOrder());
     }
 
     private Comparator<WeekendProductResponse> descendRoomThemeCount() {
-        return Comparator.comparing(WeekendProductResponse::roomThemeCount, Comparator.reverseOrder());
+        return Comparator.comparing(WeekendProductResponse::roomThemeCount,
+            Comparator.reverseOrder());
     }
 
     private int getThemeCount(RoomTheme roomTheme) {
@@ -261,9 +265,9 @@ public class ProductService {
             (roomTheme.isOceanView() ? 1 : 0);
     }
 
-    private void getEachCity(List<String> cities,
-                             HashMap<String, List<CityResponse>> savedProduct
-    ) {
+
+    private Map<String, List<CityResponse>> getEachCity(List<String> cities) {
+        Map<String, List<CityResponse>> savedProduct = new HashMap<>();
         cities.forEach(city -> {
             List<Product> productsByCity = productRepository.findProductByCity(city);
             List<CityResponse> getCityResponse = productsByCity.stream()
@@ -282,6 +286,7 @@ public class ProductService {
 
             savedProduct.put(city, getCityResponse);
         });
+        return savedProduct;
     }
 
     public ProductStockResponse isProductStockLeft(long productId) {
