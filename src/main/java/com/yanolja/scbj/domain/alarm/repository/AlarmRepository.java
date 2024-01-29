@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
-    Optional<List<Alarm>> getAllByMemberIdOrderByCreatedAtDesc(Long memberId);
+    List<Alarm> getAllByMemberIdOrderByCreatedAtDesc(Long memberId);
 
     boolean existsAlarmByMemberIdAndCheckedIsFalse(Long memeberId);
 

@@ -22,11 +22,13 @@ public class AlarmRestController {
 
     @GetMapping
     public ResponseDTO<List<AlarmResponse>> getAlarms() {
+
         return ResponseDTO.res(alarmService.getAlarms(), "알람 조회에 성공했습니다.");
     }
 
     @GetMapping("/status")
     public ResponseDTO<AlarmHasNonReadResponse> hasNonReadAlarm() {
+
         return ResponseDTO.res(alarmService.hasNonReadAlarm(), "알람 읽음 여부 조회에 성공했습니다.");
     }
 
