@@ -30,7 +30,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @ExtendWith({RestDocumentationExtension.class})
 @Import(RestDocsConfig.class)
 @SpringBootTest
-public abstract class RestDocsSupport {
+public abstract class RestDocsSupport extends AbstractContainersSupport {
 
     @Autowired
     protected ObjectMapper objectMapper;
