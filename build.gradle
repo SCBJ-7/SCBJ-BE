@@ -1,0 +1,145 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.1'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+}
+
+group = 'com.yanolja'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	asciidoctorExt
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('snippetsDir', file("build/generated-snippets"))
+}
+
+test {
+	outputs.dir snippetsDir
+}
+
+springBoot {
+	mainClass = 'com.yanolja.scbj.ScbjApplication'
+}
+
+dependencies {
+	//Jpa
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	//Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	//Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	//Web
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	//Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.projectlombok:lombok:1.18.28'
+	//h2
+	runtimeOnly 'com.h2database:h2'
+
+	//jwt
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+
+	//test-container
+	testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.17.2'
+
+	//mysqlpo
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	//querydsl
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	implementation 'com.querydsl:querydsl-sql:5.0.0'
+
+	//email - sender
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+  
+  	//crawling
+	implementation 'org.seleniumhq.selenium:selenium-java'
+	implementation 'org.seleniumhq.selenium:selenium-api'
+	implementation 'org.seleniumhq.selenium:selenium-chrome-driver'
+
+	//deserialize
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	//fcm
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+	//retry
+	implementation 'org.springframework.retry:spring-retry'
+
+	//scheduling
+	implementation 'org.quartz-scheduler:quartz:2.3.0'
+
+	//redisson
+	implementation 'org.redisson:redisson-spring-boot-starter:3.21.1'
+
+	// restdocs
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+def querydslDir = "src/main/generated"
+
+clean.doLast {
+	file(querydslDir).deleteDir()
+}
+
+sourceSets {
+	main.java.srcDirs += [ querydslDir ]
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+tasks.named('test') {
+	outputs.dir snippetsDir
+	useJUnitPlatform()
+}
+
+tasks.named('asciidoctor') {
+	inputs.dir snippetsDir
+	dependsOn test
+}
+
+asciidoctor {
+	dependsOn test
+	configurations 'asciidoctorExt'
+	inputs.dir snippetsDir
+}
+
+bootJar {
+	dependsOn asciidoctor
+
+	copy {
+		from asciidoctor.outputDir
+		into "src/main/resources/static/docs"
+	}
+}
+

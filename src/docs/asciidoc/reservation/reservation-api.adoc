@@ -1,0 +1,19 @@
+== Reservation REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[Reservation-Get]]
+== 야놀자 예약 내역 조회
+
+야놀자 예약 내역을 조회하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/reservation-rest-controller-docs-test/get-reservation/http-request.adoc[]
+
+=== HttpResponse
+include::{snippets}/reservation-rest-controller-docs-test/get-reservation/http-response.adoc[]
+include::{snippets}/reservation-rest-controller-docs-test/get-reservation/response-fields.adoc[]
+

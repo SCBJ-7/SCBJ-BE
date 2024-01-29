@@ -1,0 +1,61 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_SERVICE_USERNAME}
+    password: ${EMAIL_SERVICE_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    auth-code-expiration-millis: 900000
+
+jwt:
+  secret: KF81YSUjd3Q3KCFfaXd6cHlwMyNAKitkamFtYj02OXh2X3JfN2sqZShyamQrZysoXzVhJSN3dDcoIV9pd3pweXAzI0AqK2RqYW1iPTY5eHZfcl83ayplKHJqZCtnKw==   # Replace with your actual secret key
+  expiration: 3600000       # Replace with your desired expiration time in milliseconds
+  refreshExpiration: 604800000 # Replace with your desired refresh expiration time in milliseconds
+  redisRefreshKeyPrefix: "Refresh-token:" # Replace with your desired Redis refresh key prefix
+
+
+fcm:
+  request-url: "https://fcm.googleapis.com/v1/projects/scbj-af2e3/messages:send"
+  credential-path: "/credential/fcm-service-key.json"
+  scope: "https://www.googleapis.com/auth/cloud-platform"
+
+kakao-api:
+  api-key: ${API-KEY}
+
+
+server:
+  url: ${SERVER-URL}
+
+check-in:
+  expiration: ${CHECK-IN-EXPIRATION}
+
+schedule:
+  cron: ${SCHEDULE-CRON}

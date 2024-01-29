@@ -1,0 +1,46 @@
+== Payment REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[prepare-payment]]
+== 결제 요청
+
+결제를 요청하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/payment-history-rest-controller-docs-test/prepare-payment/http-request.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/prepare-payment/path-parameters.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/prepare-payment/query-parameters.adoc[]
+
+
+=== HttpResponse
+include::{snippets}/payment-history-rest-controller-docs-test/prepare-payment/http-response.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/prepare-payment/response-fields.adoc[]
+
+
+[[Payment-Success]]
+== 결제 성공
+
+결제를 성공하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/payment-history-rest-controller-docs-test/success-payment/http-request.adoc[]
+
+=== HttpResponse
+include::{snippets}/payment-history-rest-controller-docs-test/success-payment/http-response.adoc[]
+
+[[Payment-Fail]]
+== 결제 실패
+
+결제를 실패하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/payment-history-rest-controller-docs-test/cancel-payment/http-request.adoc[]
+
+=== HttpResponse
+include::{snippets}/payment-history-rest-controller-docs-test/cancel-payment/http-response.adoc[]
+
+

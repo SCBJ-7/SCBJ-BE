@@ -1,0 +1,70 @@
+== PaymentHistory REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[PaymentHistory-Specific-get]]
+== 구매내역 상세 조회
+
+구매내역을 상세 조회하는 API 입니다.
+
+=== HttpRequest
+include::{snippets}/payment-history-rest-controller-docs-test/get-specific-purchased-history/http-request.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/get-specific-purchased-history/path-parameters.adoc[]
+
+=== HttpResponse
+include::{snippets}/payment-history-rest-controller-docs-test/get-specific-purchased-history/http-response.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/get-specific-purchased-history/response-fields.adoc[]
+
+
+[[find-payment-page]]
+== 결제 페이지 조회
+
+결제 페이지를 조회하는 API입니다.
+
+=== HttpRequest
+include::{snippets}/payment-history-rest-controller-docs-test/find-payment-page/http-request.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/find-payment-page/path-parameters.adoc[]
+
+=== HttpResponse
+include::{snippets}/payment-history-rest-controller-docs-test/find-payment-page/http-response.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/find-payment-page/response-fields.adoc[]
+== 구매 내역 목록 조회
+
+사용자의 구매 내역 목록을 조회하는 API입니다.
+
+=== HttpRequest
+include::{snippets}/payment-history-rest-controller-docs-test/get-purchased-history/http-request.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/get-purchased-history/path-parameters.adoc[]
+
+=== HttpResponse
+include::{snippets}/payment-history-rest-controller-docs-test/get-purchased-history/http-response.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/get-purchased-history/response-fields.adoc[]
+
+[[saleHisotry-list]]
+== 판매 내역 목록 조회
+
+판매 내역 목록을 조회하는 API입니다.
+
+=== HttpRequest
+include::{snippets}/payment-history-rest-controller-docs-test/get-sale-history/http-request.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/get-sale-history/path-parameters.adoc[]
+
+=== HttpResponse
+include::{snippets}/payment-history-rest-controller-docs-test/get-sale-history/http-response.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/get-sale-history/response-fields.adoc[]
+
+== 판매 내역 상세 조회
+
+특정 판매 내역을 상세 조회하는 API입니다.
+
+=== HttpRequest
+include::{snippets}/payment-history-rest-controller-docs-test/get-specific-sale-history/http-request.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/get-specific-sale-history/path-parameters.adoc[]
+
+=== HttpResponse
+include::{snippets}/payment-history-rest-controller-docs-test/get-specific-sale-history/http-response.adoc[]
+include::{snippets}/payment-history-rest-controller-docs-test/get-specific-sale-history/response-fields.adoc[]
+
