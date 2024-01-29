@@ -69,8 +69,7 @@ class AlarmServiceTest {
             AlarmResponse expectedAlarmResponse = AlarmMapper.toAlarmResponse(alarm);
 
             given(securityUtil.getCurrentMemberId()).willReturn(1L);
-            given(alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(1L)).willReturn(
-                Optional.of(List.of(alarm)));
+            given(alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(1L)).willReturn(List.of(alarm));
             // when
             List<AlarmResponse> resultAlarmResponses = alarmService.getAlarms();
 

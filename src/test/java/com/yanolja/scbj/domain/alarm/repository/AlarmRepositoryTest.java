@@ -2,7 +2,6 @@ package com.yanolja.scbj.domain.alarm.repository;
 
 import static org.junit.Assert.assertEquals;
 
-import com.yanolja.scbj.domain.alarm.dto.CheckInAlarmResponse;
 import com.yanolja.scbj.domain.alarm.entity.Alarm;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
@@ -51,9 +50,6 @@ public class AlarmRepositoryTest extends AbstractContainersSupport {
 
     @Autowired
     private HotelRoomImageRepository hotelRoomImageRepository;
-
-    @Autowired
-    private HotelRoomPriceRepository hotelRoomPriceRepository;
 
 
     @Autowired
@@ -109,20 +105,11 @@ public class AlarmRepositoryTest extends AbstractContainersSupport {
             .build());
 
         // when
-        List<Alarm> alarms= alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(member.getId()).orElseThrow();
+        List<Alarm> alarms= alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(member.getId());
 
         // then
         assertEquals(alarms.size(),1);
     }
-
-//    @Test
-//    @DisplayName("알람이 필요한 결제내역을 조회할 수 있다.")
-//    void findPurchasedHistoriesNeedForCheckInAlarm() {
-//        // when
-//        List<CheckInAlarmResponse> checkInAlarmResponses = paymentHistoryRepository.findPurchasedHistoriesNeedForCheckInAlarm();
-//        // then
-//        assertEquals(1, checkInAlarmResponses.size());
-//    }
 
     private Member createMember(YanoljaMember yanoljaMember) {
         Member member = Member.builder()
