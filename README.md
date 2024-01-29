@@ -1,5 +1,5 @@
-![transparent](https://capsule-render.vercel.app/api?type=waving&fontColor=FFFFFF&text=%%호텔&height=230&fontAlignY=40&fontSize=60&desc=Team.숙취방지&descAlignY=65&descAlign=74&color=FE5E0D&)
-<img src="https://avatars.githubusercontent.com/u/154401745?s=200&v=4SCBJ-BE" width=100 alt=숙취방지> 퍼센트 호텔
+![transparent](https://capsule-render.vercel.app/api?type=waving&fontColor=FFFFFF&text=%%호텔&height=230&fontAlignY=40&fontSize=60&desc=Team.숙취방지&descAlignY=65&descAlign=74&color=FE5E0D&)<br>
+<img src="https://avatars.githubusercontent.com/u/154401745?s=200&v=4SCBJ-BE" width=100 alt=숙취방지> [퍼센트 호텔](https://percenthotel.web.app/)
 >**무료 예약 취소 불가한 숙소의 양도/거래 플랫폼 "퍼센트 호텔"**
 
 > 일시: 2023.12.06~2024.01.28 ~<br>
