@@ -39,8 +39,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -192,7 +190,6 @@ public class PaymentHistoryRestControllerTest {
                 "거래완료"
             ));
 
-
             given(paymentHistoryService.getUsersSaleHistory(anyLong())).willReturn(responses);
 
             //when
@@ -259,13 +256,11 @@ public class PaymentHistoryRestControllerTest {
             Long memberId = 1L;
             Long saleHistoryId = 1L;
 
-
             SpecificSaleHistoryResponse.firstPriceResponse firstPriceObject =
                 SpecificSaleHistoryResponse.firstPriceResponse.builder()
                     .originalPrice(212000)
                     .firstSalePrice(139000)
                     .build();
-
 
             SpecificSaleHistoryResponse.secondPriceResponse secondPriceObject =
                 SpecificSaleHistoryResponse.secondPriceResponse.builder()
@@ -290,11 +285,12 @@ public class PaymentHistoryRestControllerTest {
                 .build();
 
             given(securityUtil.getCurrentMemberId()).willReturn(memberId);
-            given(paymentHistoryService.getSpecificSaleHistory(memberId, saleHistoryId,true)).willReturn(
+            given(paymentHistoryService.getSpecificSaleHistory(memberId, saleHistoryId,
+                true)).willReturn(
                 response);
 
             // 실행 (When)
-            mockMvc.perform(get("/v1/members/sale-history/" + saleHistoryId+"/"+true))
+            mockMvc.perform(get("/v1/members/sale-history/" + saleHistoryId + "/" + true))
                 .andExpect(status().isOk())
                 .andDo(print())
 

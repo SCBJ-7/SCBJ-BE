@@ -31,8 +31,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @DataJpaTest
@@ -95,6 +93,7 @@ class HistoryRepositoryTest {
         entityManager.persist(hotel);
         return hotel;
     }
+
     private HotelRoomImage createHotelRoomImage(Hotel hotel) {
         HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
             .hotel(hotel)
@@ -245,8 +244,10 @@ class HistoryRepositoryTest {
             paymentHistoryRepository.save(paymentHistory);
 
             // when
-            PaymentHistory result = paymentHistoryRepository.findByIdAndMemberId(member.getId(), paymentHistory.getId())
-                .orElseThrow(() -> new PaymentHistoryNotFoundException(ErrorCode.PURCHASE_LOAD_FAIL));
+            PaymentHistory result = paymentHistoryRepository.findByIdAndMemberId(member.getId(),
+                    paymentHistory.getId())
+                .orElseThrow(
+                    () -> new PaymentHistoryNotFoundException(ErrorCode.PURCHASE_LOAD_FAIL));
 
             // then
             assertThat(result).isNotNull();

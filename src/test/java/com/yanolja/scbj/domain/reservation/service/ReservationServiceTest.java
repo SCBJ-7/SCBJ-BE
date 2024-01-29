@@ -139,7 +139,7 @@ class ReservationServiceTest {
                 .reservation(reservation1)
                 .build();
 
-            product.delete(LocalDateTime.of(2024,1,26,17,0));
+            product.delete(LocalDateTime.of(2024, 1, 26, 17, 0));
 
             given(productRepository.findByReservationId(reservation1.getId())).willReturn(
                 java.util.Optional.ofNullable(product));

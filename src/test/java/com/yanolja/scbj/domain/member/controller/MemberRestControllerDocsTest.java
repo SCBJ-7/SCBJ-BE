@@ -22,9 +22,9 @@ import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.MemberResponse;
 import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
-import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.domain.member.service.MailService;
 import com.yanolja.scbj.domain.member.service.MemberService;
+import com.yanolja.scbj.global.helper.TestConstants;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,19 +53,19 @@ class MemberRestControllerDocsTest extends RestDocsSupport {
     @DisplayName("멤버 관련 API 사용시")
     class MemberDocsRestControllerTest {
 
-        private String testPassword = "test1234@";
-        private MemberResponse memberResponse = MemberResponse.builder()
+        private final String testPassword = "test1234@";
+        private final MemberResponse memberResponse = MemberResponse.builder()
             .id(1L)
             .email("test@gmail.com")
             .phone("010-1234-5678")
             .name("test")
             .build();
 
-        private TokenResponse tokenResponse = TokenResponse.builder()
+        private final TokenResponse tokenResponse = TokenResponse.builder()
             .accessToken("")
             .refreshToken("")
             .build();
-        private MemberSignInResponse memberSignInResponse = MemberSignInResponse.builder()
+        private final MemberSignInResponse memberSignInResponse = MemberSignInResponse.builder()
             .memberResponse(memberResponse)
             .tokenResponse(tokenResponse)
             .build();
@@ -165,7 +165,7 @@ class MemberRestControllerDocsTest extends RestDocsSupport {
                 .build();
             //when & then
             mockMvc.perform(post("/v1/members/logout")
-                    .header("Authorization",  TestConstants.ACCESS_TOKEN)
+                    .header("Authorization", TestConstants.ACCESS_TOKEN)
                     .content(objectMapper.writeValueAsString(refreshRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -185,7 +185,7 @@ class MemberRestControllerDocsTest extends RestDocsSupport {
                 .builder().password(testPassword).build();
             //when & then
             mockMvc.perform(patch("/v1/members/password")
-                    .header("Authorization",  TestConstants.ACCESS_TOKEN)
+                    .header("Authorization", TestConstants.ACCESS_TOKEN)
                     .content(objectMapper.writeValueAsString(memberUpdatePasswordRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -209,7 +209,7 @@ class MemberRestControllerDocsTest extends RestDocsSupport {
                 .builder().accountNumber("1233456783").bank("농협").build();
             //when & then
             mockMvc.perform(patch("/v1/members/account")
-                    .header("Authorization",  TestConstants.ACCESS_TOKEN)
+                    .header("Authorization", TestConstants.ACCESS_TOKEN)
                     .content(objectMapper.writeValueAsString(memberUpdateAccountRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -233,7 +233,7 @@ class MemberRestControllerDocsTest extends RestDocsSupport {
                 .name(memberResponse.getName()).build();
             //when & then
             mockMvc.perform(patch("/v1/members/name")
-                    .header("Authorization",  TestConstants.ACCESS_TOKEN)
+                    .header("Authorization", TestConstants.ACCESS_TOKEN)
                     .content(objectMapper.writeValueAsString(memberUpdateNameRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -279,7 +279,7 @@ class MemberRestControllerDocsTest extends RestDocsSupport {
                 .email(memberResponse.getEmail()).build();
             //when & then
             mockMvc.perform(post("/v1/members/yanolja")
-                    .header("Authorization",  TestConstants.ACCESS_TOKEN)
+                    .header("Authorization", TestConstants.ACCESS_TOKEN)
                     .content(objectMapper.writeValueAsString(memberEmailRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -304,7 +304,7 @@ class MemberRestControllerDocsTest extends RestDocsSupport {
                 .build();
             //when & then
             mockMvc.perform(patch("/v1/members/phone")
-                    .header("Authorization",  TestConstants.ACCESS_TOKEN)
+                    .header("Authorization", TestConstants.ACCESS_TOKEN)
                     .content(objectMapper.writeValueAsString(memberUpdatePhoneRequest))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -327,10 +327,10 @@ class MemberRestControllerDocsTest extends RestDocsSupport {
             given(memberService.getMemberInfo()).willReturn(memberResponse);
             //when & then
             mockMvc.perform(get("/v1/members")
-                    .header("Authorization",  TestConstants.ACCESS_TOKEN))
+                    .header("Authorization", TestConstants.ACCESS_TOKEN))
                 .andExpect(status().isOk())
                 .andDo(restDoc.document(
-                        jwtHeader(),
+                    jwtHeader(),
                     responseFields(responseCommon()).and(
                         fieldWithPath("data.id").type(Number.class).description("사용자 식별자"),
                         fieldWithPath("data.email").type(Number.class).description("사용자 이메일"),

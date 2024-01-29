@@ -1,6 +1,5 @@
 package com.yanolja.scbj.domain.reservation.dto.response;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
 

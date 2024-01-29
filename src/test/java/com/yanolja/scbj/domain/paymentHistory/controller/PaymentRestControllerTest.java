@@ -3,7 +3,6 @@ package com.yanolja.scbj.domain.paymentHistory.controller;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.member.entity.Member;
-import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
@@ -23,7 +21,6 @@ import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.KaKaoPaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.PaymentApiService;
 import com.yanolja.scbj.domain.product.entity.Product;
-import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
@@ -51,11 +48,9 @@ import org.springframework.test.web.servlet.ResultActions;
 class PaymentRestControllerTest {
 
     @Autowired
-    private MockMvc mvc;
-
-    @Autowired
     protected ObjectMapper objectMapper;
-
+    @Autowired
+    private MockMvc mvc;
     @MockBean
     private PaymentService paymentService;
 
@@ -105,8 +100,8 @@ class PaymentRestControllerTest {
 
     @Nested
     @DisplayName("카카오페이로 결제는 ")
-    class Context_PaymentRequest{
-        
+    class Context_PaymentRequest {
+
         @Test
         @DisplayName("요청 성공 시 카카오페이 결제 url을 반환한다.")
         void _will_success_request() throws Exception {
@@ -139,7 +134,8 @@ class PaymentRestControllerTest {
 
             // when
             ResultActions result = mvc.perform(
-                post("/v1/products/" + product.getId() + "/payments?paymentType=kakaoPaymentService")
+                post(
+                    "/v1/products/" + product.getId() + "/payments?paymentType=kakaoPaymentService")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(new ObjectMapper().writeValueAsString(paymentReadyRequest)));
 

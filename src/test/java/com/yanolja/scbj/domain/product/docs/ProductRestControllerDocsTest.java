@@ -34,6 +34,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
+import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -91,10 +92,12 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(post("/v1/products/{reservation_id}", 1L)
+                .header("Authorization", TestConstants.ACCESS_TOKEN)
                 .content(objectMapper.writeValueAsString(productPostRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andDo(restDoc.document(
+                jwtHeader(),
                 pathParameters(parameterWithName("reservation_id").description("예약내역 식별자")),
                 requestFields(
                     fieldWithPath("firstPrice").type(JsonFieldType.NUMBER).description("1차 양도 가격"),
@@ -353,7 +356,8 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.content[].roomType").description("방 타입").optional(),
                     fieldWithPath("data.content[].imageUrl").description("호텔 이미지 URL").optional(),
                     fieldWithPath("data.content[].originalPrice").description("원래 가격").optional(),
-                    fieldWithPath("data.content[].isFirstPrice").description("첫 번째 가격 여부").optional(),
+                    fieldWithPath("data.content[].isFirstPrice").description("첫 번째 가격 여부")
+                        .optional(),
                     fieldWithPath("data.content[].salePercentage").description("세일 비율").optional(),
                     fieldWithPath("data.content[].createdAt").description("생성 시간").optional(),
                     fieldWithPath("message").description("Response message"),

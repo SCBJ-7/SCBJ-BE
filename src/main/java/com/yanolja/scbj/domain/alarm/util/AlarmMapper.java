@@ -6,8 +6,6 @@ import com.yanolja.scbj.domain.alarm.entity.Alarm;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
