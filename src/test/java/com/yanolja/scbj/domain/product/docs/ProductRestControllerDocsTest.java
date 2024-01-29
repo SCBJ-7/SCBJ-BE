@@ -169,9 +169,11 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(get("/v1/products/{productId}", 1L)
+                .header("Authorization", "")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(restDoc.document(
+                jwtHeaderOptional(),
                 pathParameters(parameterWithName("productId").description("상품 식별자")),
                 responseFields(this.responseCommon()).and(
                     fieldWithPath("data").type(JsonFieldType.OBJECT).optional()
@@ -218,9 +220,11 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(delete("/v1/products/{productId}", 1L)
+                .header("Authorization", "")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent())
             .andDo(restDoc.document(
+                jwtHeader(),
                 pathParameters(parameterWithName("productId").description("상품 식별자")),
                 responseFields(this.responseCommon()).and(
                     fieldWithPath("data").type(JsonFieldType.OBJECT).optional()
