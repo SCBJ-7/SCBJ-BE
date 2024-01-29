@@ -96,9 +96,6 @@ dependencies {
 	//scheduling
 	implementation 'org.quartz-scheduler:quartz:2.3.0'
 
-	// thymeleaf
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-
 	//redisson
 	implementation 'org.redisson:redisson-spring-boot-starter:3.21.1'
 
