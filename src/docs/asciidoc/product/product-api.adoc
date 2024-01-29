@@ -48,3 +48,31 @@ include::{snippets}/product-rest-controller-docs-test/delete-product/path-parame
 === HttpResponse
 include::{snippets}/product-rest-controller-docs-test/delete-product/http-response.adoc[]
 
+[[main-page-product]]
+== 메인 페이지 API 문서화
+
+메인 페이지에 표시될 상품들을 조회하는 API입니다.
+
+=== HttpRequest
+include::{snippets}/product-rest-controller-docs-test/main-page-product/http-request.adoc[]
+include::{snippets}/product-rest-controller-docs-test/main-page-product/request-parameters.adoc[]
+
+=== HttpResponse
+include::{snippets}/product-rest-controller-docs-test/main-page-product/http-response.adoc[]
+include::{snippets}/product-rest-controller-docs-test/main-page-product/response-fields.adoc[]
+
+[[search-product]]
+== 검색 조회 API 문서화
+
+사용자가 요청한 조건에 맞는 상품들을 검색하여 반환하는 API입니다.
+
+=== HttpRequest
+include::{snippets}/product-rest-controller-docs-test/
+
+include::{snippets}/product-rest-controller-docs-test/search-product/http-request.adoc[]
+include::{snippets}/product-rest-controller-docs-test/search-product/request-fields.adoc[]
+include::{snippets}/product-rest-controller-docs-test/search-product/request-parameters.adoc[]
+
+=== HttpResponse
+include::{snippets}/product-rest-controller-docs-test/search-product/http-response.adoc[]
+include::{snippets}/product-rest-controller-docs-test/search-product/response-fields.adoc[]
