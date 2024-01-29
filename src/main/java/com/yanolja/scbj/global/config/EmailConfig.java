@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.member.config;
+package com.yanolja.scbj.global.config;
 
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;

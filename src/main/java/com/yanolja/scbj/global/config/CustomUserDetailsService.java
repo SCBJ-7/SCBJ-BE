@@ -18,7 +18,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         return memberRepository.findById(Long.parseLong(userId))
             .map(MemberMapper::toUserDetails)
