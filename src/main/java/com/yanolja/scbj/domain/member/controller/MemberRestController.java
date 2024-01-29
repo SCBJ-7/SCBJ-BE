@@ -15,6 +15,7 @@ import com.yanolja.scbj.domain.member.service.MemberService;
 import com.yanolja.scbj.domain.member.validation.ValidationSequence;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,103 +23,102 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Log4j2
 @RestController
+@ResponseStatus(HttpStatus.OK)
 @RequestMapping("v1/members")
 public class MemberRestController {
 
     private final MemberService memberService;
-
     private final MailService mailService;
 
-    MemberRestController(MemberService memberService, MailService mailService) {
+    public MemberRestController(MemberService memberService, MailService mailService) {
         this.memberService = memberService;
         this.mailService = mailService;
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ResponseDTO<MemberResponse>> signUp(
+    public ResponseDTO<MemberResponse> signUp(
         @Validated(ValidationSequence.class) @RequestBody MemberSignUpRequest memberSignUpRequest) {
-        log.info("email:{}, password:{}, name:{}, phone:{}", memberSignUpRequest.email(),
-            memberSignUpRequest.password(), memberSignUpRequest.name(),
-            memberSignUpRequest.phone());
-        return ResponseEntity.ok()
-            .body(ResponseDTO.res(memberService.signUp(memberSignUpRequest), "회원가입에 성공했습니다."));
+   
+        return ResponseDTO.res(memberService.signUp(memberSignUpRequest), "회원가입에 성공했습니다.");
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<ResponseDTO<MemberSignInResponse>> signIn(
+    public ResponseDTO<MemberSignInResponse> signIn(
         @Validated(ValidationSequence.class) @RequestBody MemberSignInRequest memberSignInRequest) {
-        log.info("email:{}, password:{}, token:{}", memberSignInRequest.email(),
-            memberSignInRequest.password(), memberSignInRequest.fcmToken());
-        return ResponseEntity.ok()
-            .body(ResponseDTO.res(memberService.signIn(memberSignInRequest), "로그인에 성공했습니다."));
+     
+        return ResponseDTO.res(memberService.signIn(memberSignInRequest), "로그인에 성공했습니다.");
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ResponseDTO<String>> logout(
+    public ResponseDTO<String> logout(
         @Validated(ValidationSequence.class) @RequestBody RefreshRequest refreshRequest) {
+        
         memberService.logout(refreshRequest);
-        return ResponseEntity.ok()
-            .body(ResponseDTO.res("로그아웃에 성공했습니다."));
+        
+        return ResponseDTO.res("로그아웃에 성공했습니다.");
     }
 
     @PatchMapping("/password")
-    public ResponseEntity<ResponseDTO<String>> updateMemberPassword(
+    public ResponseDTO<String> updateMemberPassword(
         @Validated(ValidationSequence.class) @RequestBody MemberUpdatePasswordRequest memberUpdatePasswordRequest) {
-        log.info("password:{}", memberUpdatePasswordRequest.password());
+
         memberService.updateMemberPassword(memberUpdatePasswordRequest);
 
-        return ResponseEntity.ok().body(ResponseDTO.res("비밀번호 변경에 성공했습니다."));
+        return ResponseDTO.res("비밀번호 변경에 성공했습니다.");
     }
 
     @PatchMapping("/account")
-    public ResponseEntity<ResponseDTO<String>> updateMemberAccount(
+    public ResponseDTO<String> updateMemberAccount(
         @Validated(ValidationSequence.class) @RequestBody MemberUpdateAccountRequest memberUpdateAccountRequest) {
-        log.info("accountNumber:{}, bank:{}", memberUpdateAccountRequest.accountNumber(),
-            memberUpdateAccountRequest.bank());
+
         memberService.updateMemberAccount(memberUpdateAccountRequest);
 
-        return ResponseEntity.ok().body(ResponseDTO.res("계좌번호 등록/수정에 성공했습니다."));
+        return ResponseDTO.res("계좌번호 등록/수정에 성공했습니다.");
     }
 
     @PatchMapping("/name")
-    public ResponseEntity<ResponseDTO<String>> updateMemberName(
+    public ResponseDTO<String> updateMemberName(
         @Validated(ValidationSequence.class) @RequestBody MemberUpdateNameRequest memberUpdateNameRequest) {
+
         memberService.updateMemberName(memberUpdateNameRequest.name());
 
-        return ResponseEntity.ok().body(ResponseDTO.res("이름 변경에 성공했습니다."));
+        return ResponseDTO.res("이름 변경에 성공했습니다.");
     }
 
     @PostMapping("/email")
-    public ResponseEntity<ResponseDTO<String>> certifyEmail(
+    public ResponseDTO<String> certifyEmail(
         @Validated(ValidationSequence.class) @RequestBody MemberEmailRequest memberEmailRequest) {
-        return ResponseEntity.ok()
-            .body(ResponseDTO.res(mailService.certifyEmail(memberEmailRequest.email()),
-                "이메일 인증번호 발급에 성공했습니다."));
+
+        return ResponseDTO.res(mailService.certifyEmail(memberEmailRequest.email()),
+                "이메일 인증번호 발급에 성공했습니다.");
     }
 
     @PostMapping("/yanolja")
-    public ResponseEntity<ResponseDTO<String>> linkUpYanolja(
-        @Validated(ValidationSequence.class) @RequestBody MemberEmailRequest memberEmailRequest
-    ) {
+    public ResponseDTO<String> linkUpYanolja(
+        @Validated(ValidationSequence.class) @RequestBody MemberEmailRequest memberEmailRequest) {
+
         memberService.linkUpYanolja(memberEmailRequest.email());
-        return ResponseEntity.ok().body(ResponseDTO.res("야놀자 계정 연동에 성공했습니다."));
+
+        return ResponseDTO.res("야놀자 계정 연동에 성공했습니다.");
     }
 
     @PatchMapping("/phone")
-    public ResponseEntity<ResponseDTO<String>> updateMemberPhone(
+    public ResponseDTO<String> updateMemberPhone(
         @Validated(ValidationSequence.class) @RequestBody MemberUpdatePhoneRequest memberUpdatePhoneRequest) {
+
         memberService.updateMemberPhone(memberUpdatePhoneRequest.phone());
-        return ResponseEntity.ok().body(ResponseDTO.res("핸드폰 번호 변경에 성공했습니다."));
+
+        return ResponseDTO.res("핸드폰 번호 변경에 성공했습니다.");
     }
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<MemberResponse>> getMemberInfo() {
-        return ResponseEntity.ok()
-            .body(ResponseDTO.res(memberService.getMemberInfo(), "회원정보 조회에 성공했습니다."));
+    public ResponseDTO<MemberResponse> getMemberInfo() {
+
+        return ResponseDTO.res(memberService.getMemberInfo(), "회원정보 조회에 성공했습니다.");
     }
 
 

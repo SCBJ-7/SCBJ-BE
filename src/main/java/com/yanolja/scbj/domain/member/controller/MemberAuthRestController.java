@@ -5,30 +5,30 @@ import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
 import com.yanolja.scbj.domain.member.service.MemberAuthService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import jakarta.validation.Valid;
-import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Log4j2
 @RestController
+@ResponseStatus(HttpStatus.OK)
 @RequestMapping("/v1/token")
 public class MemberAuthRestController {
 
     private final MemberAuthService memberAuthService;
 
-    MemberAuthRestController(MemberAuthService memberAuthService) {
+    public MemberAuthRestController(MemberAuthService memberAuthService) {
         this.memberAuthService = memberAuthService;
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ResponseDTO<TokenResponse>> refreshAccessToken(
+    public ResponseDTO<TokenResponse> refreshAccessToken(
         @Valid @RequestBody RefreshRequest refreshRequest) {
-        log.info("accessToken:{}, refreshToken:{}", refreshRequest.getAccessToken(),
-            refreshRequest.getRefreshToken());
-        return ResponseEntity.ok().body(ResponseDTO.res(memberAuthService.refreshAccessToken(refreshRequest),"토큰 재발급에 성공했습니다."));
+
+        return ResponseDTO.res(memberAuthService.refreshAccessToken(refreshRequest),"토큰 재발급에 성공했습니다.");
     }
 
 }

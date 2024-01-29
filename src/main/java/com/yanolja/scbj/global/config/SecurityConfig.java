@@ -26,11 +26,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SecurityConfig implements WebMvcConfigurer {
 
     private static final String[] PERMIT_URL_ARRAY = {
-        "/api/member/signup",
-        "/api/member/signin",
-        "/api/token/refresh",
-        "/h2-console/**",
-        "/v1/products/**:GET",
         "/**"
     };
     private final CorsConfig corsConfig;

@@ -59,7 +59,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
 
             if (jwt != null && username != null) {
-                if (redisTemplate.opsForValue().get(JwtUtil.BLACK_LIST_PREFIX + jwt) != null) {
+                if (isAccessTokenInBlackList(jwt)) {
                     throw new ExpiredTokenException(ErrorCode.EXPIRED_TOKEN);
                 }
 
@@ -85,6 +85,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isAccessTokenInBlackList(String jwt) {
+        return redisTemplate.opsForValue().get(JwtUtil.BLACK_LIST_PREFIX + jwt) != null;
     }
 
     private void sendErrorResponse(HttpServletResponse response, int status, String message)
