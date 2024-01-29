@@ -30,7 +30,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @ExtendWith({RestDocumentationExtension.class})
 @Import(RestDocsConfig.class)
 @SpringBootTest
-public abstract class RestDocsSupport extends AbstractContainersSupport {
+public abstract class RestDocsSupport {
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -64,7 +64,9 @@ public abstract class RestDocsSupport extends AbstractContainersSupport {
 
     protected RequestHeadersSnippet jwtHeader() {
         return requestHeaders(headerWithName("Authorization").description("JWT 액세스 토큰"));
+    }
 
-
+    protected RequestHeadersSnippet jwtHeaderOptional() {
+        return requestHeaders(headerWithName("Authorization").optional().description("JWT 액세스 토큰"));
     }
 }
