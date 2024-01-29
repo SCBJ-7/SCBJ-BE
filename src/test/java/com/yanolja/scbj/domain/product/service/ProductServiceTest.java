@@ -59,7 +59,6 @@ import org.springframework.data.domain.Pageable;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
-    ArrayList<Product> arrayList = new ArrayList<>();
     @InjectMocks
     private ProductService productService;
     @Mock
@@ -491,6 +490,7 @@ class ProductServiceTest {
         @DisplayName("getAllProductForMainPage 메소드는 각 도시 및 주말 상품을 정확히 반환한다")
         void testGetAllProductForMainPage() {
             // given
+            ArrayList<Product> arrayList = new ArrayList<>();
             List<String> cityNames = Arrays.asList("서울", "강원", "부산", "제주", "전라", "경상");
 
             cityNames.forEach(city -> {
