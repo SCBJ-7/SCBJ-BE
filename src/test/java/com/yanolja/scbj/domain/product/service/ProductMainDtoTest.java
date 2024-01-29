@@ -7,7 +7,6 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
-import com.yanolja.scbj.domain.product.dto.response.CityResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
@@ -15,10 +14,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -38,31 +37,6 @@ public class ProductMainDtoTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
-
-    @Nested
-    @DisplayName("주말 상품은")
-    class Context_weekendDtoConverterTest {
-
-        @Test
-        @DisplayName("값을 넣으면 그만큼의 size가 뜬다")
-        void testToWeekendProductResponse() {
-            // given
-            List<Product> products = createMockProducts();
-            Product product = products.get(0);
-            RoomTheme roomTheme = product.getReservation().getHotel().getRoom().getRoomTheme();
-
-            // when
-            WeekendProductResponse response =
-                weekendMapper.toWeekendProductResponse(product, product.getReservation(),
-                    "image", 200000, 0.6, 2, roomTheme);
-
-            // then
-            assertEquals(response.imageUrl(),"image");
-        }
-    }
-
-
 
     private List<Product> createMockProducts() {
         List<Product> products = new ArrayList<>();
@@ -97,7 +71,6 @@ public class ProductMainDtoTest {
             .endDate(LocalDateTime.now())
             .build();
 
-
         Product product = Product.builder()
             .id(1L)
             .firstPrice(200000)
@@ -112,6 +85,28 @@ public class ProductMainDtoTest {
         products.add(product);
 
         return products;
+    }
+
+    @Nested
+    @DisplayName("주말 상품은")
+    class Context_weekendDtoConverterTest {
+
+        @Test
+        @DisplayName("값을 넣으면 그만큼의 size가 뜬다")
+        void testToWeekendProductResponse() {
+            // given
+            List<Product> products = createMockProducts();
+            Product product = products.get(0);
+            RoomTheme roomTheme = product.getReservation().getHotel().getRoom().getRoomTheme();
+
+            // when
+            WeekendProductResponse response =
+                WeekendMapper.toWeekendProductResponse(product, product.getReservation(),
+                    "image", 200000, 0.6, 2, roomTheme);
+
+            // then
+            assertEquals(response.imageUrl(), "image");
+        }
     }
 
 

@@ -17,12 +17,12 @@ import com.yanolja.scbj.domain.member.dto.response.MemberSignInResponse;
 import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
-import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.member.util.MemberMapper;
 import com.yanolja.scbj.global.config.fcm.FCMService;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
+import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -59,10 +59,10 @@ class MemberServiceTest {
     @DisplayName("유저 관련 서비스 사용 시")
     class SuccessTests {
 
-        private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
-        private String testRawPassword = "test1234@";
-        private Member testMember = Member.builder()
+        private final String testRawPassword = "test1234@";
+        private final Member testMember = Member.builder()
             .id(1L)
             .email("test@gmail.com")
             .authority(Authority.ROLE_USER)

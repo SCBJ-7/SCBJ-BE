@@ -9,7 +9,6 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomImageRepository;
-import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomPriceRepository;
 import com.yanolja.scbj.domain.hotelRoom.repository.HotelRoomRepository;
 import com.yanolja.scbj.domain.hotelRoom.repository.RoomThemeRepository;
 import com.yanolja.scbj.domain.member.entity.Authority;
@@ -37,30 +36,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class AlarmRepositoryTest extends AbstractContainersSupport {
 
     @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private YanoljaMemberRepository yanoljaMemberRepository;
-
-    @Autowired
-    private RoomThemeRepository roomThemeRepository;
-
-    @Autowired
-    private HotelRoomRepository hotelRoomRepository;
-
-    @Autowired
-    private HotelRoomImageRepository hotelRoomImageRepository;
-
-
-    @Autowired
     ReservationRepository reservationRepository;
-
     @Autowired
     ProductRepository productRepository;
-
     @Autowired
     PaymentHistoryRepository paymentHistoryRepository;
-
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private YanoljaMemberRepository yanoljaMemberRepository;
+    @Autowired
+    private RoomThemeRepository roomThemeRepository;
+    @Autowired
+    private HotelRoomRepository hotelRoomRepository;
+    @Autowired
+    private HotelRoomImageRepository hotelRoomImageRepository;
     @Autowired
     private AlarmRepository alarmRepository;
 
@@ -72,24 +62,24 @@ public class AlarmRepositoryTest extends AbstractContainersSupport {
 
     @BeforeEach
     void init() {
-            YanoljaMember yanoljaMember = createYanoljaMember();
-            yanoljaMember = yanoljaMemberRepository.save(yanoljaMember);
-            member = createMember(yanoljaMember);
-            member = memberRepository.save(member);
-            RoomTheme roomTheme = createRoomTheme();
-            roomTheme = roomThemeRepository.save(roomTheme);
-            Hotel hotel = createHotel(roomTheme, LocalTime.now());
-            hotel = hotelRoomRepository.save(hotel);
-            HotelRoomImage hotelRoomImage = createHotelRoomImage(hotel);
-            hotelRoomImage = hotelRoomImageRepository.save(hotelRoomImage);
-            createHotelRoomPrice(hotel);
-            Reservation reservation = createReservation(hotel, yanoljaMember,
-                LocalDateTime.now().minusDays(1));
-            reservation = reservationRepository.save(reservation);
-            Product product = createProduct(member, reservation);
-            product = productRepository.save(product);
-            paymentHistory = createPaymentHistory(member, product);
-            paymentHistoryRepository.save(paymentHistory);
+        YanoljaMember yanoljaMember = createYanoljaMember();
+        yanoljaMember = yanoljaMemberRepository.save(yanoljaMember);
+        member = createMember(yanoljaMember);
+        member = memberRepository.save(member);
+        RoomTheme roomTheme = createRoomTheme();
+        roomTheme = roomThemeRepository.save(roomTheme);
+        Hotel hotel = createHotel(roomTheme, LocalTime.now());
+        hotel = hotelRoomRepository.save(hotel);
+        HotelRoomImage hotelRoomImage = createHotelRoomImage(hotel);
+        hotelRoomImage = hotelRoomImageRepository.save(hotelRoomImage);
+        createHotelRoomPrice(hotel);
+        Reservation reservation = createReservation(hotel, yanoljaMember,
+            LocalDateTime.now().minusDays(1));
+        reservation = reservationRepository.save(reservation);
+        Product product = createProduct(member, reservation);
+        product = productRepository.save(product);
+        paymentHistory = createPaymentHistory(member, product);
+        paymentHistoryRepository.save(paymentHistory);
 
     }
 
@@ -105,10 +95,10 @@ public class AlarmRepositoryTest extends AbstractContainersSupport {
             .build());
 
         // when
-        List<Alarm> alarms= alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(member.getId());
+        List<Alarm> alarms = alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(member.getId());
 
         // then
-        assertEquals(alarms.size(),1);
+        assertEquals(alarms.size(), 1);
     }
 
     private Member createMember(YanoljaMember yanoljaMember) {

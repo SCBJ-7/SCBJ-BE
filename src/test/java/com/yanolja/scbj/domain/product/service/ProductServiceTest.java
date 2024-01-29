@@ -59,26 +59,19 @@ import org.springframework.data.domain.Pageable;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
+    ArrayList<Product> arrayList = new ArrayList<>();
     @InjectMocks
     private ProductService productService;
-
     @Mock
     private MemberService memberService;
-
-
     @Mock
     private MemberRepository memberRepository;
-
     @Mock
     private ReservationRepository reservationRepository;
-
     @Mock
     private ProductRepository productRepository;
-
     @Mock
     private SecurityUtil securityUtil;
-
-    ArrayList<Product> arrayList = new ArrayList<>();
 
     @Nested
     @DisplayName("postProduct()는 ")
@@ -257,7 +250,6 @@ class ProductServiceTest {
                 .paymentType("카카오페이")
                 .settlement(true)
                 .build();
-
 
             Product product = Product.builder()
                 .id(1L)

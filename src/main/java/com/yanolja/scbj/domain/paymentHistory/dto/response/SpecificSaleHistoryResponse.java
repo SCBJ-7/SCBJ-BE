@@ -2,8 +2,6 @@ package com.yanolja.scbj.domain.paymentHistory.dto.response;
 
 import java.time.LocalDateTime;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 public record SpecificSaleHistoryResponse(
     String saleStatus,

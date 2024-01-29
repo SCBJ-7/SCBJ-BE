@@ -14,10 +14,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 import com.yanolja.scbj.docs.RestDocsSupport;
 import com.yanolja.scbj.domain.alarm.service.AlarmService;
@@ -48,22 +46,17 @@ import org.springframework.restdocs.payload.JsonFieldType;
 public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
 
     @MockBean
-    private PaymentService paymentService;
-
-    @MockBean
     PaymentHistoryService paymentHistoryService;
-
-    @MockBean
-    private Map<String, PaymentApiService> paymentApiServiceMap;
-
-    @MockBean
-    private KaKaoPaymentService kaKaoPaymentService;
-
     @MockBean
     SecurityUtil securityUtil;
-
     @MockBean
     AlarmService alarmService;
+    @MockBean
+    private PaymentService paymentService;
+    @MockBean
+    private Map<String, PaymentApiService> paymentApiServiceMap;
+    @MockBean
+    private KaKaoPaymentService kaKaoPaymentService;
 
     @Override
     public Object initController() {
@@ -102,6 +95,7 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(restDoc.document(
+                jwtHeader(),
                 pathParameters(parameterWithName("paymentHistory_id").description("구매내역 식별자")),
                 responseFields(responseCommon()).and(
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
@@ -159,6 +153,7 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
         // when
         mockMvc.perform(get("/v1/products/{product_id}/payments", 1L))
             .andDo(restDoc.document(
+                jwtHeader(),
                 pathParameters(parameterWithName("product_id").description("상품 식별자")),
                 responseFields(responseCommon()).and(
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
@@ -203,11 +198,13 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
         given(kaKaoPaymentService.preparePayment(any(), any())).willReturn(preparePaymentResponse);
 
         // when, then
-        mockMvc.perform(post("/v1/products/{product_id}/payments?paymentType={paymentType}", 1L, "kakaoPaymentService")
+        mockMvc.perform(post("/v1/products/{product_id}/payments?paymentType={paymentType}", 1L,
+                "kakaoPaymentService")
                 .content(objectMapper.writeValueAsString(paymentReadyRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(restDoc.document(
+                jwtHeader(),
                 pathParameters(parameterWithName("product_id").description("상품 식별자")),
                 queryParameters(parameterWithName("paymentType").description("결제 타입")),
                 requestFields(
@@ -297,16 +294,22 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("payment-history/purchase-history",
+                jwtHeader(),
                 responseFields(this.responseCommon()).and(
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                     fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("구매 내역 식별자"),
-                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("생성 날짜 및 시간"),
-                    fieldWithPath("data[].imageUrl").type(JsonFieldType.STRING).description("이미지 URL"),
+                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING)
+                        .description("생성 날짜 및 시간"),
+                    fieldWithPath("data[].imageUrl").type(JsonFieldType.STRING)
+                        .description("이미지 URL"),
                     fieldWithPath("data[].name").type(JsonFieldType.STRING).description("호텔/객실 이름"),
-                    fieldWithPath("data[].roomType").type(JsonFieldType.STRING).description("객실 유형"),
+                    fieldWithPath("data[].roomType").type(JsonFieldType.STRING)
+                        .description("객실 유형"),
                     fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("가격"),
-                    fieldWithPath("data[].checkInDate").type(JsonFieldType.STRING).description("체크인 날짜 및 시간"),
-                    fieldWithPath("data[].checkOutDate").type(JsonFieldType.STRING).description("체크아웃 날짜 및 시간")
+                    fieldWithPath("data[].checkInDate").type(JsonFieldType.STRING)
+                        .description("체크인 날짜 및 시간"),
+                    fieldWithPath("data[].checkOutDate").type(JsonFieldType.STRING)
+                        .description("체크아웃 날짜 및 시간")
                 )
             ));
     }
@@ -347,6 +350,7 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(restDoc.document(
+                jwtHeader(),
                 responseFields(this.responseCommon()).andWithPrefix("data[].",
                     fieldWithPath("id").type(JsonFieldType.NUMBER).description("판매 내역 식별자"),
                     fieldWithPath("productId").type(JsonFieldType.NUMBER).description("상품 id"),
@@ -370,13 +374,11 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
         Long saleHistoryId = 1L;
         boolean isPaymentId = true;
 
-
         SpecificSaleHistoryResponse.firstPriceResponse firstPriceObject =
             SpecificSaleHistoryResponse.firstPriceResponse.builder()
                 .originalPrice(212000)
                 .firstSalePrice(139000)
                 .build();
-
 
         SpecificSaleHistoryResponse.secondPriceResponse secondPriceObject =
             SpecificSaleHistoryResponse.secondPriceResponse.builder()
@@ -400,33 +402,46 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
             .createdAt(LocalDateTime.now().minusDays(6))
             .build();
 
-        given(paymentHistoryService.getSpecificSaleHistory(anyLong(),anyLong(),anyBoolean())).willReturn(response);
+        given(paymentHistoryService.getSpecificSaleHistory(anyLong(), anyLong(),
+            anyBoolean())).willReturn(response);
 
         //When& Then
-            mockMvc.perform(get("/v1/members/sale-history/{saleHistory_id}/{isPaymentId}", saleHistoryId, isPaymentId))
+        mockMvc.perform(
+                get("/v1/members/sale-history/{saleHistory_id}/{isPaymentId}", saleHistoryId,
+                    isPaymentId))
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("payment-history/specific-sale-history",
+                jwtHeader(),
                 pathParameters(
                     parameterWithName("saleHistory_id").description("판매 내역 식별자"),
                     parameterWithName("isPaymentId").description("결제 ID 여부")
                 ),
                 responseFields(this.responseCommon()).and(
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                    fieldWithPath("data.saleStatus").type(JsonFieldType.STRING).description("판매 상태"),
+                    fieldWithPath("data.saleStatus").type(JsonFieldType.STRING)
+                        .description("판매 상태"),
                     fieldWithPath("data.checkIn").type(JsonFieldType.STRING).description("체크인 시간"),
-                    fieldWithPath("data.checkOut").type(JsonFieldType.STRING).description("체크아웃 시간"),
-                    fieldWithPath("data.hotelImage").type(JsonFieldType.STRING).description("호텔 이미지"),
-                    fieldWithPath("data.standardPeople").type(JsonFieldType.NUMBER).description("기준 인원"),
+                    fieldWithPath("data.checkOut").type(JsonFieldType.STRING)
+                        .description("체크아웃 시간"),
+                    fieldWithPath("data.hotelImage").type(JsonFieldType.STRING)
+                        .description("호텔 이미지"),
+                    fieldWithPath("data.standardPeople").type(JsonFieldType.NUMBER)
+                        .description("기준 인원"),
                     fieldWithPath("data.maxPeople").type(JsonFieldType.NUMBER).description("최대 인원"),
                     fieldWithPath("data.hotelName").type(JsonFieldType.STRING).description("호텔 이름"),
                     fieldWithPath("data.roomName").type(JsonFieldType.STRING).description("객실 이름"),
                     fieldWithPath("data.bank").type(JsonFieldType.STRING).description("은행 이름"),
-                    fieldWithPath("data.accountNumber").type(JsonFieldType.STRING).description("계좌 번호"),
-                    fieldWithPath("data.firstPrice.originalPrice").type(JsonFieldType.NUMBER).description("원래 가격"),
-                    fieldWithPath("data.firstPrice.firstSalePrice").type(JsonFieldType.NUMBER).description("첫 번째 판매 가격"),
-                    fieldWithPath("data.secondPrice.secondPriceStartDate").type(JsonFieldType.STRING).description("두 번째 가격 시작 날짜"),
-                    fieldWithPath("data.secondPrice.secondPrice").type(JsonFieldType.NUMBER).description("두 번째 가격"),
+                    fieldWithPath("data.accountNumber").type(JsonFieldType.STRING)
+                        .description("계좌 번호"),
+                    fieldWithPath("data.firstPrice.originalPrice").type(JsonFieldType.NUMBER)
+                        .description("원래 가격"),
+                    fieldWithPath("data.firstPrice.firstSalePrice").type(JsonFieldType.NUMBER)
+                        .description("첫 번째 판매 가격"),
+                    fieldWithPath("data.secondPrice.secondPriceStartDate").type(
+                        JsonFieldType.STRING).description("두 번째 가격 시작 날짜"),
+                    fieldWithPath("data.secondPrice.secondPrice").type(JsonFieldType.NUMBER)
+                        .description("두 번째 가격"),
                     fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 시간")
                 )
             ));

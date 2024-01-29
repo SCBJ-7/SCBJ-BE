@@ -70,7 +70,6 @@ public class ProductSearchRepositoryTest {
                 entityManager.flush();
             });
 
-
         IntStream.rangeClosed(1, 5)
             .forEach(i -> {
                 String randomAddress = "강릉";
@@ -187,7 +186,6 @@ public class ProductSearchRepositoryTest {
             Page<ProductSearchResponse> results =
                 productRepository.search(PageRequest.of(0, 10), searchRequest);
 
-
             //then
             assertThat(results).isNotEmpty();
             List<ProductSearchResponse> content = results.getContent();
@@ -264,7 +262,6 @@ public class ProductSearchRepositoryTest {
             //when
             Page<ProductSearchResponse> responses =
                 productRepository.search(PageRequest.of(0, 10), productSearchRequest);
-
 
             //then
             assertThat(responses).isNotEmpty();

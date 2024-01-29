@@ -1,7 +1,5 @@
 package com.yanolja.scbj.global.config.fcm;
 
-import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
-import java.util.concurrent.TimeUnit;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 

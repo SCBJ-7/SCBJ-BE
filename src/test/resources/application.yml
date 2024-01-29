@@ -45,14 +45,14 @@ jwt:
 fcm:
   request-url: "https://fcm.googleapis.com/v1/projects/scbj-af2e3/messages:send"
   credential-path: "/credential/fcm-service-key.json"
-  scope : "https://www.googleapis.com/auth/cloud-platform"
+  scope: "https://www.googleapis.com/auth/cloud-platform"
 
 kakao-api:
-  api-key : ${API-KEY}
+  api-key: ${API-KEY}
 
 
 server:
-  url : ${SERVER-URL}
+  url: ${SERVER-URL}
 
 check-in:
   expiration: ${CHECK-IN-EXPIRATION}

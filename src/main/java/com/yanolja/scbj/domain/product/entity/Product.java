@@ -2,7 +2,6 @@ package com.yanolja.scbj.domain.product.entity;
 
 import com.querydsl.core.annotations.QueryInit;
 import com.yanolja.scbj.domain.member.entity.Member;
-import com.yanolja.scbj.domain.member.entity.MemberAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.common.BaseEntity;

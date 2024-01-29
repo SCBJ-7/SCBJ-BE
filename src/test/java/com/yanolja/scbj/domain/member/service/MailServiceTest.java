@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 @ExtendWith(MockitoExtension.class)
 public class MailServiceTest {
+
     @Mock
     private JavaMailSender javaMailSender;
 
@@ -24,7 +25,7 @@ public class MailServiceTest {
         //given
         String email = "wocjf0513@ajou.ac.kr";
         //when
-        String resultAuthCode= mailService.certifyEmail(email);
+        String resultAuthCode = mailService.certifyEmail(email);
         //then
         assertThat(resultAuthCode).isNotBlank().hasSize(6);
     }

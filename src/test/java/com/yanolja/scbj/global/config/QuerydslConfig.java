@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class QuerydslConfig {
+
     @PersistenceContext
     private EntityManager entityManager;
 

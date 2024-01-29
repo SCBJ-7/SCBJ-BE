@@ -86,6 +86,7 @@ public class ReservationRestControllerDocsTest extends RestDocsSupport {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(restDoc.document(
+                jwtHeader(),
                 responseFields(responseCommon()).and(
                     fieldWithPath("data").type(JsonFieldType.ARRAY).description("응답 데이터"),
                     fieldWithPath("data[].reservationId").type(JsonFieldType.NUMBER)

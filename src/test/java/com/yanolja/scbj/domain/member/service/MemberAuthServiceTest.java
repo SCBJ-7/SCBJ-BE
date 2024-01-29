@@ -6,9 +6,9 @@ import static org.mockito.BDDMockito.given;
 
 import com.yanolja.scbj.domain.member.dto.request.RefreshRequest;
 import com.yanolja.scbj.domain.member.dto.response.TokenResponse;
-import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.global.config.CustomUserDetailsService;
 import com.yanolja.scbj.global.config.jwt.JwtUtil;
+import com.yanolja.scbj.global.helper.TestConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.util.Collection;
@@ -50,8 +50,8 @@ class MemberAuthServiceTest {
             .refreshToken(TestConstants.REFRESH_PREFIX.getValue())
             .build();
 
-
-        given(jwtUtil.extractUsername(any())).willThrow(new ExpiredJwtException(null, new ClaimImpl("1"),null));
+        given(jwtUtil.extractUsername(any())).willThrow(
+            new ExpiredJwtException(null, new ClaimImpl("1"), null));
         given(jwtUtil.isRefreshTokenValid(any(), any())).willReturn(true);
         given(jwtUtil.generateToken(any())).willReturn(TestConstants.GRANT_TYPE.getValue());
         given(jwtUtil.generateRefreshToken(any())).willReturn(
@@ -62,12 +62,14 @@ class MemberAuthServiceTest {
             .isEqualTo(memberAuthService.refreshAccessToken(refreshRequest));
     }
 
-    class ClaimImpl implements Claims{
+    class ClaimImpl implements Claims {
 
         private String username;
+
         public ClaimImpl(String username) {
 
         }
+
         @Override
         public String getIssuer() {
             return null;

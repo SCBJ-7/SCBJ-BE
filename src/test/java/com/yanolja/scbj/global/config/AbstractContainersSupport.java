@@ -1,8 +1,5 @@
 package com.yanolja.scbj.global.config;
 
-import org.junit.jupiter.api.Disabled;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -19,8 +16,9 @@ public abstract class AbstractContainersSupport {
     }
 
     @DynamicPropertySource
-    public static void overrideProps(DynamicPropertyRegistry registry){
+    public static void overrideProps(DynamicPropertyRegistry registry) {
         registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
-        registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
+        registry.add("spring.data.redis.port",
+            () -> REDIS_CONTAINER.getMappedPort(6379).toString());
     }
 }
