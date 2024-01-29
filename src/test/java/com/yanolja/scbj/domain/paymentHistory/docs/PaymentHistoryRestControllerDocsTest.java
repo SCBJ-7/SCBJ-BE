@@ -33,6 +33,7 @@ import com.yanolja.scbj.domain.paymentHistory.service.PaymentHistoryService;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.KaKaoPaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.PaymentApiService;
+import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -92,6 +93,7 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(get("/v1/members/purchased-history/{paymentHistory_id}", 1L)
+                .header("Authorization", TestConstants.ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(restDoc.document(
@@ -151,7 +153,8 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
         given(paymentService.getPaymentPage(1L)).willReturn(findResponse);
 
         // when
-        mockMvc.perform(get("/v1/products/{product_id}/payments", 1L))
+        mockMvc.perform(get("/v1/products/{product_id}/payments", 1L)
+                .header("Authorization", TestConstants.ACCESS_TOKEN))
             .andDo(restDoc.document(
                 jwtHeader(),
                 pathParameters(parameterWithName("product_id").description("상품 식별자")),
@@ -200,6 +203,7 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
         // when, then
         mockMvc.perform(post("/v1/products/{product_id}/payments?paymentType={paymentType}", 1L,
                 "kakaoPaymentService")
+                .header("Authorization", TestConstants.ACCESS_TOKEN)
                 .content(objectMapper.writeValueAsString(paymentReadyRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -290,7 +294,8 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
         // then
         mockMvc.perform(get("/v1/members/purchased-history")
                 .param("page", "0")
-                .param("pageSize", "10"))
+                .param("pageSize", "10")
+                .header("Authorization", TestConstants.ACCESS_TOKEN))
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("payment-history/purchase-history",
@@ -347,6 +352,7 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
         mockMvc.perform(get("/v1/members/sale-history")
                 .param("page", "0")
                 .param("pageSize", "10")
+                .header("Authorization", TestConstants.ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(restDoc.document(
@@ -408,7 +414,8 @@ public class PaymentHistoryRestControllerDocsTest extends RestDocsSupport {
         //When& Then
         mockMvc.perform(
                 get("/v1/members/sale-history/{saleHistory_id}/{isPaymentId}", saleHistoryId,
-                    isPaymentId))
+                    isPaymentId)
+                    .header("Authorization", TestConstants.ACCESS_TOKEN))
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document("payment-history/specific-sale-history",

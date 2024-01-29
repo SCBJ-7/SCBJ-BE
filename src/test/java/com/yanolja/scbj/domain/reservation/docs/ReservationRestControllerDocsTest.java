@@ -12,6 +12,7 @@ import com.yanolja.scbj.domain.alarm.service.AlarmService;
 import com.yanolja.scbj.domain.reservation.controller.ReservationRestController;
 import com.yanolja.scbj.domain.reservation.dto.response.ReservationFindResponse;
 import com.yanolja.scbj.domain.reservation.service.ReservationService;
+import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -83,7 +84,8 @@ public class ReservationRestControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(get("/v1/reservations")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", TestConstants.ACCESS_TOKEN))
             .andExpect(status().isOk())
             .andDo(restDoc.document(
                 jwtHeader(),

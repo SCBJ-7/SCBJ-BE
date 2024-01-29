@@ -34,6 +34,7 @@ import com.yanolja.scbj.domain.product.dto.response.ProductPostResponse;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.service.ProductService;
+import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -91,6 +92,7 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(post("/v1/products/{reservation_id}", 1L)
+                .header("Authorization", TestConstants.ACCESS_TOKEN)
                 .content(objectMapper.writeValueAsString(productPostRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
