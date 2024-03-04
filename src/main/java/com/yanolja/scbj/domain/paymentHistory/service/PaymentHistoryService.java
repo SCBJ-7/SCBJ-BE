@@ -109,7 +109,6 @@ public class PaymentHistoryService {
     public SpecificSaleHistoryResponse getSpecificSaleHistory(Long memberId, Long saleHistoryId, boolean isPaymentId) {
 
         if (isPaymentId) {
-
             PaymentHistory paymentHistory =
                 paymentHistoryRepository.findSaleHistoryInformationById(memberId,saleHistoryId).orElseThrow(
                     () -> new SaleHistoryNotFoundException(ErrorCode.SALE_DETAIL_LOAD_FAIL));
