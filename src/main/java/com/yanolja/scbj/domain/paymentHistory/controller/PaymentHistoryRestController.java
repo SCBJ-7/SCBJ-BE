@@ -58,11 +58,11 @@ public class PaymentHistoryRestController {
     }
 
 
-    @GetMapping("/sale-history/{saleHistory_id}/{isPaymentId}")
+    @GetMapping("/sale-history/{saleHistory_id}/{isPayment_Id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<SpecificSaleHistoryResponse> getSpecificSaleHistory(
         @PathVariable("saleHistory_id") Long saleId,
-        @PathVariable("isPaymentId") boolean isPaymentId
+        @PathVariable("isPayment_Id") boolean isPaymentId
     ) {
         return ResponseDTO.res(
             paymentHistoryService.getSpecificSaleHistory(securityUtil.getCurrentMemberId(),

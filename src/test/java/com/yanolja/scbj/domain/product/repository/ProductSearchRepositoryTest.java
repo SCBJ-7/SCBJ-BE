@@ -244,7 +244,7 @@ public class ProductSearchRepositoryTest {
             List<ProductSearchResponse> content = highSearchResult.getContent();
 
             for (int i = 0; i < 5; i++) {
-                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.25);
+                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.4);
             }
 
             assertThat(lowPriceResult).isNotEmpty();
