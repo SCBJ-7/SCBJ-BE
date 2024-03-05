@@ -141,6 +141,7 @@ class ReservationServiceTest {
 
             product.delete(LocalDateTime.of(2024, 3, 5, 17, 0));
 
+          
             given(productRepository.findByReservationId(reservation1.getId())).willReturn(
                 java.util.Optional.ofNullable(product));
 

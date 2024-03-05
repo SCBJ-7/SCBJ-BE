@@ -61,24 +61,16 @@ class ProductServiceTest {
 
     @InjectMocks
     private ProductService productService;
-
     @Mock
     private MemberService memberService;
-
-
     @Mock
     private MemberRepository memberRepository;
-
     @Mock
     private ReservationRepository reservationRepository;
-
     @Mock
     private ProductRepository productRepository;
-
     @Mock
     private SecurityUtil securityUtil;
-
-    ArrayList<Product> arrayList = new ArrayList<>();
 
     @Nested
     @DisplayName("postProduct()는 ")
@@ -257,7 +249,6 @@ class ProductServiceTest {
                 .paymentType("카카오페이")
                 .settlement(true)
                 .build();
-
 
             Product product = Product.builder()
                 .id(1L)
@@ -499,6 +490,7 @@ class ProductServiceTest {
         @DisplayName("getAllProductForMainPage 메소드는 각 도시 및 주말 상품을 정확히 반환한다")
         void testGetAllProductForMainPage() {
             // given
+            ArrayList<Product> arrayList = new ArrayList<>();
             List<String> cityNames = Arrays.asList("서울", "강원", "부산", "제주", "전라", "경상");
 
             cityNames.forEach(city -> {

@@ -24,18 +24,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @ExtendWith(MockitoExtension.class)
 public class FCMIntegrationTest extends AbstractContainersSupport {
 
+    private final String TEST_EMAIL = "test1@gmail.com";
+    private final Data test_date = new Data("TEST용 제목", "TEST용 내용", LocalDateTime.now());
     @Autowired
     private FCMService fcmService;
-
     @MockBean
     private MailService mailService;
-
     @Autowired
     private FCMTokenRepository fcmTokenRepository;
-
-    private final String TEST_EMAIL = "test1@gmail.com";
-
-    private final Data test_date = new Data("TEST용 제목", "TEST용 내용",LocalDateTime.now());
 
     @Test
     @DisplayName("FCM을 이용해 알림을 보낼 때")
@@ -61,12 +57,14 @@ public class FCMIntegrationTest extends AbstractContainersSupport {
 
         fcmTokenRepository.saveToken(TEST_EMAIL, FCM_TOKEN);
         Thread.sleep(500);
-        doNothing().when(mailService).sendEmail(TEST_EMAIL, test_date.getTitle(), test_date.getMessage());
+        doNothing().when(mailService)
+            .sendEmail(TEST_EMAIL, test_date.getTitle(), test_date.getMessage());
         // when & then
         assertTrue(fcmTokenRepository.hasKey(TEST_EMAIL));
         assertDoesNotThrow(() -> fcmService.sendMessageTo(TEST_EMAIL, test_date));
         Thread.sleep(1500);
-        verify(mailService, times(1)).sendEmail(TEST_EMAIL, test_date.getTitle(), test_date.getMessage());
+        verify(mailService, times(1)).sendEmail(TEST_EMAIL, test_date.getTitle(),
+            test_date.getMessage());
 
     }
 

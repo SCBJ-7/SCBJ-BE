@@ -1,6 +1,5 @@
 package com.yanolja.scbj.domain.member.validation;
 
-import com.yanolja.scbj.domain.member.validation.ValidationGroups.PatternGroup;
 import com.yanolja.scbj.domain.member.validation.validator.TokenValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

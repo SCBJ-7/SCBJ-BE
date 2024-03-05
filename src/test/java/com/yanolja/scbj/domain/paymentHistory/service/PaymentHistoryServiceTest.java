@@ -20,11 +20,8 @@ import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepositor
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -36,8 +33,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -293,12 +288,13 @@ class PaymentHistoryServiceTest {
 
             given(paymentHistoryRepository.findSaleHistoryInformationById(saleHistoryId, memberId))
                 .willReturn(Optional.of(paymentHistory));
-            given(saleHistoryDtoConverter.toSpecificSaleHistoryResponse(paymentHistory.getProduct(),true))
+            given(saleHistoryDtoConverter.toSpecificSaleHistoryResponse(paymentHistory.getProduct(),
+                true))
                 .willReturn(specificSaleHistoryResponse);
 
             // when
             SpecificSaleHistoryResponse result = paymentHistoryService.getSpecificSaleHistory(
-                memberId, saleHistoryId,true);
+                memberId, saleHistoryId, true);
 
             // then
             assertThat(result).isNotNull();

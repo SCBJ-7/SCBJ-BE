@@ -64,7 +64,6 @@ public class ProductMainRepositoryTest {
                 entityManager.flush();
             });
 
-
         IntStream.rangeClosed(1, 5)
             .forEach(i -> {
                 String randomAddress = "강릉";
@@ -138,7 +137,8 @@ public class ProductMainRepositoryTest {
             assertFalse(products.isEmpty());
             assertEquals(products.size(), 5);
             products.forEach(product -> {
-                assertTrue(product.getReservation().getHotel().getHotelMainAddress().contains(city));
+                assertTrue(
+                    product.getReservation().getHotel().getHotelMainAddress().contains(city));
             });
         }
     }

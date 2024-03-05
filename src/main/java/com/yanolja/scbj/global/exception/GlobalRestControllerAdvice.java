@@ -2,7 +2,6 @@ package com.yanolja.scbj.global.exception;
 
 import com.yanolja.scbj.global.common.ResponseDTO;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;

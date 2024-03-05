@@ -7,26 +7,23 @@ import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificSaleHistoryResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
-import com.yanolja.scbj.domain.paymentHistory.service.SaleHistoryDtoConverter;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
-import com.yanolja.scbj.domain.testdata.TestData;
-import com.yanolja.scbj.global.common.BaseEntity;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
- class SaleHistoryDtoConverterTest {
+class SaleHistoryDtoConverterTest {
+
     @InjectMocks
     private SaleHistoryDtoConverter saleHistoryDtoConverter;
-
 
 
     @Test
@@ -79,9 +76,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
             .accountNumber("123-456-7890")
             .secondGrantPeriod(6)
             .build();
-
-
-
 
         // when
         SpecificSaleHistoryResponse result =

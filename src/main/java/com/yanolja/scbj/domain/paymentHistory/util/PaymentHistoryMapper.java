@@ -1,7 +1,6 @@
 package com.yanolja.scbj.domain.paymentHistory.util;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
-import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.paymentHistory.dto.redis.PaymentRedisDto;
@@ -10,7 +9,6 @@ import com.yanolja.scbj.domain.paymentHistory.dto.response.SpecificPurchasedHist
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.product.entity.Product;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

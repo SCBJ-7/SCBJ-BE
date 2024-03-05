@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class TestData {
+
     public static Member createMember(String email, String phoneNumber) {
         return Member.builder()
             .email(email)
@@ -68,8 +69,8 @@ public class TestData {
     }
 
     public static Reservation createReservation(Hotel hotel, YanoljaMember yanoljaMember,
-                                                LocalDate checkIn, LocalDate checkOut,
-                                                int purchasePrice) {
+        LocalDate checkIn, LocalDate checkOut,
+        int purchasePrice) {
         return Reservation.builder()
             .hotel(hotel)
             .yanoljaMember(yanoljaMember)
@@ -80,7 +81,7 @@ public class TestData {
     }
 
     public static Product createProduct(Member member, Reservation reservation, int firstPrice,
-                                        int secondPrice, int time) {
+        int secondPrice, int time) {
         return Product.builder()
             .reservation(reservation)
             .member(member)
@@ -92,7 +93,8 @@ public class TestData {
             .build();
     }
 
-    public static HotelRoomPrice createHotelRoomPrice(Hotel hotel, int peakPrice, int offPeakPrice) {
+    public static HotelRoomPrice createHotelRoomPrice(Hotel hotel, int peakPrice,
+        int offPeakPrice) {
         return HotelRoomPrice.builder()
             .hotel(hotel)
             .peakPrice(peakPrice)

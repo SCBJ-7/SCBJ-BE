@@ -5,13 +5,13 @@ public enum TestConstants {
     REFRESH_PREFIX("Refresh"),
     ACCESS_TOKEN("ACCESS_TOKEN");
 
-    private String value;
-
-    public String getValue() {
-        return value;
-    }
+    private final String value;
 
     TestConstants(String value) {
         this.value = value;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

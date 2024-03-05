@@ -3,7 +3,6 @@ package com.yanolja.scbj.domain.member.dto.request;
 import com.yanolja.scbj.domain.member.validation.AccessToken;
 import com.yanolja.scbj.domain.member.validation.ValidationGroups.PatternGroup;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

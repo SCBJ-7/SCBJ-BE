@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -15,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
@@ -256,7 +254,8 @@ class ProductRestControllerTest {
             ProductSearchResponse response = ProductSearchResponse.builder().build();
             Pageable pageable = PageRequest.of(1, 10);
 
-            Page<ProductSearchResponse> expectedResponse = new PageImpl<>(List.of(response), pageable, 1);
+            Page<ProductSearchResponse> expectedResponse = new PageImpl<>(List.of(response),
+                pageable, 1);
             objectMapper.writeValueAsString(expectedResponse);
             when(productService.searchByRequest(any(ProductSearchRequest.class), eq(pageable)))
                 .thenReturn(expectedResponse);
@@ -271,7 +270,7 @@ class ProductRestControllerTest {
 
     @Nested
     @DisplayName("메인 페이지는")
-    class Context_mainProduct{
+    class Context_mainProduct {
 
         @Test
         @DisplayName("성공시 200을 가져온다")
@@ -309,7 +308,8 @@ class ProductRestControllerTest {
                 .build();
 
             Pageable pageable = PageRequest.of(1, 10);
-            Page<WeekendProductResponse> weekendPage = new PageImpl<>(List.of(weekendProductResponse),pageable,1); // 인자를 하나만 줬을때 문제다?
+            Page<WeekendProductResponse> weekendPage = new PageImpl<>(
+                List.of(weekendProductResponse), pageable, 1); // 인자를 하나만 줬을때 문제다?
 
             ProductMainResponse productMainResponse = ProductMainResponse.builder()
                 .seoul(List.of(seoulCityResponse))
@@ -351,7 +351,8 @@ class ProductRestControllerTest {
             ProductStockResponse productStockResponse = ProductStockResponse.builder()
                 .hasStock(true).build();
 
-            given(productService.isProductStockLeft(any(Long.TYPE))).willReturn(productStockResponse);
+            given(productService.isProductStockLeft(any(Long.TYPE))).willReturn(
+                productStockResponse);
 
             // when, then
             mvc.perform(get("/v1/products/" + productId + "/stock"))

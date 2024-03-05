@@ -51,7 +51,7 @@ class AlarmServiceTest {
     private PaymentHistoryRepository paymentHistoryRepository;
     @InjectMocks
     private AlarmService alarmService;
-    private Alarm alarm = Alarm.builder()
+    private final Alarm alarm = Alarm.builder()
         .title("TEST용 제목")
         .content("TEST용 내용")
         .build();
@@ -69,7 +69,8 @@ class AlarmServiceTest {
             AlarmResponse expectedAlarmResponse = AlarmMapper.toAlarmResponse(alarm);
 
             given(securityUtil.getCurrentMemberId()).willReturn(1L);
-            given(alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(1L)).willReturn(List.of(alarm));
+            given(alarmRepository.getAllByMemberIdOrderByCreatedAtDesc(1L)).willReturn(
+                List.of(alarm));
             // when
             List<AlarmResponse> resultAlarmResponses = alarmService.getAlarms();
 
@@ -83,7 +84,7 @@ class AlarmServiceTest {
         void createAlarms() {
             //given
             Member member = Member.builder().build();
-            Data data = new Data("TEST용 제목", "TEST용 메시지",LocalDateTime.now());
+            Data data = new Data("TEST용 제목", "TEST용 메시지", LocalDateTime.now());
             PaymentHistory paymentHistory = PaymentHistory.builder().build();
 
             given(memberService.getMember(any(Long.class))).willReturn(member);
@@ -94,7 +95,7 @@ class AlarmServiceTest {
             //when & then
             assertDoesNotThrow(() -> alarmService.createAlarm(1L, 1L, data));
             verify(alarmRepository, times(1)).save(any());
-            verify(fcmService, times(1)).sendMessageTo(any(),any());
+            verify(fcmService, times(1)).sendMessageTo(any(), any());
         }
 
         @Test
@@ -104,7 +105,6 @@ class AlarmServiceTest {
             AlarmHasNonReadResponse expectedalarmHasNonReadResponse = AlarmHasNonReadResponse.builder()
                 .hasNonReadAlarm(true)
                 .build();
-
 
             given(securityUtil.getCurrentMemberId()).willReturn(1L);
             given(alarmRepository.existsAlarmByMemberIdAndCheckedIsFalse(1L)).willReturn(true);

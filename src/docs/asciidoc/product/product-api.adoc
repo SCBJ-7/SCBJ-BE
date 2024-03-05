@@ -27,6 +27,7 @@ include::{snippets}/product-rest-controller-docs-test/post-product/response-fiel
 상품 상세 조회 API입니다.
 
 === HttpRequest
+include::{snippets}/product-rest-controller-docs-test/get-detail-product/request-headers.adoc[]
 include::{snippets}/product-rest-controller-docs-test/get-detail-product/http-request.adoc[]
 include::{snippets}/product-rest-controller-docs-test/get-detail-product/path-parameters.adoc[]
 
@@ -41,6 +42,7 @@ include::{snippets}/product-rest-controller-docs-test/get-detail-product/respons
 상품 삭제 API입니다.
 
 === HttpRequest
+include::{snippets}/product-rest-controller-docs-test/delete-product/request-headers.adoc[]
 include::{snippets}/product-rest-controller-docs-test/delete-product/http-request.adoc[]
 include::{snippets}/product-rest-controller-docs-test/delete-product/path-parameters.adoc[]
 
