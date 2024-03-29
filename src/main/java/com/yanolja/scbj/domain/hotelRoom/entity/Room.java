@@ -45,9 +45,31 @@ public class Room {
     @Comment("객실 테마")
     private RoomTheme roomTheme;
 
+    @Column(nullable = false)
+    @Comment("객실 전체 평점")
+    private String roomAllRating;
+
+    @Column(nullable = false)
+    @Comment("객실 친절도 평점")
+    private String roomKindnessRating;
+
+    @Column(nullable = false)
+    @Comment("객실 청결도 평점")
+    private String roomCleanlinessRating;
+
+    @Column(nullable = false)
+    @Comment("객실 편의성 평점")
+    private String roomConvenienceRating;
+
+    @Column(nullable = false)
+    @Comment("객실 위치 만족도 평점")
+    private String roomLocationRating;
+
     @Builder
     private Room(String roomName, LocalTime checkIn, LocalTime checkOut, String bedType,
-        int standardPeople, int maxPeople, RoomTheme roomTheme) {
+        int standardPeople, int maxPeople, RoomTheme roomTheme, String roomAllRating,
+        String roomKindnessRating, String roomCleanlinessRating, String roomConvenienceRating,
+        String roomLocationRating) {
         this.roomName = roomName;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
@@ -55,5 +77,10 @@ public class Room {
         this.standardPeople = standardPeople;
         this.maxPeople = maxPeople;
         this.roomTheme = roomTheme;
+        this.roomAllRating = roomAllRating;
+        this.roomKindnessRating = roomKindnessRating;
+        this.roomCleanlinessRating = roomCleanlinessRating;
+        this.roomConvenienceRating = roomConvenienceRating;
+        this.roomLocationRating = roomLocationRating;
     }
 }

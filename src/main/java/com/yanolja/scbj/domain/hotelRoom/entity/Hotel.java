@@ -53,16 +53,21 @@ public class Hotel {
     private Room room;
 
     @OneToMany(mappedBy = "hotel")
-    List<HotelRoomImage> hotelRoomImageList = new ArrayList<>();
+    private List<HotelRoomImage> hotelRoomImageList = new ArrayList<>();
 
     @OneToMany(mappedBy = "hotel")
-    List<RefundPolicy> hotelRefundPolicyList = new ArrayList<>();
+    private List<RefundPolicy> hotelRefundPolicyList = new ArrayList<>();
+
+    @Column(length = 30, nullable = false)
+    @Comment("호텔 성급")
+    private String hotelLevel;
 
     @Builder
     private Hotel(Long id, List<Reservation> reservationList, String hotelName,
         String hotelMainAddress,
         String hotelDetailAddress, String hotelInfoUrl, HotelRoomPrice hotelRoomPrice, Room room,
-        List<HotelRoomImage> hotelRoomImageList, List<RefundPolicy> hotelRefundPolicyList) {
+        List<HotelRoomImage> hotelRoomImageList, List<RefundPolicy> hotelRefundPolicyList,
+        String hotelLevel) {
         this.id = id;
         this.reservationList = reservationList;
         this.hotelName = hotelName;
@@ -73,5 +78,6 @@ public class Hotel {
         this.room = room;
         this.hotelRoomImageList = hotelRoomImageList;
         this.hotelRefundPolicyList = hotelRefundPolicyList;
+        this.hotelLevel = hotelLevel;
     }
 }
