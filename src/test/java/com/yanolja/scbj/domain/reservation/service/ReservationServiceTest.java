@@ -15,7 +15,6 @@ import com.yanolja.scbj.domain.product.repository.ProductRepository;
 import com.yanolja.scbj.domain.reservation.dto.response.ReservationFindResponse;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
-import jakarta.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -30,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @ExtendWith(MockitoExtension.class)
@@ -105,8 +105,8 @@ class ReservationServiceTest {
                 .hotel(hotel)
                 .yanoljaMember(yanoljaMember)
                 .purchasePrice(4500000)
-                .startDate(LocalDateTime.of(2024, 2, 10, 15, 0))
-                .endDate(LocalDateTime.of(2024, 2, 11, 11, 0))
+                .startDate(LocalDateTime.of(2027, 2, 10, 15, 0))
+                .endDate(LocalDateTime.of(2027, 2, 11, 11, 0))
                 .build();
 
             reservationList.add(reservation1);
@@ -139,8 +139,9 @@ class ReservationServiceTest {
                 .reservation(reservation1)
                 .build();
 
-            product.delete(LocalDateTime.of(2024, 1, 26, 17, 0));
+            product.delete(LocalDateTime.of(2024, 3, 5, 17, 0));
 
+          
             given(productRepository.findByReservationId(reservation1.getId())).willReturn(
                 java.util.Optional.ofNullable(product));
 

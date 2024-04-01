@@ -9,6 +9,7 @@ import static com.yanolja.scbj.domain.product.entity.QProduct.product;
 import static com.yanolja.scbj.domain.reservation.entity.QReservation.reservation;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
@@ -58,28 +59,18 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .join(roomTheme)
             .leftJoin(product.paymentHistory, paymentHistory)
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
-            .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
+            .where(allFilter(productSearchRequest).and(product.deletedAt.isNull())
+                .and(paymentHistory.id.isNull()))
             .groupBy(product.id)
             .fetch()
             .stream().map(tuple -> {
                 tuple.get(hotelRoomPrice.peakPrice);
-                Integer originalPrice = checkPeak(tuple.get(hotelRoomPrice.peakPrice), tuple.get(hotelRoomPrice.offPeakPrice));
+                Integer originalPrice = checkPeak(tuple.get(hotelRoomPrice.peakPrice),
+                    tuple.get(hotelRoomPrice.offPeakPrice));
                 Integer salePrice = getSalePrice(tuple.get(reservation.startDate),
                     tuple.get(product.secondGrantPeriod), tuple.get(product.firstPrice),
                     tuple.get(product.secondPrice));
-                return new ProductSearchResponse(
-                    tuple.get(product.id),
-                    tuple.get(hotel.hotelName),
-                    tuple.get(hotel.room.roomName),
-                    tuple.get(hotelRoomImage.url),
-                    originalPrice,
-                    isFirstPrice(salePrice, tuple.get(product.firstPrice)),
-                    salePrice,
-                    getSaleRate(originalPrice, salePrice),
-                    tuple.get(reservation.startDate).toLocalDate(),
-                    tuple.get(reservation.endDate).toLocalDate(),
-                    tuple.get(product.createdAt)
-                );
+                return mapToSearchResponse(tuple, originalPrice, salePrice);
             })
             .collect(Collectors.toList());
 
@@ -91,7 +82,26 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return new PageImpl<>(paginatedResponse, pageable, total);
     }
 
-    private int checkPeak( int peak , int offPeak) {
+    private ProductSearchResponse mapToSearchResponse(Tuple tuple, Integer originalPrice,
+                                                           Integer salePrice) {
+        return new ProductSearchResponse(
+            tuple.get(product.id),
+            tuple.get(hotel.hotelName),
+            tuple.get(hotel.room.roomName),
+            tuple.get(hotelRoomImage.url),
+            originalPrice,
+            isFirstPrice(salePrice, tuple.get(product.firstPrice)),
+            salePrice,
+            getSaleRate(originalPrice, salePrice),
+            tuple.get(reservation.startDate).toLocalDate(),
+            tuple.get(reservation.endDate).toLocalDate(),
+            tuple.get(product.createdAt)
+        );
+    }
+
+
+
+    private int checkPeak(int peak, int offPeak) {
         if (TimeValidator.isPeakTime(LocalDate.now())) {
             return peak;
         }
@@ -126,7 +136,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             return reservation.startDate.between(checkIn.atStartOfDay(),
                     checkOut.atStartOfDay())
                 .and(reservation.endDate
-                    .between(checkIn.atStartOfDay().plusDays(1), checkOut.atStartOfDay().plusDays(1)));
+                    .between(checkIn.atStartOfDay().plusDays(1),
+                        checkOut.atStartOfDay().plusDays(1)));
         }
         return reservation.startDate.goe(LocalDateTime.now());
     }

@@ -47,6 +47,7 @@ class SaleHistoryDtoConverterTest {
 
         HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
             .peakPrice(200000)
+            .offPeakPrice(100000)
             .build();
 
         Hotel hotel = Hotel.builder()
@@ -83,7 +84,7 @@ class SaleHistoryDtoConverterTest {
         // then
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.hotelName()).isEqualTo("호텔 인 나인 강남");
-        Assertions.assertThat(result.firstPrice().originalPrice()).isEqualTo(200000);
+        Assertions.assertThat(result.firstPrice().originalPrice()).isEqualTo(100000);
         // 기타 필요한 필드 검증
     }
 
