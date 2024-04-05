@@ -80,6 +80,11 @@ class HistoryRepositoryTest {
             .standardPeople(2)
             .maxPeople(4)
             .roomTheme(roomTheme)
+            .roomAllRating("4")
+            .roomKindnessRating("3")
+            .roomCleanlinessRating("4.5")
+            .roomConvenienceRating("5")
+            .roomLocationRating("4.6")
             .build();
 
         Hotel hotel = Hotel.builder()
@@ -87,6 +92,7 @@ class HistoryRepositoryTest {
             .hotelMainAddress("Seoul")
             .hotelDetailAddress("123 Yanolja St, Gangnam-gu")
             .hotelInfoUrl("http://yanoljahotel.com")
+            .hotelLevel("4.4")
             .room(room)
             .build();
 

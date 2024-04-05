@@ -132,6 +132,11 @@ public class AlarmRepositoryTest extends AbstractContainersSupport {
             .standardPeople(2)
             .maxPeople(4)
             .roomTheme(roomTheme)
+            .roomAllRating("4")
+            .roomKindnessRating("3")
+            .roomCleanlinessRating("4.5")
+            .roomConvenienceRating("5")
+            .roomLocationRating("4.6")
             .build();
 
         Hotel hotel = Hotel.builder()
@@ -139,6 +144,7 @@ public class AlarmRepositoryTest extends AbstractContainersSupport {
             .hotelMainAddress("Seoul")
             .hotelDetailAddress("123 Yanolja St, Gangnam-gu")
             .hotelInfoUrl("http://yanoljahotel.com")
+            .hotelLevel("4.6")
             .room(room)
             .build();
         return hotel;

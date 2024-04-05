@@ -105,8 +105,8 @@ class ReservationServiceTest {
                 .hotel(hotel)
                 .yanoljaMember(yanoljaMember)
                 .purchasePrice(4500000)
-                .startDate(LocalDateTime.of(2024, 2, 10, 15, 0))
-                .endDate(LocalDateTime.of(2024, 2, 11, 11, 0))
+                .startDate(LocalDateTime.of(2025, 2, 10, 15, 0))
+                .endDate(LocalDateTime.of(2025, 2, 11, 11, 0))
                 .build();
 
             reservationList.add(reservation1);

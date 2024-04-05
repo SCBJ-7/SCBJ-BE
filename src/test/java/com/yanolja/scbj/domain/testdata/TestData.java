@@ -44,6 +44,11 @@ public class TestData {
             .standardPeople(2)
             .maxPeople(maxPeople)
             .roomTheme(roomTheme)
+            .roomAllRating("4")
+            .roomKindnessRating("3")
+            .roomCleanlinessRating("4.5")
+            .roomConvenienceRating("5")
+            .roomLocationRating("4.6")
             .build();
 
         return Hotel.builder()
@@ -52,6 +57,7 @@ public class TestData {
             .hotelDetailAddress("123 Yanolja St, Gangnam-gu")
             .hotelInfoUrl("http://yanoljahotel.com")
             .room(room)
+            .hotelLevel("4.2")
             .build();
     }
 

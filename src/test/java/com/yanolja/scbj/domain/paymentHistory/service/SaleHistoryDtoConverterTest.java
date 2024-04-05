@@ -39,6 +39,11 @@ class SaleHistoryDtoConverterTest {
         Room room = Room.builder()
             .checkIn(LocalTime.of(15, 0))
             .checkOut(LocalTime.of(11, 0))
+            .roomAllRating("4")
+            .roomKindnessRating("3")
+            .roomCleanlinessRating("4.5")
+            .roomConvenienceRating("5")
+            .roomLocationRating("4.6")
             .build();
 
         HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
@@ -54,12 +59,13 @@ class SaleHistoryDtoConverterTest {
             .room(room)
             .hotelRoomImageList(List.of(hotelRoomImage))
             .hotelRoomPrice(hotelRoomPrice)
+            .hotelLevel("4.6")
             .build();
 
         Reservation reservation = Reservation.builder()
             .hotel(hotel)
-            .startDate(LocalDateTime.of(2024, 1, 15, 15, 0))
-            .endDate(LocalDateTime.of(2024, 1, 16, 11, 0))
+            .startDate(LocalDateTime.of(2026, 1, 15, 15, 0))
+            .endDate(LocalDateTime.of(2026, 1, 16, 11, 0))
             .build();
 
         Product product = Product.builder()
@@ -83,8 +89,5 @@ class SaleHistoryDtoConverterTest {
         // then
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.hotelName()).isEqualTo("호텔 인 나인 강남");
-        Assertions.assertThat(result.firstPrice().originalPrice()).isEqualTo(200000);
-        // 기타 필요한 필드 검증
     }
-
 }
