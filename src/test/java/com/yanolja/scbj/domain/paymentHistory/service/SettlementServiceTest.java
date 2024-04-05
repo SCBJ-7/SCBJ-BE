@@ -102,6 +102,11 @@ class SettlementServiceTest extends AbstractContainersSupport {
                 .standardPeople(2)
                 .maxPeople(4)
                 .roomTheme(roomTheme)
+                .roomAllRating("4")
+                .roomKindnessRating("3")
+                .roomCleanlinessRating("4.5")
+                .roomConvenienceRating("5")
+                .roomLocationRating("4.6")
                 .build();
 
             Hotel hotel = Hotel.builder()
@@ -110,6 +115,7 @@ class SettlementServiceTest extends AbstractContainersSupport {
                 .hotelDetailAddress("서울광역시 강남구")
                 .hotelInfoUrl("vasnoanwfowiamsfokm.jpg")
                 .room(room)
+                .hotelLevel("4.5")
                 .build();
 
             hotelRoomRepository.save(hotel);

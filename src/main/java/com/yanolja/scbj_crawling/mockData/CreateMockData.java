@@ -15,10 +15,12 @@ import com.yanolja.scbj.domain.member.entity.YanoljaMember;
 import com.yanolja.scbj.domain.member.repository.YanoljaMemberRepository;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.domain.reservation.repository.ReservationRepository;
+import com.yanolja.scbj_crawling.dto.response.RoomRatingResponse;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
@@ -59,8 +61,8 @@ public class CreateMockData {
 
 
     @GetMapping("/mockData")
-    public void createMockData(){
-//        crawling();
+    public void createMockData() {
+        crawling();
 //        createYanoljaMember();
 //        createRefundPolicy();
 //        createReservation();
@@ -73,10 +75,10 @@ public class CreateMockData {
         chromeOptions.addArguments("--start-minimized");
         chromeOptions.addArguments("--disable-popup-blocking");
         System.setProperty("webdriver.chrome.driver",
-            "/Users/qwert/Downloads/chromedriver-mac-arm64/chromedriver");
+            "./driver/chromedriver");
         ChromeDriver chromeDriver = new ChromeDriver(chromeOptions);
 
-        for (int i = 0; i < localNumberArray.length; i++) {
+        for (int i = 8; i < 9; i++) {
             String localNumber = localNumberArray[i];
             String url = BASE_URL + localNumber + SUFFIX_URL;
 
@@ -84,12 +86,12 @@ public class CreateMockData {
             chromeDriver.get(url);
             chromeDriver.manage().timeouts().implicitlyWait(Duration.ofMillis(3000));
 
-            String hotelDetailUrlPath = "div.PlaceListBody_listGroup__LddQf > div > div > a";
+            String hotelDetailUrlPath = "div.PlaceListItemBanner_container__ARsIm > a";
             List<WebElement> hotelDetailElements = chromeDriver.findElements(
                 By.cssSelector(hotelDetailUrlPath));
 
-            System.err.println(hotelDetailElements.size());
-
+            System.err.println("호텔 개수: " + hotelDetailElements.size());
+            int cnt = 0;
             for (WebElement hotelDetailElement : hotelDetailElements) {
                 try {
                     String hotelUrl = hotelDetailElement.getAttribute("href");
@@ -100,10 +102,20 @@ public class CreateMockData {
                     secondChromeDriver.manage().timeouts()
                         .implicitlyWait(Duration.ofMillis(3000));
 
+                    RoomRatingResponse roomRating = getRoomRating(hotelUrl);
+
+                    // 호텔 성급
+                    String hotelLevel = "css-1xsh8xn";
+                    WebElement hotelLevelElement = getElement(CLASS_NAME, hotelLevel,
+                        secondChromeDriver);
+
+                    System.err.println(hotelLevelElement.getText());
+
                     // 호텔 이름
                     String hotelNameClassName = "css-1g3ik0v";
                     WebElement hotelNameElement = getElement(CLASS_NAME, hotelNameClassName,
                         secondChromeDriver);
+
 
                     // 방 이름
                     String roomNameCssSelector = "h3.css-deizzc > div.css-1rr4h0w";
@@ -123,25 +135,28 @@ public class CreateMockData {
                     int checkOutMin = Integer.parseInt(timeArray[3].split(":")[1]);
 
                     // 기준인원, 최대인원
-                    String peopleNumClassName = "css-18j6obq";
-                    WebElement peopleNumElement = getElement(CLASS_NAME, peopleNumClassName,
-                        secondChromeDriver);
-
-                    char[] peopleNumArray = peopleNumElement.getText().toCharArray();
+                    Random random = new Random();
+                    int maxPeopleStart = 2;
+                    int maxPeopleEnd = 4;
+                    int maxPeopleNum = random.nextInt(maxPeopleEnd - maxPeopleStart + 1) + maxPeopleStart;
 
                     // 호텔 이미지, 방 이미지
-                    String imgPath = "//*[@id=\"__next\"]/div/div/main/article/div[1]/section/div[1]/div/div/div[3]/div/span/img";
+                    String imgPath = "//*[@id=\"__next\"]/div/div/main/article/div[1]/div/section/div[1]/div/div/div[3]/div/span/img";
                     WebElement hotelImgElement = getElement(XPATH, imgPath, secondChromeDriver);
 
                     String hotelImgUrl = hotelImgElement.getAttribute("src");
 
-                    String nextImgBtnClassName = "css-ln49wb";
-                    WebElement nextBtn = getElement(CLASS_NAME, nextImgBtnClassName,
-                        secondChromeDriver);
-                    nextBtn.click();
+//                    String nextImgBtnClassName = "css-ln49wb";
+//                    WebElement nextBtn = getElement(CLASS_NAME, nextImgBtnClassName,
+//                        secondChromeDriver);
+//                    nextBtn.click();
 
-                    WebElement roomImgElement = getElement(XPATH, imgPath, secondChromeDriver);
+                    String roomImgClassName = "css-sr2c7j";
+                    WebElement roomImgElement = getElement(CLASS_NAME, roomImgClassName, secondChromeDriver);
                     String roomImgUrl = roomImgElement.getAttribute("src");
+
+//                    WebElement roomImgElement = getElement(XPATH, imgPath, secondChromeDriver);
+//                    String roomImgUrl = roomImgElement.getAttribute("src");
 
                     // 호텔 주소
                     String hotelAddressSelector = "div.css-11ynnk0 > div.css-cxbger > div> span";
@@ -149,7 +164,7 @@ public class CreateMockData {
                         secondChromeDriver);
 
                     // 가격
-                    Random random = new Random();
+                    random = new Random();
                     int min = 20;
                     int max = 50;
                     int randomNum = random.nextInt(max - min + 1) + min;
@@ -176,18 +191,25 @@ public class CreateMockData {
                         .roomName(roomNameElement.getText())
                         .checkIn(LocalTime.of(checkInHour, checkInMin))
                         .checkOut(LocalTime.of(checkOutHour, checkOutMin))
-                        .standardPeople(Integer.parseInt(String.valueOf(peopleNumArray[3])))
-                        .maxPeople(Integer.parseInt(String.valueOf(peopleNumArray[11])))
+                        .standardPeople(2)
+                        .maxPeople(maxPeopleNum)
                         .bedType(randomBedType)
                         .roomTheme(roomTheme)
+                        .roomAllRating(roomRating.getRoomAllRating())
+                        .roomKindnessRating(roomRating.getRoomKindnessRating())
+                        .roomCleanlinessRating(roomRating.getRoomCleanlinessRating())
+                        .roomConvenienceRating(roomRating.getRoomConvenienceRating())
+                        .roomLocationRating(roomRating.getRoomLocationRating())
                         .build();
 
                     Hotel hotel = Hotel.builder()
+                        .hotelLevel(hotelLevelElement.getText())
                         .hotelName(hotelNameElement.getText())
                         .hotelMainAddress(localNameArray[i])
                         .hotelDetailAddress(addressElement.getText())
                         .room(room)
                         .hotelInfoUrl(hotelUrl)
+                        .hotelLevel(hotelLevelElement.getText())
                         .build();
 
                     HotelRoomImage hotelImage = HotelRoomImage.builder()
@@ -212,12 +234,50 @@ public class CreateMockData {
                     hotelRoomImageRepository.save(hotelImage);
                     hotelRoomImageRepository.save(roomImage);
 
+                    System.err.println("quit");
                     secondChromeDriver.quit();
+                    if(cnt == 0){
+                        break;
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    private RoomRatingResponse getRoomRating(String hotelUrl) {
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable--gpu");
+        chromeOptions.addArguments("--start-minimized");
+        chromeOptions.addArguments("--disable-popup-blocking");
+        System.setProperty("webdriver.chrome.driver",
+            "./driver/chromedriver");
+        ChromeDriver thirdChromeDriver = new ChromeDriver(chromeOptions);
+        thirdChromeDriver.manage().timeouts()
+            .implicitlyWait(Duration.ofMillis(3000));
+
+        String[] hotelUrlArray = hotelUrl.split("/");
+        String hotelNumber = hotelUrlArray[hotelUrlArray.length - 1];
+        String roomUrl = "https://www.yanolja.com/reviews/domestic/" + hotelNumber;
+        System.err.println("room: " + roomUrl);
+        thirdChromeDriver.get(roomUrl);
+
+        String hotelRatingClassName = "css-1pd8ix2";
+        String roomRatingClassName = "css-ftdln6";
+
+        WebElement hotelRatingElement = getElement(CLASS_NAME, hotelRatingClassName, thirdChromeDriver);
+        List<WebElement> roomRatingElementList = thirdChromeDriver.findElements(
+            By.className(roomRatingClassName));
+
+        return RoomRatingResponse.builder()
+            .roomAllRating(hotelRatingElement.getText())
+            .roomKindnessRating(roomRatingElementList.get(0).getText())
+            .roomCleanlinessRating(roomRatingElementList.get(1).getText())
+            .roomConvenienceRating(roomRatingElementList.get(2).getText())
+            .roomLocationRating(roomRatingElementList.get(3).getText())
+            .build();
     }
 
     private WebElement getElement(String type, String selector, ChromeDriver driver) {
@@ -233,9 +293,9 @@ public class CreateMockData {
         }
     }
 
-    private void createYanoljaMember(){
+    private void createYanoljaMember() {
         String email = "";
-        for(int i = 1; i <= 100; i++){
+        for (int i = 1; i <= 100; i++) {
             email = "test" + i + "@example.com";
             yanoljaMemberRepository.save(YanoljaMember.builder()
                 .email(email)
@@ -243,28 +303,28 @@ public class CreateMockData {
         }
     }
 
-    private void createRefundPolicy(){
+    private void createRefundPolicy() {
         List<Hotel> hotelList = hotelRoomRepository.findAll();
 
         for (Hotel hotel : hotelList) {
             Random random = new Random();
-            int randomBaseDate = random.nextInt(1,7);
+            int randomBaseDate = random.nextInt(1, 7);
             int randomPercent = 0;
 
-            if(randomBaseDate == 1){
-                randomPercent = random.nextInt(0,10);
-            } else if (randomBaseDate == 2){
-                randomPercent = random.nextInt(10,20);
-            } else if (randomBaseDate == 3){
-                randomPercent = random.nextInt(20,30);
-            } else if (randomBaseDate == 4){
-                randomPercent = random.nextInt(30,40);
-            } else if (randomBaseDate == 5){
-                randomPercent = random.nextInt(40,50);
-            } else if (randomBaseDate == 6){
-                randomPercent = random.nextInt(60,70);
-            } else if (randomBaseDate == 7){
-                randomPercent = random.nextInt(80,90);
+            if (randomBaseDate == 1) {
+                randomPercent = random.nextInt(0, 10);
+            } else if (randomBaseDate == 2) {
+                randomPercent = random.nextInt(10, 20);
+            } else if (randomBaseDate == 3) {
+                randomPercent = random.nextInt(20, 30);
+            } else if (randomBaseDate == 4) {
+                randomPercent = random.nextInt(30, 40);
+            } else if (randomBaseDate == 5) {
+                randomPercent = random.nextInt(40, 50);
+            } else if (randomBaseDate == 6) {
+                randomPercent = random.nextInt(60, 70);
+            } else if (randomBaseDate == 7) {
+                randomPercent = random.nextInt(80, 90);
             }
 
             RefundPolicy refundPolicy = RefundPolicy.builder()
@@ -278,14 +338,15 @@ public class CreateMockData {
     }
 
 
-    private void createReservation(){
+    private void createReservation() {
         List<Hotel> hotelList = hotelRoomRepository.findAll();
         List<YanoljaMember> yanoljaMemberList = yanoljaMemberRepository.findAll();
 
         Random random = new Random();
 
         for (Hotel hotel : hotelList) {
-            YanoljaMember yanoljaMember = yanoljaMemberList.get(random.nextInt(yanoljaMemberList.size() - 1));
+            YanoljaMember yanoljaMember = yanoljaMemberList.get(
+                random.nextInt(yanoljaMemberList.size() - 1));
 
             LocalDate startDate = LocalDate.of(2024, random.nextInt(2, 3), random.nextInt(1, 29));
             LocalDateTime startDateTime = LocalDateTime.of(startDate, hotel.getRoom().getCheckIn());
@@ -295,8 +356,9 @@ public class CreateMockData {
             int price = hotel.getHotelRoomPrice().getPeakPrice();
             String splitPrice = String.valueOf(price).substring(0, 2);
             int left = String.valueOf(price).substring(2).length();
-            int randomInt = random.nextInt(5,10);
-            int finalPrice = (int) ((Integer.parseInt(splitPrice) * (randomInt * 0.1)) * Math.pow(10, left));
+            int randomInt = random.nextInt(5, 10);
+            int finalPrice = (int) ((Integer.parseInt(splitPrice) * (randomInt * 0.1)) * Math.pow(
+                10, left));
 
             Reservation reservation = Reservation.builder()
                 .hotel(hotel)
