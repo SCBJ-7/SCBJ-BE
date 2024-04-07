@@ -10,6 +10,7 @@ import static com.yanolja.scbj.domain.reservation.entity.QReservation.reservatio
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yanolja.scbj.domain.product.dto.request.ProductSearchRequest;
 import com.yanolja.scbj.domain.product.dto.response.ProductSearchResponse;
@@ -58,7 +59,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .join(roomTheme)
             .leftJoin(product.paymentHistory, paymentHistory)
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
-            .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
+            .where(allFilter(productSearchRequest))
             .groupBy(product.id)
             .fetch()
             .stream().map(tuple -> {
@@ -115,20 +116,17 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .and(eqOcean(productSearchRequest.getOceanView()))
             .and(containsLocation(productSearchRequest.getLocation()))
             .and(goeMaximumPeople(productSearchRequest.getQuantityPeople()))
-            .and(
-                betweenDate(productSearchRequest.getCheckIn(), productSearchRequest.getCheckOut()));
+            .and(betweenDate(productSearchRequest.getCheckIn(), productSearchRequest.getCheckOut()));
 
         return builder;
     }
 
     private BooleanExpression betweenDate(LocalDate checkIn, LocalDate checkOut) {
         if (checkIn != null && checkOut != null) {
-            return reservation.startDate.between(checkIn.atStartOfDay(),
-                    checkOut.atStartOfDay())
-                .and(reservation.endDate
-                    .between(checkIn.atStartOfDay().plusDays(1), checkOut.atStartOfDay().plusDays(1)));
+            return reservation.startDate.between(checkIn.atStartOfDay(), checkOut.atStartOfDay())
+                .and(reservation.endDate.between(checkIn.atStartOfDay().plusDays(1), checkOut.atStartOfDay().plusDays(1)));
         }
-        return reservation.startDate.goe(LocalDateTime.now());
+        return Expressions.asBoolean(true).isTrue();
     }
 
     private BooleanExpression goeMaximumPeople(Integer maximumPeople) {
