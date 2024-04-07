@@ -23,15 +23,26 @@ public class ProductSearchResponse {
    private LocalDate checkIn;
    private LocalDate checkOut;
    private LocalDateTime createdAt;
+   private double reviewRate;
+   private int hotelRate;
 
 
 
    @Builder
    @QueryProjection
-   public ProductSearchResponse(Long id, String name, String roomType, String imageUrl,
-                                Integer originalPrice, Boolean isFirstPrice, Integer salePrice, Double salePercentage,
+   public ProductSearchResponse(Long id,
+                                String name,
+                                String roomType,
+                                String imageUrl,
+                                Integer originalPrice,
+                                Boolean isFirstPrice,
+                                Integer salePrice,
+                                Double salePercentage,
                                 LocalDate checkIn,
-                                LocalDate checkOut, LocalDateTime localDateTime) {
+                                LocalDate checkOut,
+                                LocalDateTime localDateTime,
+                                int reviewRate,
+                                int hotelRate) {
       this.id = id;
       this.name = name;
       this.roomType = roomType;
@@ -43,6 +54,8 @@ public class ProductSearchResponse {
       this.checkIn = checkIn;
       this.checkOut = checkOut;
       this.createdAt = localDateTime;
+      this.reviewRate = reviewRate;
+      this.hotelRate = hotelRate;
    }
 
 
