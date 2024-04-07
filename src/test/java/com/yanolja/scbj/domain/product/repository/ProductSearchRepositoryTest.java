@@ -60,8 +60,8 @@ public class ProductSearchRepositoryTest {
                     TestData.createYanoljaMember("yanolja" + i + "@example.com");
                 entityManager.persist(yanoljaMember);
                 Reservation reservation =
-                    TestData.createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(1),
-                        LocalDate.now().plusDays(5), 200000);
+                    TestData.createReservation(hotel2, yanoljaMember, LocalDate.now().plusDays(10),
+                        LocalDate.now().plusDays(15), 200000);
                 entityManager.persist(reservation);
                 Product product = TestData.createProduct(member, reservation, 100000, 50000, 0);
                 entityManager.persist(product);
@@ -159,13 +159,14 @@ public class ProductSearchRepositoryTest {
         public void will_success_testDateSearchProduct() {
             //given
             ProductSearchRequest searchRequest =
-                ProductSearchRequest.builder().checkIn(LocalDate.now())
-                    .checkOut(LocalDate.now().plusDays(5)).build();
+                ProductSearchRequest.builder()
+                    .checkIn(LocalDate.now())
+                    .checkOut(LocalDate.now().plusDays(5))
+                    .build();
 
             //when
-
             Page<ProductSearchResponse> results =
-                productRepository.search(PageRequest.of(0, 10), searchRequest);
+                productRepository.search(PageRequest.of(0, 100), searchRequest);
 
             //then
             assertThat(results).isNotEmpty();
@@ -244,29 +245,30 @@ public class ProductSearchRepositoryTest {
             List<ProductSearchResponse> content = highSearchResult.getContent();
 
             for (int i = 0; i < 5; i++) {
-                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.4);
+                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.7142857142857143);
             }
 
             assertThat(lowPriceResult).isNotEmpty();
             for (int i = 0; i < 5; i++) {
-                assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(200000);
+                assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(100000);
             }
         }
 
         @Test
-        @DisplayName("판매중인것만 조회가 된다")
-        public void will_success_get_on_sale() {
+        @DisplayName("날짜를 입력하지 않았을때 날짜가 지난 상품들 까지 조회가 된다")
+        public void will_success_get_past_products() {
             //given
             ProductSearchRequest productSearchRequest = ProductSearchRequest.builder().build();
 
             //when
             Page<ProductSearchResponse> responses =
-                productRepository.search(PageRequest.of(0, 10), productSearchRequest);
+                productRepository.search(PageRequest.of(0, 50), productSearchRequest);
 
             //then
             assertThat(responses).isNotEmpty();
             List<ProductSearchResponse> content = responses.getContent();
-            assertThat(content.size()).isEqualTo(10);
+            assertThat(content.size()).isEqualTo(20);
+        }
 
         }
     }
