@@ -385,7 +385,9 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.pageable.unpaged").description("페이지 사이즈"),
                     fieldWithPath("data.sort.empty").description("정렬 비어있는 기준"),
                     fieldWithPath("data.sort.sorted").description("정렬 기준"),
-                    fieldWithPath("data.sort.unsorted").description("정렬 기준")
+                    fieldWithPath("data.sort.unsorted").description("정렬 기준"),
+                    fieldWithPath("data.content[].reviewRate").description("리뷰 점수"),
+                    fieldWithPath("data.content[].hotelRate").description("호텔 성급")
                 )
             ));
     }
