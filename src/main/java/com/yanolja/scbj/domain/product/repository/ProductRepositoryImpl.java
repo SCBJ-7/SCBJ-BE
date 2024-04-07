@@ -80,6 +80,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     tuple.get(reservation.startDate).toLocalDate(),
                     tuple.get(reservation.endDate).toLocalDate(),
                     tuple.get(product.createdAt)
+                    ,5 //todo 크롤링 후 값 대입 - reviewRate
+                    ,5 // todo 크롤링 후 값 대입 - hotelRate
                 );
             })
             .collect(Collectors.toList());
