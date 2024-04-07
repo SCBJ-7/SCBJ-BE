@@ -270,6 +270,23 @@ public class ProductSearchRepositoryTest {
             assertThat(content.size()).isEqualTo(20);
         }
 
+        @Test
+        @DisplayName("크롤링 전 호텔 등급과 호텔 리뷰는 항상 5이다")
+        public void will_give_always_five() {
+            //given
+            ProductSearchRequest productSearchRequest = ProductSearchRequest.builder().build();
+
+            //when
+            Page<ProductSearchResponse> responses =
+                productRepository.search(PageRequest.of(0, 50), productSearchRequest);
+
+
+            //then
+            assertThat(responses).isNotEmpty();
+            for (ProductSearchResponse eachResponse : responses) {
+                assertThat(eachResponse.getHotelRate()).isEqualTo(5);
+                assertThat(eachResponse.getReviewRate()).isEqualTo(5.0);
+            }
         }
     }
 }
