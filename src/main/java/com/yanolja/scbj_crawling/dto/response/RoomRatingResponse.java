@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class RoomRatingResponse {
+    private String roomFacilityInfo;
     private String roomAllRating;
     private String roomKindnessRating;
     private String roomCleanlinessRating;
@@ -12,8 +13,10 @@ public class RoomRatingResponse {
     private String roomLocationRating;
 
     @Builder
-    public RoomRatingResponse(String roomAllRating, String roomKindnessRating,
+    public RoomRatingResponse(String roomFacilityInfo, String roomAllRating,
+        String roomKindnessRating,
         String roomCleanlinessRating, String roomConvenienceRating, String roomLocationRating) {
+        this.roomFacilityInfo = roomFacilityInfo;
         this.roomAllRating = roomAllRating;
         this.roomKindnessRating = roomKindnessRating;
         this.roomCleanlinessRating = roomCleanlinessRating;
