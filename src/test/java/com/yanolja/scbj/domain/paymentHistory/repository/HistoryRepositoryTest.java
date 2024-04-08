@@ -85,6 +85,7 @@ class HistoryRepositoryTest {
             .roomCleanlinessRating("4.5")
             .roomConvenienceRating("5")
             .roomLocationRating("4.6")
+            .facilityInformation("전 객실 금연\n싱글 침대 2개")
             .build();
 
         Hotel hotel = Hotel.builder()
