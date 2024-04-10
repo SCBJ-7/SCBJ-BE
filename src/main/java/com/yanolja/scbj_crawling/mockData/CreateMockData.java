@@ -264,7 +264,7 @@ public class CreateMockData {
             By.className(roomFacilityClassName));
 
         String facilityInformation = facilityElements.stream()
-            .map(webElement -> webElement.getText() + " ")
+            .map(webElement -> webElement.getText() + "\n")
             .collect(Collectors.joining());
 
         String[] roomUrlArray = roomUrl.split("/");
