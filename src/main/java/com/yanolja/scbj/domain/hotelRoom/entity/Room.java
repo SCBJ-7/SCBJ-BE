@@ -65,11 +65,15 @@ public class Room {
     @Comment("객실 위치 만족도 평점")
     private String roomLocationRating;
 
+    @Column(nullable = false)
+    @Comment("객실 기본 정보")
+    private String facilityInformation;
+
     @Builder
     private Room(String roomName, LocalTime checkIn, LocalTime checkOut, String bedType,
         int standardPeople, int maxPeople, RoomTheme roomTheme, String roomAllRating,
         String roomKindnessRating, String roomCleanlinessRating, String roomConvenienceRating,
-        String roomLocationRating) {
+        String roomLocationRating, String facilityInformation) {
         this.roomName = roomName;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
@@ -82,5 +86,6 @@ public class Room {
         this.roomCleanlinessRating = roomCleanlinessRating;
         this.roomConvenienceRating = roomConvenienceRating;
         this.roomLocationRating = roomLocationRating;
+        this.facilityInformation = facilityInformation;
     }
 }

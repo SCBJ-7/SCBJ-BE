@@ -23,6 +23,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -78,7 +79,7 @@ public class CreateMockData {
             "./driver/chromedriver");
         ChromeDriver chromeDriver = new ChromeDriver(chromeOptions);
 
-        for (int i = 8; i < 9; i++) {
+        for (int i = 0; i < localNumberArray.length; i++) {
             String localNumber = localNumberArray[i];
             String url = BASE_URL + localNumber + SUFFIX_URL;
 
@@ -102,20 +103,27 @@ public class CreateMockData {
                     secondChromeDriver.manage().timeouts()
                         .implicitlyWait(Duration.ofMillis(3000));
 
-                    RoomRatingResponse roomRating = getRoomRating(hotelUrl);
+                    String roomUrlClassName = "css-1w7jlh2";
+                    WebElement element = getElement(CLASS_NAME, roomUrlClassName,
+                        secondChromeDriver);
+                    String[] roomHref = element.getAttribute("href").split("/");
+
+                    String[] hotelUrlArr = hotelUrl.split("/");
+                    String roomUrl = "https://place-site.yanolja.com/places/" + hotelUrlArr[hotelUrlArr.length - 1] + "/" + roomHref[roomHref.length - 2];
+
+
+                    // 호텔 평점
+                    RoomRatingResponse roomInfoAndRating = getRoomInfoAndRating(roomUrl);
 
                     // 호텔 성급
                     String hotelLevel = "css-1xsh8xn";
                     WebElement hotelLevelElement = getElement(CLASS_NAME, hotelLevel,
                         secondChromeDriver);
 
-                    System.err.println(hotelLevelElement.getText());
-
                     // 호텔 이름
                     String hotelNameClassName = "css-1g3ik0v";
                     WebElement hotelNameElement = getElement(CLASS_NAME, hotelNameClassName,
                         secondChromeDriver);
-
 
                     // 방 이름
                     String roomNameCssSelector = "h3.css-deizzc > div.css-1rr4h0w";
@@ -146,17 +154,9 @@ public class CreateMockData {
 
                     String hotelImgUrl = hotelImgElement.getAttribute("src");
 
-//                    String nextImgBtnClassName = "css-ln49wb";
-//                    WebElement nextBtn = getElement(CLASS_NAME, nextImgBtnClassName,
-//                        secondChromeDriver);
-//                    nextBtn.click();
-
                     String roomImgClassName = "css-sr2c7j";
                     WebElement roomImgElement = getElement(CLASS_NAME, roomImgClassName, secondChromeDriver);
                     String roomImgUrl = roomImgElement.getAttribute("src");
-
-//                    WebElement roomImgElement = getElement(XPATH, imgPath, secondChromeDriver);
-//                    String roomImgUrl = roomImgElement.getAttribute("src");
 
                     // 호텔 주소
                     String hotelAddressSelector = "div.css-11ynnk0 > div.css-cxbger > div> span";
@@ -195,11 +195,12 @@ public class CreateMockData {
                         .maxPeople(maxPeopleNum)
                         .bedType(randomBedType)
                         .roomTheme(roomTheme)
-                        .roomAllRating(roomRating.getRoomAllRating())
-                        .roomKindnessRating(roomRating.getRoomKindnessRating())
-                        .roomCleanlinessRating(roomRating.getRoomCleanlinessRating())
-                        .roomConvenienceRating(roomRating.getRoomConvenienceRating())
-                        .roomLocationRating(roomRating.getRoomLocationRating())
+                        .roomAllRating(roomInfoAndRating.getRoomAllRating())
+                        .roomKindnessRating(roomInfoAndRating.getRoomKindnessRating())
+                        .roomCleanlinessRating(roomInfoAndRating.getRoomCleanlinessRating())
+                        .roomConvenienceRating(roomInfoAndRating.getRoomConvenienceRating())
+                        .roomLocationRating(roomInfoAndRating.getRoomLocationRating())
+                        .facilityInformation(roomInfoAndRating.getRoomFacilityInfo())
                         .build();
 
                     Hotel hotel = Hotel.builder()
@@ -236,9 +237,6 @@ public class CreateMockData {
 
                     System.err.println("quit");
                     secondChromeDriver.quit();
-                    if(cnt == 0){
-                        break;
-                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -246,7 +244,7 @@ public class CreateMockData {
         }
     }
 
-    private RoomRatingResponse getRoomRating(String hotelUrl) {
+    private RoomRatingResponse getRoomInfoAndRating(String roomUrl) {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable--gpu");
@@ -258,11 +256,22 @@ public class CreateMockData {
         thirdChromeDriver.manage().timeouts()
             .implicitlyWait(Duration.ofMillis(3000));
 
-        String[] hotelUrlArray = hotelUrl.split("/");
-        String hotelNumber = hotelUrlArray[hotelUrlArray.length - 1];
-        String roomUrl = "https://www.yanolja.com/reviews/domestic/" + hotelNumber;
-        System.err.println("room: " + roomUrl);
         thirdChromeDriver.get(roomUrl);
+
+        // 객실 기본 정보
+        String roomFacilityClassName = "css-1muque2";
+        List<WebElement> facilityElements = thirdChromeDriver.findElements(
+            By.className(roomFacilityClassName));
+
+        String facilityInformation = facilityElements.stream()
+            .map(webElement -> webElement.getText() + "\n")
+            .collect(Collectors.joining());
+
+        String[] roomUrlArray = roomUrl.split("/");
+        String hotelNumber = roomUrlArray[roomUrlArray.length - 2];
+        String roomNumber = roomUrlArray[roomUrlArray.length - 1];
+        String roomRatingUrl = "https://www.yanolja.com/reviews/domestic/" + hotelNumber + "?roomTypeIds=" + roomNumber;
+        thirdChromeDriver.get(roomRatingUrl);
 
         String hotelRatingClassName = "css-1pd8ix2";
         String roomRatingClassName = "css-ftdln6";
@@ -272,6 +281,7 @@ public class CreateMockData {
             By.className(roomRatingClassName));
 
         return RoomRatingResponse.builder()
+            .roomFacilityInfo(facilityInformation)
             .roomAllRating(hotelRatingElement.getText())
             .roomKindnessRating(roomRatingElementList.get(0).getText())
             .roomCleanlinessRating(roomRatingElementList.get(1).getText())
