@@ -65,7 +65,7 @@ public class Room {
     @Comment("객실 위치 만족도 평점")
     private String roomLocationRating;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     @Comment("객실 기본 정보")
     private String facilityInformation;
 
