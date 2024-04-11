@@ -61,7 +61,7 @@ public class CreateMockData {
 
     @GetMapping("/mockData")
     public void createMockData() {
-        crawling();
+//        crawling();
 //        createYanoljaMember();
 //        createRefundPolicy();
 //        createReservation();
@@ -76,7 +76,7 @@ public class CreateMockData {
         System.setProperty("webdriver.chrome.driver",
             "./driver/chromedriver");
         ChromeDriver chromeDriver = new ChromeDriver(chromeOptions);
-
+        for (int i = 0; i < localNameArray.length; i++) {
             String localNumber = localNumberArray[i];
             String url = BASE_URL + localNumber + SUFFIX_URL;
 
