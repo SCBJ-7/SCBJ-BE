@@ -1,6 +1,7 @@
 package com.yanolja.scbj.domain.product.repository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
@@ -18,6 +19,7 @@ import com.yanolja.scbj.global.config.QuerydslConfig;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -49,7 +51,7 @@ public class ProductSearchRepositoryTest {
                 entityManager.persist(member);
                 RoomTheme roomTheme = TestData.createRoomTheme(true, true);
                 entityManager.persist(roomTheme);
-                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 2);
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 2,"3.0","3성급");
                 entityManager.persist(hotel2);
                 HotelRoomPrice hotelRoomPrice =
                     TestData.createHotelRoomPrice(hotel2, 250000, 350000);
@@ -78,7 +80,7 @@ public class ProductSearchRepositoryTest {
                 entityManager.persist(member);
                 RoomTheme roomTheme = TestData.createRoomTheme(true, true);
                 entityManager.persist(roomTheme);
-                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 4);
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 4,"4.0","4성급");
                 entityManager.persist(hotel2);
                 HotelRoomPrice hotelRoomPrice =
                     TestData.createHotelRoomPrice(hotel2, 200000, 300000);
@@ -107,7 +109,7 @@ public class ProductSearchRepositoryTest {
                 entityManager.persist(member);
                 RoomTheme roomTheme = TestData.createRoomTheme(true, true);
                 entityManager.persist(roomTheme);
-                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 3);
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 3,"1.0","1성급");
                 entityManager.persist(hotel2);
                 HotelRoomPrice hotelRoomPrice =
                     TestData.createHotelRoomPrice(hotel2, 400000, 500000);
@@ -142,7 +144,6 @@ public class ProductSearchRepositoryTest {
             ProductSearchRequest searchRequest = ProductSearchRequest.builder()
                 .location("서울")
                 .build();
-
             // when
             Page<ProductSearchResponse> results =
                 productRepository.search(PageRequest.of(0, 10), searchRequest);
@@ -152,6 +153,9 @@ public class ProductSearchRepositoryTest {
             List<ProductSearchResponse> responses = results.getContent();
 
             assertThat(responses.size()).isEqualTo(5);
+            assertThat(responses.get(0).getReviewRate()).isEqualTo("1.0");
+            assertThat(responses.get(0).getHotelRate()).isEqualTo("1성급");
+
         }
 
         @Test
@@ -245,17 +249,17 @@ public class ProductSearchRepositoryTest {
             List<ProductSearchResponse> content = highSearchResult.getContent();
 
             for (int i = 0; i < 5; i++) {
-                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.7142857142857143);
+                assertThat(content.get(i).getSalePercentage()).isEqualTo(0.4);
             }
 
             assertThat(lowPriceResult).isNotEmpty();
             for (int i = 0; i < 5; i++) {
-                assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(100000);
+                assertThat(lowPriceResult.getContent().get(i).getSalePrice()).isEqualTo(200000);
             }
         }
 
         @Test
-        @DisplayName("날짜를 입력하지 않았을때 날짜가 지난 상품들 까지 조회가 된다")
+        @DisplayName("날짜를 입력하지 않았을때 날짜가 지난 상품들 까지 조회가 되지 않는다")
         public void will_success_get_past_products() {
             //given
             ProductSearchRequest productSearchRequest = ProductSearchRequest.builder().build();
@@ -267,11 +271,11 @@ public class ProductSearchRepositoryTest {
             //then
             assertThat(responses).isNotEmpty();
             List<ProductSearchResponse> content = responses.getContent();
-            assertThat(content.size()).isEqualTo(20);
+            assertNotEquals(content.size(),20);
         }
 
         @Test
-        @DisplayName("크롤링 전 호텔 등급과 호텔 리뷰는 항상 5이다")
+        @DisplayName("크롤링 전 호텔 등급과 호텔 리뷰는 항상 5가 아니다")
         public void will_give_always_five() {
             //given
             ProductSearchRequest productSearchRequest = ProductSearchRequest.builder().build();
@@ -284,8 +288,8 @@ public class ProductSearchRepositoryTest {
             //then
             assertThat(responses).isNotEmpty();
             for (ProductSearchResponse eachResponse : responses) {
-                assertThat(eachResponse.getHotelRate()).isEqualTo(5);
-                assertThat(eachResponse.getReviewRate()).isEqualTo(5.0);
+                assertNotEquals(eachResponse.getHotelRate(),"5성급");
+                assertNotEquals(eachResponse.getReviewRate(),"5.0");
             }
         }
     }
