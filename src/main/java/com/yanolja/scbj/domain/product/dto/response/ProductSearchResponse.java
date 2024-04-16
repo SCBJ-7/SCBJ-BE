@@ -23,8 +23,8 @@ public class ProductSearchResponse {
    private LocalDate checkIn;
    private LocalDate checkOut;
    private LocalDateTime createdAt;
-   private double reviewRate;
-   private int hotelRate;
+   private String reviewRate;
+   private String hotelRate;
 
 
 
@@ -41,8 +41,8 @@ public class ProductSearchResponse {
                                 LocalDate checkIn,
                                 LocalDate checkOut,
                                 LocalDateTime localDateTime,
-                                int reviewRate,
-                                int hotelRate) {
+                                String reviewRate,
+                                String hotelRate) {
       this.id = id;
       this.name = name;
       this.roomType = roomType;

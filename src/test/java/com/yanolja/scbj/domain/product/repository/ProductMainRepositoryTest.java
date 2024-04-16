@@ -46,7 +46,7 @@ public class ProductMainRepositoryTest {
                 entityManager.persist(member);
                 RoomTheme roomTheme = TestData.createRoomTheme(true, true);
                 entityManager.persist(roomTheme);
-                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 2);
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 2,"5.0","3성급");
                 entityManager.persist(hotel2);
                 HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
                 entityManager.persist(hotelRoomImage);
@@ -72,7 +72,7 @@ public class ProductMainRepositoryTest {
                 entityManager.persist(member);
                 RoomTheme roomTheme = TestData.createRoomTheme(true, true);
                 entityManager.persist(roomTheme);
-                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 4);
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 4,"3.0","5성급");
                 entityManager.persist(hotel2);
                 HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
                 entityManager.persist(hotelRoomImage);
@@ -98,7 +98,7 @@ public class ProductMainRepositoryTest {
                 entityManager.persist(member);
                 RoomTheme roomTheme = TestData.createRoomTheme(true, true);
                 entityManager.persist(roomTheme);
-                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 3);
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 3,"5.0","5성급");
                 entityManager.persist(hotel2);
                 HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
                 entityManager.persist(hotelRoomImage);

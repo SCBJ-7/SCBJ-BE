@@ -50,7 +50,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 reservation.startDate,
                 reservation.endDate,
                 product.createdAt,
-                paymentHistory.id
+                paymentHistory.id,
+                hotel.room.roomAllRating,
+                hotel.hotelLevel
             )
             .from(product)
             .innerJoin(product.reservation, reservation)
@@ -59,7 +61,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .join(roomTheme)
             .leftJoin(product.paymentHistory, paymentHistory)
             .innerJoin(hotelRoomImage).on(hotelRoomImage.hotel.id.eq(hotel.id))
-            .where(allFilter(productSearchRequest))
+            .where(allFilter(productSearchRequest).and(paymentHistory.id.isNull()))
             .groupBy(product.id)
             .fetch()
             .stream().map(tuple -> {
@@ -80,8 +82,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     tuple.get(reservation.startDate).toLocalDate(),
                     tuple.get(reservation.endDate).toLocalDate(),
                     tuple.get(product.createdAt)
-                    ,5 //todo 크롤링 후 값 대입 - reviewRate
-                    ,5 // todo 크롤링 후 값 대입 - hotelRate
+                    ,tuple.get(hotel.room.roomAllRating)
+                    ,tuple.get(hotel.hotelLevel)
                 );
             })
             .collect(Collectors.toList());
@@ -128,7 +130,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             return reservation.startDate.between(checkIn.atStartOfDay(), checkOut.atStartOfDay())
                 .and(reservation.endDate.between(checkIn.atStartOfDay().plusDays(1), checkOut.atStartOfDay().plusDays(1)));
         }
-        return Expressions.asBoolean(true).isTrue();
+        return reservation.startDate.goe(LocalDateTime.now());
     }
 
     private BooleanExpression goeMaximumPeople(Integer maximumPeople) {

@@ -35,7 +35,7 @@ public class TestData {
             .build();
     }
 
-    public static Hotel createHotel(RoomTheme roomTheme, String hotelAddress, Integer maxPeople) {
+    public static Hotel createHotel(RoomTheme roomTheme, String hotelAddress, Integer maxPeople, String roomAllRate, String hotelLevel) {
         Room room = Room.builder()
             .roomName("Deluxe Room")
             .checkIn(LocalTime.of(14, 0))
@@ -44,7 +44,7 @@ public class TestData {
             .standardPeople(2)
             .maxPeople(maxPeople)
             .roomTheme(roomTheme)
-            .roomAllRating("4")
+            .roomAllRating(roomAllRate)
             .roomKindnessRating("3")
             .roomCleanlinessRating("4.5")
             .roomConvenienceRating("5")
@@ -58,7 +58,7 @@ public class TestData {
             .hotelDetailAddress("123 Yanolja St, Gangnam-gu")
             .hotelInfoUrl("http://yanoljahotel.com")
             .room(room)
-            .hotelLevel("4.2")
+            .hotelLevel(hotelLevel)
             .build();
     }
 
