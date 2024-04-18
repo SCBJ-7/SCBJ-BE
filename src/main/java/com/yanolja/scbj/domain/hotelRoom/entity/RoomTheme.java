@@ -63,4 +63,8 @@ public class RoomTheme {
     public boolean hasOceanView() {
         return oceanView;
     }
+
+    public String[] getRoomThemeNameList() {
+        return new String[]{"오션뷰", "주차가능", "수영장", "조식제공"};
+    }
 }
