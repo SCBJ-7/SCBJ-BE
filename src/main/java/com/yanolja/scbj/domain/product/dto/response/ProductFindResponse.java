@@ -21,7 +21,11 @@ public record ProductFindResponse(
     String hotelAddress,
     String hotelInfoUrl,
     boolean saleStatus,
-    boolean isSeller
+    boolean isSeller,
+    String hotelLevel,
+    List<String> sellerCommentList,
+    String facilityInformation,
+    boolean isLike
 ) {
 
     @Builder
