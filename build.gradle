@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.2.1'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id "io.sentry.jvm.gradle" version "4.4.1"
 }
 
 group = 'com.yanolja'
@@ -11,6 +12,8 @@ version = '0.0.1-SNAPSHOT'
 java {
 	sourceCompatibility = '17'
 }
+
+generateSentryBundleIdJava.dependsOn compileJava
 
 configurations {
 	compileOnly {
@@ -21,6 +24,17 @@ configurations {
 
 repositories {
 	mavenCentral()
+}
+
+sentry {
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
+
+	org = "eb256c3f1cf9"
+	projectName = "java-spring-boot"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
 
 ext {
@@ -102,6 +116,8 @@ dependencies {
 	// restdocs
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
+	implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.8.0'
 }
 
 def querydslDir = "src/main/generated"
