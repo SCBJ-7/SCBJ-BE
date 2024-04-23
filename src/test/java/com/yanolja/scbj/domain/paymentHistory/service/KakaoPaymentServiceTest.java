@@ -1,5 +1,6 @@
 package com.yanolja.scbj.domain.paymentHistory.service;
 
+import static javax.management.Query.eq;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -18,6 +19,7 @@ import com.yanolja.scbj.domain.member.repository.MemberRepository;
 import com.yanolja.scbj.domain.paymentHistory.dto.redis.PaymentRedisDto;
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayReadyResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayRefundResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.ProductNotForSaleException;
@@ -29,6 +31,7 @@ import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.config.fcm.FCMRequest.Data;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import jakarta.transaction.Transactional;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -46,6 +49,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Transactional
@@ -235,7 +239,6 @@ public class KakaoPaymentServiceTest {
             });
         }
 
-
         @Test
         @DisplayName("approvePayment로 승인 요청을 한다.")
         void approvePayment_willSuccess() throws Exception {
@@ -269,6 +272,55 @@ public class KakaoPaymentServiceTest {
             // then
             verify(alarmService, times(1))
                 .createAlarm(anyLong(), anyLong(), any(Data.class));
+        }
+
+        @Test
+        @DisplayName("cancelPayment 로 취소 요청을 한다.")
+        void cancelPayment_willSuccess() throws Exception {
+            // given
+            ResponseEntity responseEntity = new ResponseEntity<>(HttpStatus.OK);
+
+            PaymentRedisDto paymentInfo = PaymentRedisDto.builder()
+                .productId(1L)
+                .price(10000)
+                .isAgeOver14(true)
+                .tid("12234")
+                .productName("양양")
+                .useAgree(true)
+                .cancelAndRefund(true)
+                .build();
+
+            given(redisTemplate.opsForValue()).willReturn(valueOperations);
+            given(redisTemplate.opsForValue().get(any())).willReturn(paymentInfo);
+            given(restTemplate.postForEntity(any(), any(), any())).willReturn(
+                responseEntity);
+
+            // when
+            kaKaoPaymentService.cancelPayment();
+
+            // then
+            verify(restTemplate, times(1)).postForEntity(any(), any(), any());
+        }
+
+        @Test
+        @DisplayName("refundPayment 로 환불 요청을 한다.")
+        void refundPayment_willSuccess() throws Exception {
+            // given
+            KakaoPayRefundResponse kakaoPayRefundResponse = new KakaoPayRefundResponse(
+                "CANCEL_PAYMENT");
+            ResponseEntity<KakaoPayRefundResponse> responseEntity = new ResponseEntity<>(
+                kakaoPayRefundResponse, HttpStatus.OK);
+
+            given(paymentHistoryRepository.findById(any())).willReturn(Optional.of(paymentHistory));
+            given(restTemplate.postForEntity(any(URI.class), any(MultiValueMap.class),
+                any(Class.class))).willReturn(responseEntity);
+            doNothing().when(paymentHistoryRepository).deleteById(any());
+
+            // when
+            kaKaoPaymentService.refundPayment(paymentHistory.getId());
+
+            // then
+            verify(paymentHistoryRepository, times(1)).deleteById(anyLong());
         }
 
     }

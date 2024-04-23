@@ -207,6 +207,7 @@ public class AlarmRepositoryTest extends AbstractContainersSupport {
             .paymentType("신용카드")
             .settlement(false)
             .productName("호텔이름 객실이름")
+            .tid("testTid")
             .build();
         return paymentHistory;
     }

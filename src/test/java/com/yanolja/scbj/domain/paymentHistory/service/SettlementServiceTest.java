@@ -190,6 +190,7 @@ class SettlementServiceTest extends AbstractContainersSupport {
                     .customerEmail("asd@naver.com")
                     .customerName("Agasdasd")
                     .customerPhoneNumber("01012341122")
+                    .tid("testTid")
                     .build());
             }
         }
