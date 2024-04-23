@@ -12,11 +12,14 @@ public class WeekendMapper {
 
 
     public static WeekendProductResponse toWeekendProductResponse(Product product,
-                                                           Reservation reservation,
-                                                           String hotelUrl, int currentPrice,
-                                                           double discountRate,
-                                                           int roomThemeCount,
-                                                           RoomTheme roomTheme) {
+                                                                  Reservation reservation,
+                                                                  String hotelUrl,
+                                                                  int currentPrice,
+                                                                  double discountRate,
+                                                                  int roomThemeCount,
+                                                                  RoomTheme roomTheme,
+                                                                  String roomRate,
+                                                                  String hotelRate) {
 
         return WeekendProductResponse.builder()
             .id(product.getId())
@@ -32,6 +35,8 @@ public class WeekendMapper {
             .isPoolIncluded(roomTheme.isPool())
             .isOceanViewIncluded(roomTheme.isOceanView())
             .roomThemeCount(roomThemeCount)
+            .reviewRate(roomRate)
+            .hotelRate(hotelRate)
             .build();
 
     }

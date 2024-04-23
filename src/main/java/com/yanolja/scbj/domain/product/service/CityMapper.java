@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CityMapper {
-    public static CityResponse toCityResponse(Product product, String hotelUrl , Reservation reservation, int currentPrice, double discountRate , int originalPrice) {
+    public static CityResponse toCityResponse(Product product, String hotelUrl , Reservation reservation, int currentPrice, double discountRate , int originalPrice,
+                                              String hotelRate, String reviewRate) {
         return CityResponse.builder()
             .id(product.getId())
             .city(reservation.getHotel().getHotelMainAddress())
@@ -20,6 +21,8 @@ public class CityMapper {
             .salePercentage(discountRate)
             .checkInDate(reservation.getStartDate())
             .checkOutDate(reservation.getEndDate())
+            .hotelRate(hotelRate)
+            .reviewRate(reviewRate)
             .build();
     }
 }
