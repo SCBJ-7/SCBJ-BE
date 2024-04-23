@@ -66,7 +66,8 @@ public class ProductService {
     private static final int FIRST_HOTEL_IMAGE = 0;
 
     @Transactional
-    public ProductPostResponse postProduct(Long memberId, Long reservationId,
+    public ProductPostResponse postProduct(Long memberId,
+                                           Long reservationId,
                                            ProductPostRequest productPostRequest) {
 
         Member currentMember = memberRepository.findById(memberId)
@@ -218,6 +219,31 @@ public class ProductService {
             .build();
     }
 
+    private Map<String, List<CityResponse>> getEachCity(List<String> cities) {
+        Map<String, List<CityResponse>> savedProduct = new HashMap<>();
+        cities.forEach(city -> {
+            List<Product> productsByCity = productRepository.findProductByCity(city);
+            List<CityResponse> getCityResponse = productsByCity.stream()
+                .map(product -> {
+                    Reservation reservation = product.getReservation();
+                    int currentPrice = PricingHelper.getCurrentPrice(product);
+                    int originalPrice = PricingHelper.getOriginalPrice(reservation.getHotel());
+                    double discountRate = PricingHelper.calculateDiscountRate(product, currentPrice);
+                    String hotelUrl = getHotelUrl(product.getReservation().getHotel());
+                    String hotelRate = product.getReservation().getHotel().getHotelLevel();
+                    String roomRate = product.getReservation().getHotel().getRoom().getRoomAllRating();
+
+                    return CityMapper.toCityResponse(product, hotelUrl, reservation,
+                        currentPrice, discountRate, originalPrice,hotelRate,roomRate);
+                }).sorted(Comparator.comparingDouble(CityResponse::salePercentage).reversed())
+                .limit(PRODUCT_QUANTITY)
+                .collect(Collectors.toList());
+
+            savedProduct.put(city, getCityResponse);
+        });
+        return savedProduct;
+    }
+
     private Page<WeekendProductResponse> getWeekendProducts(Pageable pageable) {
         List<Product> productByWeekend = productRepository.findProductByWeekend();
         List<WeekendProductResponse> responses = productByWeekend.stream()
@@ -239,9 +265,11 @@ public class ProductService {
         String hotelUrl = getHotelUrl(product.getReservation().getHotel());
         int currentPrice = PricingHelper.getCurrentPrice(product);
         double discountRate = PricingHelper.calculateDiscountRate(product, currentPrice);
+        String hotelRate = product.getReservation().getHotel().getHotelLevel();
+        String roomRate = product.getReservation().getHotel().getRoom().getRoomAllRating();
 
         return Stream.of(WeekendMapper.toWeekendProductResponse(product, reservation, hotelUrl,
-            currentPrice, discountRate, getThemeCount(roomTheme), roomTheme));
+            currentPrice, discountRate, getThemeCount(roomTheme), roomTheme,hotelRate,roomRate));
     }
 
     private Comparator<WeekendProductResponse> ascendCheckin() {
@@ -265,29 +293,6 @@ public class ProductService {
             (roomTheme.isOceanView() ? 1 : 0);
     }
 
-
-    private Map<String, List<CityResponse>> getEachCity(List<String> cities) {
-        Map<String, List<CityResponse>> savedProduct = new HashMap<>();
-        cities.forEach(city -> {
-            List<Product> productsByCity = productRepository.findProductByCity(city);
-            List<CityResponse> getCityResponse = productsByCity.stream()
-                .map(product -> {
-                    Reservation reservation = product.getReservation();
-                    int currentPrice = PricingHelper.getCurrentPrice(product);
-                    int originalPrice = PricingHelper.getOriginalPrice(reservation.getHotel());
-                    double discountRate = PricingHelper.calculateDiscountRate(product, currentPrice);
-                    String hotelUrl = getHotelUrl(product.getReservation().getHotel());
-
-                    return CityMapper.toCityResponse(product, hotelUrl, reservation,
-                        currentPrice, discountRate, originalPrice);
-                }).sorted(Comparator.comparingDouble(CityResponse::salePercentage).reversed())
-                .limit(PRODUCT_QUANTITY)
-                .collect(Collectors.toList());
-
-            savedProduct.put(city, getCityResponse);
-        });
-        return savedProduct;
-    }
 
     public ProductStockResponse isProductStockLeft(long productId) {
         Product product = productRepository.findById(productId)

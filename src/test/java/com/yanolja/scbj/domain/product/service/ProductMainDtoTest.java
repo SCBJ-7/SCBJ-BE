@@ -1,19 +1,24 @@
 package com.yanolja.scbj.domain.product.service;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.yanolja.scbj.domain.hotelRoom.entity.Hotel;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
+import com.yanolja.scbj.domain.product.dto.response.ProductMainResponse;
 import com.yanolja.scbj.domain.product.dto.response.WeekendProductResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageRequest;
 
 public class ProductMainDtoTest {
 
@@ -28,10 +34,13 @@ public class ProductMainDtoTest {
     private CityMapper cityMapper;
 
     @InjectMocks
+    ProductService productService;
+    @InjectMocks
     private WeekendMapper weekendMapper;
 
     @Mock
     private PricingHelper pricingHelper;
+
 
     @BeforeEach
     void setUp() {
@@ -48,6 +57,7 @@ public class ProductMainDtoTest {
             .checkIn(LocalTime.now().plusHours(24))
             .checkOut(LocalTime.now().plusHours(48))
             .roomTheme(roomTheme)
+            .roomAllRating("4.5")
 
             .build();
 
@@ -62,6 +72,7 @@ public class ProductMainDtoTest {
             .room(room)
             .hotelRoomImageList(List.of(HotelRoomImage.builder().build()))
             .hotelRoomPrice(hotelRoomPrice)
+            .hotelLevel("5성급")
             .build();
 
         Reservation reservation = Reservation.builder()
@@ -98,14 +109,41 @@ public class ProductMainDtoTest {
             List<Product> products = createMockProducts();
             Product product = products.get(0);
             RoomTheme roomTheme = product.getReservation().getHotel().getRoom().getRoomTheme();
+            String roomRate = product.getReservation().getHotel().getRoom().getRoomAllRating();
+            String hotelRate = product.getReservation().getHotel().getHotelLevel();
 
             // when
             WeekendProductResponse response =
                 WeekendMapper.toWeekendProductResponse(product, product.getReservation(),
-                    "image", 200000, 0.6, 2, roomTheme);
+                    "image", 200000, 0.6, 2, roomTheme,roomRate,hotelRate);
 
             // then
             assertEquals(response.imageUrl(), "image");
+        }
+
+        @Test
+        @DisplayName("주말 호텔 성급 및 리뷰들이 나온다")
+        void getHotelRateAndReviewRatesOnWeekend() {
+            //given
+            List<Product> products = createMockProducts();
+            Product product = products.get(0);
+            RoomTheme roomTheme = product.getReservation().getHotel().getRoom().getRoomTheme();
+            String roomRate = product.getReservation().getHotel().getRoom().getRoomAllRating();
+            String hotelRate = product.getReservation().getHotel().getHotelLevel();
+
+            //when
+            WeekendProductResponse response =
+                WeekendMapper.toWeekendProductResponse(product, product.getReservation(),
+                    "image", 200000, 0.6, 2, roomTheme, roomRate, hotelRate);
+
+
+            //then
+            assertEquals(response.reviewRate(),"4.5");
+            assertEquals(response.hotelRate(),"5성급");
+            assertNotEquals(response.reviewRate(), "5.0");
+            assertNotEquals(response.hotelRate(), "4성급");
+
+
         }
     }
 

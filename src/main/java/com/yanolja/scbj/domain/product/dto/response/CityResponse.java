@@ -15,7 +15,9 @@ public record CityResponse(
     int salePrice,
     Double salePercentage,
     LocalDateTime checkInDate,
-    LocalDateTime checkOutDate
+    LocalDateTime checkOutDate,
+    String hotelRate,
+    String reviewRate
 
 ) {
 

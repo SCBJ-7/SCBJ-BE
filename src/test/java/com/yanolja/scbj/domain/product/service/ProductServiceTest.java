@@ -2,6 +2,8 @@ package com.yanolja.scbj.domain.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.hibernate.validator.internal.util.Contracts.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
@@ -71,6 +73,70 @@ class ProductServiceTest {
     private ProductRepository productRepository;
     @Mock
     private SecurityUtil securityUtil;
+
+
+    public Product makeProductMock() {
+        RoomTheme roomTheme = RoomTheme.builder()
+            .id(1L)
+            .build();
+
+        Room room = Room.builder()
+            .checkIn(LocalTime.now())
+            .checkOut(LocalTime.now())
+            .roomTheme(roomTheme)
+            .roomAllRating("5.0")
+            .build();
+
+        HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
+            .id(1L)
+            .offPeakPrice(100000)
+            .peakPrice(200000)
+            .build();
+
+        HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
+            .id(1L)
+            .url("Asdagasd")
+            .build();
+
+        Hotel hotel = Hotel.builder()
+            .id(1L)
+            .room(room)
+            .hotelMainAddress("서울")
+            .hotelLevel("5성급")
+            .hotelRoomPrice(hotelRoomPrice)
+            .hotelRoomImageList(List.of(hotelRoomImage))
+            .build();
+
+        Reservation reservation = Reservation.builder()
+            .id(1L)
+            .hotel(hotel)
+            .startDate(LocalDateTime.now().minusDays(1))
+            .endDate(LocalDateTime.now())
+            .build();
+
+        PaymentHistory paymentHistory = PaymentHistory.builder()
+            .id(1L)
+            .price(100000)
+            .customerName("tester")
+            .customerEmail("qwe@nav.com")
+            .customerPhoneNumber("010-1122-3344")
+            .paymentType("카카오페이")
+            .settlement(true)
+            .build();
+
+        Product product = Product.builder()
+            .id(1L)
+            .firstPrice(200000)
+            .secondPrice(100000)
+            .bank("국민")
+            .accountNumber("12512-2131-12512")
+            .secondGrantPeriod(24)
+            .reservation(reservation)
+            .paymentHistory(paymentHistory)
+            .build();
+
+        return product;
+    }
 
     @Nested
     @DisplayName("postProduct()는 ")
@@ -200,71 +266,14 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품 상세 조회는 ")
     class Context_findProduct {
-
         @Test
         @DisplayName("성공시 상품 정보를 반환한다.")
         void _will_success() {
             // given
-            RoomTheme roomTheme = RoomTheme.builder()
-                .id(1L)
-                .build();
-
-            Room room = Room.builder()
-                .checkIn(LocalTime.now())
-                .checkOut(LocalTime.now())
-                .roomTheme(roomTheme)
-                .build();
-
-            HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
-                .id(1L)
-                .offPeakPrice(100000)
-                .peakPrice(200000)
-                .build();
-
-            HotelRoomImage hotelRoomImage = HotelRoomImage.builder()
-                .id(1L)
-                .url("Asdagasd")
-                .build();
-
-            Hotel hotel = Hotel.builder()
-                .id(1L)
-                .room(room)
-                .hotelRoomPrice(hotelRoomPrice)
-                .hotelRoomImageList(List.of(hotelRoomImage))
-                .build();
-
-            Reservation reservation = Reservation.builder()
-                .id(1L)
-                .hotel(hotel)
-                .startDate(LocalDateTime.now().minusDays(1))
-                .endDate(LocalDateTime.now())
-                .build();
-
-            PaymentHistory paymentHistory = PaymentHistory.builder()
-                .id(1L)
-                .price(100000)
-                .customerName("tester")
-                .customerEmail("qwe@nav.com")
-                .customerPhoneNumber("010-1122-3344")
-                .paymentType("카카오페이")
-                .settlement(true)
-                .build();
-
-            Product product = Product.builder()
-                .id(1L)
-                .firstPrice(200000)
-                .secondPrice(100000)
-                .bank("국민")
-                .accountNumber("12512-2131-12512")
-                .secondGrantPeriod(24)
-                .reservation(reservation)
-                .paymentHistory(paymentHistory)
-                .build();
-
-            given(productRepository.findById(any())).willReturn(Optional.of(product));
+            given(productRepository.findById(any())).willReturn(Optional.of(makeProductMock()));
             given(securityUtil.isUserNotAuthenticated()).willReturn(true);
             // when
-            ProductFindResponse response = productService.findProduct(product.getId());
+            ProductFindResponse response = productService.findProduct(makeProductMock().getId());
 
             // then
             Assertions.assertThat(response).isNotNull();
@@ -344,7 +353,7 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품 재고 조회는")
     class Context_getProductStock {
-
+        //todo  makeProductMock() 대체하기
         @Test
         @DisplayName("재고가 존재시 true를 반환한다.")
         void will_success() throws Exception {
@@ -352,57 +361,7 @@ class ProductServiceTest {
             // given
             long productId = 1L;
 
-            RoomTheme roomTheme = RoomTheme.builder()
-                .id(1L)
-                .build();
-
-            Room room = Room.builder()
-                .checkIn(LocalTime.now())
-                .checkOut(LocalTime.now())
-                .roomTheme(roomTheme)
-                .build();
-
-            HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
-                .id(1L)
-                .offPeakPrice(100000)
-                .peakPrice(200000)
-                .build();
-
-            Hotel hotel = Hotel.builder()
-                .id(1L)
-                .room(room)
-                .hotelRoomPrice(hotelRoomPrice)
-                .build();
-
-            Reservation reservation = Reservation.builder()
-                .id(1L)
-                .hotel(hotel)
-                .startDate(LocalDateTime.now())
-                .endDate(LocalDateTime.now())
-                .build();
-
-            PaymentHistory paymentHistory = PaymentHistory.builder()
-                .id(1L)
-                .price(100000)
-                .customerName("tester")
-                .customerEmail("qwe@nav.com")
-                .customerPhoneNumber("010-1122-3344")
-                .paymentType("카카오페이")
-                .settlement(true)
-                .build();
-
-            Product product = Product.builder()
-                .id(1L)
-                .firstPrice(200000)
-                .secondPrice(100000)
-                .bank("국민")
-                .accountNumber("12512-2131-12512")
-                .secondGrantPeriod(24)
-                .reservation(reservation)
-                .paymentHistory(paymentHistory)
-                .build();
-
-            given(productRepository.findById(any())).willReturn(Optional.of(product));
+            given(productRepository.findById(any())).willReturn(Optional.of(makeProductMock()));
 
             // when
             ProductStockResponse result = productService.isProductStockLeft(productId);
@@ -488,9 +447,10 @@ class ProductServiceTest {
 
         @Test
         @DisplayName("getAllProductForMainPage 메소드는 각 도시 및 주말 상품을 정확히 반환한다")
-        void testGetAllProductForMainPage() {
+        void will_success() {
             // given
             ArrayList<Product> arrayList = new ArrayList<>();
+            arrayList.add(makeProductMock());
             List<String> cityNames = Arrays.asList("서울", "강원", "부산", "제주", "전라", "경상");
 
             cityNames.forEach(city -> {
@@ -511,6 +471,33 @@ class ProductServiceTest {
             assertNotNull(result);
         }
 
+
+        @Test
+        @DisplayName("메인페이지에서 성급과 호텔이 나온다")
+        void will_success_show_hotelRate_reviewRate() {
+            //given
+
+
+            ArrayList<Product> arrayList = new ArrayList<>();
+            arrayList.add(makeProductMock());
+            List<String> cityNames = Arrays.asList("서울", "강원", "부산", "제주", "전라", "경상");
+
+            cityNames.forEach(city -> {
+                List<Product> cityProducts = arrayList;
+                when(productRepository.findProductByCity(city)).thenReturn(cityProducts);
+            });
+
+            Pageable pageable = PageRequest.of(0, 3);
+
+            //when
+            ProductMainResponse result =
+                productService.getAllProductForMainPage(cityNames, pageable);
+
+            //then
+            assertNotNull(result);
+            assertEquals(result.seoul().get(0).hotelRate(),"5성급");
+            assertEquals(result.seoul().get(0).reviewRate(),"5.0");
+        }
     }
 
 }
