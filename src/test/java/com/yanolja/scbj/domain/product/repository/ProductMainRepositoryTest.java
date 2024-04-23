@@ -98,7 +98,7 @@ public class ProductMainRepositoryTest {
                 entityManager.persist(member);
                 RoomTheme roomTheme = TestData.createRoomTheme(true, true);
                 entityManager.persist(roomTheme);
-                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 3,"5.0","5성급");
+                Hotel hotel2 = TestData.createHotel(roomTheme, randomAddress, 3,"4.5","5성급");
                 entityManager.persist(hotel2);
                 HotelRoomImage hotelRoomImage = TestData.createHotelRoomImage(hotel2);
                 entityManager.persist(hotelRoomImage);
