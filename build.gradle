@@ -14,7 +14,7 @@ java {
 }
 
 generateSentryBundleIdJava.dependsOn compileJava
-sentryCollectSourcesJava.dependsOn compileJava
+sentryCollectSourcesJava.dependsOn compileTestJava
 
 configurations {
 	compileOnly {
