@@ -18,7 +18,9 @@ public record WeekendProductResponse(
     boolean isBrunchIncluded,
     boolean isPoolIncluded,
     boolean isOceanViewIncluded,
-    int roomThemeCount
+    int roomThemeCount,
+    String hotelRate,
+    String reviewRate
 ) {
 
     @Builder
