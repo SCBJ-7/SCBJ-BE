@@ -119,6 +119,7 @@ public class TestData {
             .paymentType("신용카드")
             .settlement(true)
             .productName("호텔이름 객실이름")
+            .tid("testTid")
             .build();
     }
 }

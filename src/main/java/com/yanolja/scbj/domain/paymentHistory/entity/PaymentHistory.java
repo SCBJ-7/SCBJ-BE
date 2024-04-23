@@ -102,11 +102,15 @@ public class PaymentHistory extends BaseEntity {
     @Comment("정산 상태")
     private boolean settlement;
 
+    @Column(length = 20, nullable = false)
+    @Comment("결제 고유 번호")
+    private String tid;
+
 
     @Builder
     private PaymentHistory(Long id, Member member, Product product, String productName,
         PaymentAgreement paymentAgreement, int price, String customerName, String customerEmail,
-        String customerPhoneNumber, String paymentType, boolean settlement) {
+        String customerPhoneNumber, String paymentType, boolean settlement, String tid) {
         this.id = id;
         this.member = member;
         this.product = product;
@@ -118,8 +122,8 @@ public class PaymentHistory extends BaseEntity {
         this.customerPhoneNumber = customerPhoneNumber;
         this.paymentType = paymentType;
         this.settlement = settlement;
+        this.tid = tid;
     }
-
 
     public void processSettlement() {
         if (!this.settlement) {

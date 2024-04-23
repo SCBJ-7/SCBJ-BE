@@ -40,6 +40,7 @@ public enum ErrorCode {
     KAKAO_PAY_READY_FAIL(HttpStatus.BAD_REQUEST, "카카오페이 결제 요청에 실패했습니다."),
     KAKAO_PAY_INFO_FAIL(HttpStatus.PAYMENT_REQUIRED, "카카오페이 결제 승인에 실패했습니다."),
     KAKAO_PAY_CANCEL_FAIL(HttpStatus.BAD_REQUEST, "카카오페이 결제 취소에 실패했습니다."),
+    KAKAO_PAY_RUFUND_FAIL(HttpStatus.BAD_REQUEST, "카카오페이 환불에 실패했습니다."),
 
     //RESERVATION
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),

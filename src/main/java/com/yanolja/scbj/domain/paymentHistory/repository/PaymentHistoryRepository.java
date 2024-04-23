@@ -57,4 +57,5 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
 
     @Query(name ="find_check_in_alarm",nativeQuery = true)
     List<CheckInAlarmResponse> findPurchasedHistoriesNeedForCheckInAlarm();
+
 }

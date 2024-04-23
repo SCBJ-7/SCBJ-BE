@@ -14,12 +14,14 @@ import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentRespons
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentAgreement;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.exception.KakaoPayException;
+import com.yanolja.scbj.domain.paymentHistory.exception.PaymentHistoryNotFoundException;
 import com.yanolja.scbj.domain.paymentHistory.exception.ProductNotForSaleException;
 import com.yanolja.scbj.domain.paymentHistory.exception.ProductOutOfStockException;
 import com.yanolja.scbj.domain.paymentHistory.repository.PaymentHistoryRepository;
 import com.yanolja.scbj.domain.paymentHistory.util.PaymentAgreementMapper;
 import com.yanolja.scbj.domain.paymentHistory.util.PaymentHistoryMapper;
 import com.yanolja.scbj.domain.paymentHistory.util.PaymentRedisMapper;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayRefundResponse;
 import com.yanolja.scbj.domain.product.entity.Product;
 import com.yanolja.scbj.domain.product.exception.ProductNotFoundException;
 import com.yanolja.scbj.domain.product.repository.ProductRepository;
@@ -273,6 +275,39 @@ public class KaKaoPaymentService implements PaymentApiService {
             throw new ProductOutOfStockException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
     }
+
+    @Override
+    public void refundPayment(Long paymentHistoryId) {
+        PaymentHistory targetPaymentHistory = paymentHistoryRepository.findById(paymentHistoryId)
+            .orElseThrow(() -> new PaymentHistoryNotFoundException(ErrorCode.KAKAO_PAY_RUFUND_FAIL));
+
+        MultiValueMap<String, Object> body = createRefundParams(targetPaymentHistory);
+        ResponseEntity<KakaoPayRefundResponse> kakaoPayRefundResponse;
+        try {
+            kakaoPayRefundResponse = restTemplate.postForEntity(
+                new URI(KAKAO_BASE_URL + "/cancel"), body, KakaoPayRefundResponse.class);
+        } catch (URISyntaxException e) {
+            throw new KakaoPayException(ErrorCode.KAKAO_PAY_RUFUND_FAIL);
+        }
+
+        if("CANCEL_PAYMENT".equals(kakaoPayRefundResponse.getBody().status())) {
+            paymentHistoryRepository.deleteById(paymentHistoryId);
+            return;
+        }
+
+        throw new KakaoPayException(ErrorCode.KAKAO_PAY_RUFUND_FAIL);
+    }
+
+    private MultiValueMap<String, Object> createRefundParams(PaymentHistory targetPaymentHistory) {
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("cid", "TC0ONETIME");
+        params.add("tid", targetPaymentHistory.getTid());
+        params.add("cancel_amount", targetPaymentHistory.getPrice());
+        params.add("cancel_tax_free_amount", TAX_FREE_AMOUNT);
+
+        return params;
+    }
+
 
     @Override
     @Retryable(
