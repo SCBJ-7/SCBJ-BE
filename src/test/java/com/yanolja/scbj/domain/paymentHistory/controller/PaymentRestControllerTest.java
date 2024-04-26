@@ -17,6 +17,7 @@ import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
+import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
 import com.yanolja.scbj.domain.paymentHistory.service.PaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.KaKaoPaymentService;
 import com.yanolja.scbj.domain.paymentHistory.service.paymentApi.PaymentApiService;
@@ -108,7 +109,7 @@ class PaymentRestControllerTest {
             // given
             Member member = Member.builder()
                 .id(1L)
-                .name("asgasdaf")
+                .name("퍼센트호텔")
                 .build();
 
             Product product = Product.builder()
@@ -151,7 +152,7 @@ class PaymentRestControllerTest {
             // given
             Member member = Member.builder()
                 .id(1L)
-                .name("asgasdaf")
+                .name("퍼센트호텔")
                 .build();
 
             KaKaoPaymentService kaKaoPaymentService = mock(KaKaoPaymentService.class);
@@ -182,7 +183,7 @@ class PaymentRestControllerTest {
             // given
             Member member = Member.builder()
                 .id(1L)
-                .name("asgasdaf")
+                .name("퍼센트호텔")
                 .build();
 
             KaKaoPaymentService kaKaoPaymentService = mock(KaKaoPaymentService.class);
@@ -200,6 +201,31 @@ class PaymentRestControllerTest {
             result.andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is("결제에 실패했습니다.")));
+        }
+
+        @Test
+        @DisplayName("환불 시 환불 성공 메시지를 반환한다.")
+        void _will_refund_payment() throws Exception {
+            // given
+            PaymentHistory paymentHistory = PaymentHistory.builder()
+                .id(1L)
+                .tid("tid")
+                .build();
+
+            KaKaoPaymentService kaKaoPaymentService = mock(KaKaoPaymentService.class);
+
+            given(paymentApiServiceMap.get(any())).willReturn(kaKaoPaymentService);
+            doNothing().when(kaKaoPaymentService).refundPayment(paymentHistory.getId());
+
+            //when
+            ResultActions result = mvc.perform(
+                get("/v1/products/pay-refund/"
+                   + paymentHistory.getId() + "?paymentType=kakaoPaymentService"));
+
+            //then
+            result.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.message", is("환불에 성공했습니다.")));
         }
 
     }

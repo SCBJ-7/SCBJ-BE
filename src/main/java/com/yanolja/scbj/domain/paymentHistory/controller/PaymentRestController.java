@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.paymentHistory.controller;
 
 import com.yanolja.scbj.domain.paymentHistory.dto.request.PaymentReadyRequest;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayCancelResponse;
+import com.yanolja.scbj.domain.paymentHistory.dto.response.KakaoPayRefundResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentPageFindResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PaymentSuccessResponse;
 import com.yanolja.scbj.domain.paymentHistory.dto.response.PreparePaymentResponse;
@@ -69,6 +70,18 @@ public class PaymentRestController {
         paymentApiService.cancelPayment();
 
         return ResponseDTO.res("결제에 실패했습니다.");
+    }
+
+    @GetMapping("/pay-refund/{paymentHistory_id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO<Void> refundPayment(
+        @PathVariable("paymentHistory_id") Long paymentHistoryId,
+        @RequestParam("paymentType") String paymentType) {
+
+        PaymentApiService paymentApiService = paymentApiServiceMap.get(paymentType);
+        paymentApiService.refundPayment(paymentHistoryId);
+
+        return ResponseDTO.res("환불에 성공했습니다.");
     }
 
 }

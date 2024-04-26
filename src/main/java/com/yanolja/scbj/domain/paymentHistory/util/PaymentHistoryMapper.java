@@ -51,6 +51,7 @@ public final class PaymentHistoryMapper {
             .paymentAgreement(paymentAgreement)
             .price(paymentInfo.price())
             .paymentType(PAYMENT_TYPE)
+            .tid(paymentInfo.tid())
             .build();
     }
 

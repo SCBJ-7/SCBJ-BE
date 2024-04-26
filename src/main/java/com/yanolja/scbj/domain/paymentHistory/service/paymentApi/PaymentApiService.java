@@ -11,4 +11,6 @@ public interface PaymentApiService {
     PaymentSuccessResponse approvePaymentWithLock(String pgToken);
 
     void cancelPayment();
+
+    void refundPayment(Long paymentHistoryId);
 }
