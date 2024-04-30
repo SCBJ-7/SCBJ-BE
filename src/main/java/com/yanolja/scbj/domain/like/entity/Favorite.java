@@ -2,6 +2,7 @@ package com.yanolja.scbj.domain.like.entity;
 
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.product.entity.Product;
+import com.yanolja.scbj.global.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,24 +19,20 @@ import org.hibernate.annotations.Comment;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Favorite {
+public class Favorite extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Comment("찜 식별자")
     private Long id;
 
-
-    @ManyToOne
-    @JoinColumn(name = "member_id")
+    @Column
     @Comment("멤버 식별자")
-    private Member member;
+    private Long memberId;
 
-
-    @ManyToOne
-    @JoinColumn(name = "product_id")
+    @Column
     @Comment("상품 식별자")
-    private Product product;
+    private Long productId;
 
 
     @Column(nullable = false)
@@ -44,10 +41,10 @@ public class Favorite {
 
 
     @Builder
-    private Favorite(Long id, Member member, Product product, boolean favoriteStatement) {
+    private Favorite(Long id, Long memberId, Long productId, boolean favoriteStatement) {
         this.id = id;
-        this.member = member;
-        this.product = product;
+        this.memberId = memberId;
+        this.productId = productId;
         this.favoriteStatement = favoriteStatement;
     }
 }
