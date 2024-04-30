@@ -1,5 +1,7 @@
 package com.yanolja.scbj.global.exception;
 
+import com.yanolja.scbj.domain.like.entity.Favorite;
+import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteDeleteResponse;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -49,7 +51,12 @@ public enum ErrorCode {
     REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "환불 규정을 찾을 수 없습니다."),
 
     //Alarm
-    ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다.");
+    ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."),
+
+    //FAVORITE
+    FAVORITE_SAVE_NOT_AVAILABLE(HttpStatus.CONFLICT, "좋아요 저장이 불가합니다"),
+    FAVORITE_DELETE_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "좋아요 삭제가 불가합니다"),
+    FAVORITE_CANNOT_FIND(HttpStatus.NOT_FOUND,"좋아요 찾기가 불가능합니다");
 
     private final HttpStatus httpStatus;
     private final String simpleMessage;
