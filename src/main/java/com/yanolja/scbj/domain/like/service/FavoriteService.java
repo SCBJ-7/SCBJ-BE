@@ -22,7 +22,6 @@ public class FavoriteService {
 
     private final FavoriteRepository favoriteRepository;
 
-
     @Transactional
     public FavoriteRegisterResponse register(Long memberId,
                                              Long productId,
@@ -47,7 +46,7 @@ public class FavoriteService {
 
 
     @Transactional
-    public FavoriteDeleteResponse delete(Long memberId,
+    public FavoriteDeleteResponse remove(Long memberId,
                                          Long productId) {
         Favorite favorite = getByMemberIdAndProductId(memberId, productId);
         delete(favorite);
