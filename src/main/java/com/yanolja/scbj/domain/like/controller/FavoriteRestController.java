@@ -40,7 +40,7 @@ public class FavoriteRestController {
     @DeleteMapping("/{product_id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseDTO<FavoriteDeleteResponse> delete(@PathVariable("product_id") Long productId) {
-        return ResponseDTO.res(favoriteService.delete(securityUtil.getCurrentMemberId(),
+        return ResponseDTO.res(favoriteService.remove(securityUtil.getCurrentMemberId(),
                 productId),
             "삭제에 성공하였습니다");
     }
