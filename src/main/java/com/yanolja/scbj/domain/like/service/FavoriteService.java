@@ -37,10 +37,10 @@ public class FavoriteService {
         try {
             return favoriteRepository.save(favorite);
         } catch (DataIntegrityViolationException e) {
-            log.error("무결성 조건 위반됨:{}",e.getMessage(),e.getCause(),e);
+            log.error("무결성 조건 위반됨:{},{}", e.getMessage(), e.getCause(),e);
             throw new FavoriteDeleteFailException(ErrorCode.FAVORITE_SAVE_NOT_AVAILABLE);
-        } catch (EntityExistsException e){
-            log.error("좋아요 엔티티 중복됨:{}",e.getMessage(),e.getCause(),e);
+        } catch (EntityExistsException e) {
+            log.error("좋아요 엔티티 중복됨:{},{}", e.getMessage(), e.getCause(),e);
             throw new FavoriteDeleteFailException(ErrorCode.FAVORITE_SAVE_NOT_AVAILABLE);
         }
     }
@@ -49,20 +49,26 @@ public class FavoriteService {
     @Transactional
     public FavoriteDeleteResponse delete(Long memberId,
                                          Long productId) {
-        Favorite favorite = favoriteRepository.findByMemberIdAndProductId(memberId, productId);
+        Favorite favorite = getByMemberIdAndProductId(memberId, productId);
         delete(favorite);
         return FavoriteMapper.toFavoriteDeleteResponse(favorite);
+    }
+
+    private Favorite getByMemberIdAndProductId(Long memberId, Long productId) {
+        try {
+            return favoriteRepository.findByMemberIdAndProductId(memberId, productId);
+        } catch (EntityNotFoundException e) {
+            log.error("좋아요 엔티티 찾기가 불가함:{},{}", e.getMessage(), e.getCause(),e);
+            throw new FavoriteDeleteFailException(ErrorCode.FAVORITE_CANNOT_FIND);
+        }
     }
 
     private void delete(Favorite favorite) {
         try {
             favoriteRepository.delete(favorite);
         } catch (IllegalArgumentException e) {
-            log.error("유효하지 않은 인자가 전달됨:{}", e.getMessage(), e.getCause(),e);
+            log.error("유효하지 않은 인자가 전달됨:{},{}", e.getMessage(), e.getCause(),e);
             throw new FavoriteDeleteFailException(ErrorCode.FAVORITE_DELETE_NOT_AVAILABLE);
-        } catch (EntityNotFoundException e) {
-            log.error("좋아요 엔티티 찾기가 불가함:{}", e.getMessage(), e.getCause(),e);
-            throw new FavoriteDeleteFailException(ErrorCode.FAVORITE_CANNOT_FIND);
         }
     }
 }
