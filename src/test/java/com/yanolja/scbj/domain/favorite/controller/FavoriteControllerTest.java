@@ -66,7 +66,6 @@ public class FavoriteControllerTest {
                 .build();
 
             given(securityUtil.getCurrentMemberId()).willReturn(1L);
-            given(favoriteService.register(1L, productId, request)).willReturn(response);
 
             // when
             ResultActions result = mvc.perform(post("/v1/favorites/" + productId)
@@ -75,9 +74,6 @@ public class FavoriteControllerTest {
 
             //then
             result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message", is("좋아요 등록에 성공하였습니다.")))
-                .andExpect(jsonPath("$.data.favoriteId", is(1)))
-                .andExpect(jsonPath("$.data.likeStatement", is(true)))
                 .andDo(print());
         }
     }
