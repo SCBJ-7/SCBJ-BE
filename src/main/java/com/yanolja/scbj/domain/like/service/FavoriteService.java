@@ -9,6 +9,9 @@ import com.yanolja.scbj.domain.like.repository.FavoriteRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,13 +26,12 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
 
     @Transactional
-    public FavoriteRegisterResponse register(Long memberId,
+    public void register(Long memberId,
                                              Long productId,
-                                             FavoriteRegisterRequest favoriteRegisterRequest
+                                             boolean favoriteStatus
     ) {
-        Favorite favorite = FavoriteMapper.toFavorite(memberId, productId, favoriteRegisterRequest);
-        Favorite save = save(favorite);
-        return FavoriteMapper.toFavoriteRegisterResponse(save);
+        Favorite favorite = FavoriteMapper.toFavorite(memberId, productId,favoriteStatus );
+        save(favorite);
     }
 
     private Favorite save(Favorite favorite) {

@@ -14,20 +14,12 @@ public class FavoriteMapper {
 
     public static Favorite toFavorite(Long memberId,
                                       Long productId,
-                                      FavoriteRegisterRequest favoriteRegisterRequest) {
+                                      boolean favoriteState) {
         return Favorite.builder()
             .memberId(memberId)
             .productId(productId)
-            .favoriteStatement(favoriteRegisterRequest.favoriteStatement())
+            .favoriteStatement(favoriteState)
             .build();
-    }
-
-    public static FavoriteRegisterResponse toFavoriteRegisterResponse(Favorite favorite) {
-        return FavoriteRegisterResponse.builder()
-            .favoriteId(favorite.getId())
-            .likeStatement(favorite.isFavoriteStatement())
-            .build();
-
     }
 
     public static FavoriteDeleteResponse toFavoriteDeleteResponse(Favorite favorite) {

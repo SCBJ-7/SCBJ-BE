@@ -28,13 +28,12 @@ public class FavoriteRestController {
 
     @PostMapping("/{product_id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseDTO<FavoriteRegisterResponse> register(
-        @PathVariable("product_id") Long productId,
-        @Valid @RequestBody FavoriteRegisterRequest favoriteRegisterRequest) {
-        return ResponseDTO.res(favoriteService.register(securityUtil.getCurrentMemberId(),
+    public ResponseDTO<FavoriteRegisterResponse> register(@PathVariable("product_id") Long productId) {
+        final boolean FAVORITE_STATUS = true;
+        favoriteService.register(securityUtil.getCurrentMemberId(),
             productId,
-            favoriteRegisterRequest),
-            "좋아요 등록에 성공하였습니다.");
+            FAVORITE_STATUS);
+        return ResponseDTO.res("좋아요 등록에 성공하였습니다.");
     }
 
     @DeleteMapping("/{product_id}")
