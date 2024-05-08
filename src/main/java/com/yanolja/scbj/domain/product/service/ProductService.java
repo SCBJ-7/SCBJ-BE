@@ -123,11 +123,14 @@ public class ProductService {
         }
     }
 
+    private Product getProduct(long productId) {
+        return productRepository.findById(productId)
+            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
 
     @Transactional(readOnly = true)
     public ProductFindResponse findProduct(Long productId) {
-        Product foundProduct = productRepository.findById(productId)
-            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product foundProduct = getProduct(productId);
 
         Reservation foundReservation = foundProduct.getReservation();
         Hotel foundHotel = foundReservation.getHotel();
@@ -295,8 +298,7 @@ public class ProductService {
 
 
     public ProductStockResponse isProductStockLeft(long productId) {
-        Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = getProduct(productId);
         if (product.getStock() > OUT_OF_STOCK) {
             return ProductStockResponse.builder().hasStock(true).build();
         }
