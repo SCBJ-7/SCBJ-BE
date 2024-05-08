@@ -123,7 +123,7 @@ public class ProductService {
         }
     }
 
-    private Product getProduct(long productId) {
+    public Product getProduct(long productId) {
         return productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
     }
@@ -305,7 +305,7 @@ public class ProductService {
         return ProductStockResponse.builder().hasStock(false).build();
     }
 
-    private String getHotelUrl(Hotel hotel) {
+    public String getHotelUrl(Hotel hotel) {
         return hotel.getHotelRoomImageList().isEmpty() ? null :
             hotel.getHotelRoomImageList().get(FIRST_HOTEL_IMAGE).getUrl();
     }
