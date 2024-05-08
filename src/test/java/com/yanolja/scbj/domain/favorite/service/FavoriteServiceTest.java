@@ -1,14 +1,10 @@
 package com.yanolja.scbj.domain.favorite.service;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.yanolja.scbj.domain.like.entity.Favorite;
-import com.yanolja.scbj.domain.like.entity.dto.request.FavoriteRegisterRequest;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteRegisterResponse;
 import com.yanolja.scbj.domain.like.exception.FavoriteDeleteFailException;
 import com.yanolja.scbj.domain.like.repository.FavoriteRepository;
 import com.yanolja.scbj.domain.like.service.FavoriteService;
@@ -28,6 +24,7 @@ public class FavoriteServiceTest {
 
     @InjectMocks
     private FavoriteService favoriteService;
+
 
     @BeforeEach
     void setup() {
