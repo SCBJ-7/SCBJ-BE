@@ -192,7 +192,7 @@ public class KaKaoPaymentService implements PaymentApiService {
 
         try {
             if (!lock.tryLock(500, 5_000, TimeUnit.MICROSECONDS)) {
-                throw new RuntimeException();
+                throw new KakaoPayException(ErrorCode.KAKAO_PAY_INFO_FAIL);
             }
             Product targetProduct = productRepository.findById(paymentInfo.productId())
                 .orElseThrow();
@@ -200,7 +200,7 @@ public class KaKaoPaymentService implements PaymentApiService {
 
             return approvePayment(pgToken, memberId);
         } catch (InterruptedException e) {
-            throw new RuntimeException();
+            throw new KakaoPayException(ErrorCode.KAKAO_PAY_INFO_FAIL);
         } finally {
             if (lock != null && lock.isLocked()) {
                 lock.unlock();
