@@ -1,21 +1,27 @@
 package com.yanolja.scbj.domain.favorite.controller;
 
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.like.controller.FavoriteRestController;
 import com.yanolja.scbj.domain.like.entity.dto.request.FavoriteRegisterRequest;
 import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteDeleteResponse;
 import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteRegisterResponse;
+import com.yanolja.scbj.domain.like.entity.dto.response.FavoritesResponse;
 import com.yanolja.scbj.domain.like.service.FavoriteService;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -80,7 +86,7 @@ public class FavoriteControllerTest {
 
 
     @Nested
-    @DisplayName("DELETE /v1/favorites/{product_id}")
+    @DisplayName("찜 삭제는")
     class DeleteFavorite {
 
         @Test
@@ -88,7 +94,8 @@ public class FavoriteControllerTest {
         void deleteFavorite_success() throws Exception {
             // given
             Long productId = 1L;
-            FavoriteDeleteResponse response = FavoriteDeleteResponse.builder().productId(productId).build();
+            FavoriteDeleteResponse response =
+                FavoriteDeleteResponse.builder().productId(productId).build();
 
             given(securityUtil.getCurrentMemberId()).willReturn(1L);
             given(favoriteService.remove(1L, productId)).willReturn(response);
@@ -99,9 +106,48 @@ public class FavoriteControllerTest {
             //then
             result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.message", is("삭제에 성공하였습니다")))
-                .andExpect(jsonPath("$.data.productId",is(1)))
+                .andExpect(jsonPath("$.data.productId", is(1)))
                 .andDo(print());
 
+        }
+    }
+
+    @Nested
+    @DisplayName("찜 조회는")
+    class Context_Find_Favorites {
+        @Test
+        public void testGetFavorites() throws Exception {
+            when(securityUtil.getCurrentMemberId()).thenReturn(1L);
+            List<FavoritesResponse> mockFavorites = List.of(
+                FavoritesResponse.builder().
+                    hotelName("시그니엘")
+                    .roomType("스탠다드")
+                    .imageUrl("https://example.com/image2.jpg")
+                    .checkInDate(LocalDateTime.of(2024, 5, 20, 14, 0))
+                    .checkOutDate(LocalDateTime.of(2024, 5, 23, 10, 0))
+                    .price(90000)
+                    .build()
+                ,
+                FavoritesResponse.builder().
+                    hotelName("롯데")
+                    .roomType("디럭스")
+                    .imageUrl("https://example.com/image2.jpg")
+                    .checkInDate(LocalDateTime.of(2024, 5, 20, 14, 0))
+                    .checkOutDate(LocalDateTime.of(2024, 5, 23, 10, 0))
+                    .price(90000)
+                    .build()
+            );
+
+            when(favoriteService.getFavorites(anyLong())).thenReturn(mockFavorites);
+
+            ResultActions result = mvc.perform(get("/v1/favorites"));
+
+            result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("조회에 성공하였습니다"))
+                .andExpect(jsonPath("$.data[0].hotelName").value("시그니엘"))
+                .andExpect(jsonPath("$.data[0].roomType").value("스탠다드"))
+                .andExpect(jsonPath("$.data[1].hotelName").value("롯데"))
+                .andExpect(jsonPath("$.data[1].price").value(90000));
         }
     }
 }

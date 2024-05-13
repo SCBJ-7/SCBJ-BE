@@ -1,17 +1,15 @@
 package com.yanolja.scbj.domain.like.service;
 
 import com.yanolja.scbj.domain.like.entity.Favorite;
-import com.yanolja.scbj.domain.like.entity.dto.request.FavoriteRegisterRequest;
 import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteDeleteResponse;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteRegisterResponse;
+import com.yanolja.scbj.domain.like.entity.dto.response.FavoritesResponse;
 import com.yanolja.scbj.domain.like.exception.FavoriteDeleteFailException;
 import com.yanolja.scbj.domain.like.repository.FavoriteRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,10 +25,10 @@ public class FavoriteService {
 
     @Transactional
     public void register(Long memberId,
-                                             Long productId,
-                                             boolean favoriteStatus
+                         Long productId,
+                         boolean favoriteStatus
     ) {
-        Favorite favorite = FavoriteMapper.toFavorite(memberId, productId,favoriteStatus );
+        Favorite favorite = FavoriteMapper.toFavorite(memberId, productId, favoriteStatus);
         save(favorite);
     }
 
@@ -38,10 +36,10 @@ public class FavoriteService {
         try {
             return favoriteRepository.save(favorite);
         } catch (DataIntegrityViolationException e) {
-            log.error("무결성 조건 위반됨:{},{}", e.getMessage(), e.getCause(),e);
+            log.error("무결성 조건 위반됨:{},{}", e.getMessage(), e.getCause(), e);
             throw new FavoriteDeleteFailException(ErrorCode.FAVORITE_SAVE_NOT_AVAILABLE);
         } catch (EntityExistsException e) {
-            log.error("좋아요 엔티티 중복됨:{},{}", e.getMessage(), e.getCause(),e);
+            log.error("좋아요 엔티티 중복됨:{},{}", e.getMessage(), e.getCause(), e);
             throw new FavoriteDeleteFailException(ErrorCode.FAVORITE_SAVE_NOT_AVAILABLE);
         }
     }
@@ -59,7 +57,7 @@ public class FavoriteService {
         try {
             return favoriteRepository.findByMemberIdAndProductId(memberId, productId);
         } catch (EntityNotFoundException e) {
-            log.error("좋아요 엔티티 찾기가 불가함:{},{}", e.getMessage(), e.getCause(),e);
+            log.error("좋아요 엔티티 찾기가 불가함:{},{}", e.getMessage(), e.getCause(), e);
             throw new FavoriteDeleteFailException(ErrorCode.FAVORITE_CANNOT_FIND);
         }
     }
@@ -68,8 +66,15 @@ public class FavoriteService {
         try {
             favoriteRepository.delete(favorite);
         } catch (IllegalArgumentException e) {
-            log.error("유효하지 않은 인자가 전달됨:{},{}", e.getMessage(), e.getCause(),e);
+            log.error("유효하지 않은 인자가 전달됨:{},{}", e.getMessage(), e.getCause(), e);
             throw new FavoriteDeleteFailException(ErrorCode.FAVORITE_DELETE_NOT_AVAILABLE);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<FavoritesResponse> getFavorites(Long memberId) {
+        List<FavoritesResponse> response =
+            favoriteRepository.findFavoritesByMemberId(memberId);
+        return response.isEmpty() ? Collections.emptyList() : response;
     }
 }

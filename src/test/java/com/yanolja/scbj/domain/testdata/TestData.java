@@ -5,6 +5,7 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
+import com.yanolja.scbj.domain.like.entity.Favorite;
 import com.yanolja.scbj.domain.member.entity.Authority;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
@@ -120,6 +121,16 @@ public class TestData {
             .settlement(true)
             .productName("호텔이름 객실이름")
             .tid("testTid")
+            .build();
+    }
+
+
+    public static Favorite createFavorite(Long id, Product product, Member member) {
+        return Favorite.builder()
+            .id(id)
+            .productId(product.getId())
+            .memberId(member.getId())
+            .favoriteStatement(true)
             .build();
     }
 }

@@ -1,18 +1,19 @@
 package com.yanolja.scbj.domain.like.controller;
 
-import com.yanolja.scbj.domain.like.entity.dto.request.FavoriteRegisterRequest;
+
 import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteDeleteResponse;
 import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteRegisterResponse;
+import com.yanolja.scbj.domain.like.entity.dto.response.FavoritesResponse;
 import com.yanolja.scbj.domain.like.service.FavoriteService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
-import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,4 +45,11 @@ public class FavoriteRestController {
             "삭제에 성공하였습니다");
     }
 
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseDTO<List<FavoritesResponse>> getFavorites() {
+        return ResponseDTO.res(favoriteService.getFavorites(securityUtil.getCurrentMemberId()),
+            "조회에 성공하였습니다");
+    }
 }
