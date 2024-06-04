@@ -38,6 +38,7 @@ public final class ProductMapper {
             .bank(productPostRequest.bank())
             .accountNumber(productPostRequest.accountNumber())
             .secondGrantPeriod(productPostRequest.secondGrantPeriod())
+            .comments(productPostRequest.comments())
             .build();
     }
 

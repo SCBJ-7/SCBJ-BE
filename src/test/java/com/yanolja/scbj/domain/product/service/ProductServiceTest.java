@@ -2,7 +2,6 @@ package com.yanolja.scbj.domain.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -133,6 +132,7 @@ class ProductServiceTest {
             .secondGrantPeriod(24)
             .reservation(reservation)
             .paymentHistory(paymentHistory)
+            .comments(new ArrayList<>(Arrays.asList("A", "B", "C", "D", "E")))
             .build();
 
         return product;
@@ -266,6 +266,7 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품 상세 조회는 ")
     class Context_findProduct {
+
         @Test
         @DisplayName("성공시 상품 정보를 반환한다.")
         void _will_success() {
@@ -353,6 +354,7 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품 재고 조회는")
     class Context_getProductStock {
+
         //todo  makeProductMock() 대체하기
         @Test
         @DisplayName("재고가 존재시 true를 반환한다.")
@@ -477,7 +479,6 @@ class ProductServiceTest {
         void will_success_show_hotelRate_reviewRate() {
             //given
 
-
             ArrayList<Product> arrayList = new ArrayList<>();
             arrayList.add(makeProductMock());
             List<String> cityNames = Arrays.asList("서울", "강원", "부산", "제주", "전라", "경상");
@@ -495,8 +496,8 @@ class ProductServiceTest {
 
             //then
             assertNotNull(result);
-            assertEquals(result.seoul().get(0).hotelRate(),"5성급");
-            assertEquals(result.seoul().get(0).reviewRate(),"5.0");
+            assertEquals(result.seoul().get(0).hotelRate(), "5성급");
+            assertEquals(result.seoul().get(0).reviewRate(), "5.0");
         }
     }
 
