@@ -3,10 +3,12 @@ package com.yanolja.scbj.domain.product.entity;
 import com.querydsl.core.annotations.QueryInit;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.paymentHistory.entity.PaymentHistory;
+import com.yanolja.scbj.domain.product.util.StringListConverter;
 import com.yanolja.scbj.domain.reservation.entity.Reservation;
 import com.yanolja.scbj.global.common.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,7 +47,7 @@ public class Product extends BaseEntity {
     @Comment("멤버 식별자")
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "product_agreement_id")
     @Comment("상품 약관 식별자")
     private ProductAgreement productAgreement;
@@ -76,11 +79,16 @@ public class Product extends BaseEntity {
     @Comment("재고")
     private int stock;
 
+    @Column
+    @Comment("사용자 코멘트")
+    @Convert(converter = StringListConverter.class)
+    private List<String> comments;
+
     @Builder
     private Product(Long id, Reservation reservation,
         Member member, ProductAgreement productAgreement, int firstPrice, int secondPrice,
         String bank, String accountNumber, int secondGrantPeriod,
-        PaymentHistory paymentHistory) {
+        PaymentHistory paymentHistory, List<String> comments) {
         this.id = id;
         this.reservation = reservation;
         this.member = member;
@@ -92,13 +100,14 @@ public class Product extends BaseEntity {
         this.secondGrantPeriod = secondGrantPeriod;
         this.paymentHistory = paymentHistory;
         this.stock = 1;
+        this.comments = comments;
     }
 
-    public void delete(LocalDateTime deleteTime){
+    public void delete(LocalDateTime deleteTime) {
         super.delete(deleteTime);
     }
 
-    public void sell(){
+    public void sell() {
         if (this.stock == 1) {
             this.stock--;
         }
