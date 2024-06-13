@@ -278,7 +278,7 @@ class ProductServiceTest {
             Favorite favorite = Favorite.builder().build();
             given(productRepository.findById(any())).willReturn(Optional.of(makeProductMock()));
             given(securityUtil.isUserNotAuthenticated()).willReturn(true);
-            given(favoriteRepository.findByMemberIdAndProductId(any(), any())).willReturn(favorite);
+//            given(favoriteRepository.findByMemberIdAndProductId(any(), any())).willReturn(favorite);
 
             // when
             ProductFindResponse response = productService.findProduct(makeProductMock().getId());
