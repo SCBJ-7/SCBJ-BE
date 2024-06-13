@@ -16,6 +16,8 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomPrice;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
+import com.yanolja.scbj.domain.like.entity.Favorite;
+import com.yanolja.scbj.domain.like.repository.FavoriteRepository;
 import com.yanolja.scbj.domain.member.dto.request.MemberUpdateAccountRequest;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.entity.YanoljaMember;
@@ -73,6 +75,8 @@ class ProductServiceTest {
     private ProductRepository productRepository;
     @Mock
     private SecurityUtil securityUtil;
+    @Mock
+    private FavoriteRepository favoriteRepository;
 
 
     public Product makeProductMock() {
@@ -85,6 +89,7 @@ class ProductServiceTest {
             .checkOut(LocalTime.now())
             .roomTheme(roomTheme)
             .roomAllRating("5.0")
+            .facilityInformation("에어컨\n냉장고\n커피포트")
             .build();
 
         HotelRoomPrice hotelRoomPrice = HotelRoomPrice.builder()
@@ -270,8 +275,11 @@ class ProductServiceTest {
         @DisplayName("성공시 상품 정보를 반환한다.")
         void _will_success() {
             // given
+            Favorite favorite = Favorite.builder().build();
             given(productRepository.findById(any())).willReturn(Optional.of(makeProductMock()));
             given(securityUtil.isUserNotAuthenticated()).willReturn(true);
+            given(favoriteRepository.findByMemberIdAndProductId(any(), any())).willReturn(favorite);
+
             // when
             ProductFindResponse response = productService.findProduct(makeProductMock().getId());
 

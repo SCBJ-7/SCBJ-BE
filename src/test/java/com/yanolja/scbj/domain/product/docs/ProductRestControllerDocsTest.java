@@ -165,6 +165,11 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
             .hotelInfoUrl("https://place-site.yanolja.com/places/3001615")
             .saleStatus(true)
             .isSeller(false)
+            .roomAllRating("4.5")
+            .hotelLevel("4성")
+            .sellerCommentList(List.of("판매자 말"))
+            .facilityInformation("에어컨\n냉장고")
+            .isLike(false)
             .build();
 
         given(productService.findProduct(any())).willReturn(findResponse);
@@ -209,7 +214,16 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
                         .description("호텔 상세 정보 Url"),
                     fieldWithPath("data.saleStatus").type(JsonFieldType.BOOLEAN)
                         .description("판매 상태"),
-                    fieldWithPath("data.isSeller").type(JsonFieldType.BOOLEAN).description("판매자 여부")
+                    fieldWithPath("data.isSeller").type(JsonFieldType.BOOLEAN)
+                        .description("판매자 여부"),
+                    fieldWithPath("data.roomAllRating").type(JsonFieldType.STRING)
+                        .description("방 평점"),
+                    fieldWithPath("data.hotelLevel").type(JsonFieldType.STRING).description("성 급"),
+                    fieldWithPath("data.sellerCommentList[]").type(JsonFieldType.ARRAY)
+                        .description("판매자 코멘트"),
+                    fieldWithPath("data.facilityInformation").type(JsonFieldType.STRING)
+                        .description("시설 정보"),
+                    fieldWithPath("data.isLike").type(JsonFieldType.BOOLEAN).description("좋아요 여부")
                 )
             ));
     }
