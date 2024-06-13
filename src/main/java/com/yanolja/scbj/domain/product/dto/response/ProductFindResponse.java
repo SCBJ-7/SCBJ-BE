@@ -22,6 +22,7 @@ public record ProductFindResponse(
     String hotelInfoUrl,
     boolean saleStatus,
     boolean isSeller,
+    String roomAllRating,
     String hotelLevel,
     List<String> sellerCommentList,
     String facilityInformation,

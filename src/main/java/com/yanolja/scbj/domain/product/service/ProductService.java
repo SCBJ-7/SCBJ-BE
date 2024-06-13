@@ -6,6 +6,8 @@ import com.yanolja.scbj.domain.hotelRoom.entity.HotelRoomImage;
 import com.yanolja.scbj.domain.hotelRoom.entity.Room;
 import com.yanolja.scbj.domain.hotelRoom.entity.RoomTheme;
 import com.yanolja.scbj.domain.hotelRoom.util.RoomThemeMapper;
+import com.yanolja.scbj.domain.like.entity.Favorite;
+import com.yanolja.scbj.domain.like.repository.FavoriteRepository;
 import com.yanolja.scbj.domain.member.entity.Member;
 import com.yanolja.scbj.domain.member.exception.MemberNotFoundException;
 import com.yanolja.scbj.domain.member.repository.MemberRepository;
@@ -36,6 +38,7 @@ import com.yanolja.scbj.global.util.SecurityUtil;
 import com.yanolja.scbj.global.util.TimeValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +61,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final MemberService memberService;
     private final SecurityUtil securityUtil;
+    private final FavoriteRepository favoriteRepository;
 
     private static final int MIN_SECOND_GRANT_PERIOD = 3;
     private final int OUT_OF_STOCK = 0;
@@ -131,6 +135,10 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductFindResponse findProduct(Long productId) {
         Product foundProduct = getProduct(productId);
+        Long currentMemberId = securityUtil.getCurrentMemberId();
+
+        Favorite favorite = favoriteRepository.findByMemberIdAndProductId(
+            currentMemberId, productId);
 
         Reservation foundReservation = foundProduct.getReservation();
         Hotel foundHotel = foundReservation.getHotel();
@@ -145,7 +153,7 @@ public class ProductService {
             getOriginalPrice(foundHotel),
             getSalePrice(foundProduct, foundReservation.getStartDate()),
             roomThemeResponse, getSaleStatus(foundProduct, foundReservation.getStartDate()),
-            checkSeller(foundProduct));
+            checkSeller(foundProduct), getRemovedDuplicateInformation(foundHotel), favorite != null);
     }
 
     private boolean getSaleStatus(Product product, LocalDateTime checkIn) {
@@ -186,6 +194,32 @@ public class ProductService {
         return hotelRoomImageList.stream()
             .map(HotelRoomImage::getUrl)
             .collect(Collectors.toList());
+    }
+
+    private String getRemovedDuplicateInformation(Hotel hotel) {
+        Room room = hotel.getRoom();
+        RoomTheme roomTheme = room.getRoomTheme();
+        String[] roomThemeNameList = roomTheme.getRoomThemeNameList();
+        List<String> removeWordList = new java.util.ArrayList<>(
+            Arrays.stream(roomThemeNameList).toList());
+        String[] targetWord = {"베드", "기준", "최대"};
+        removeWordList.addAll(List.of(targetWord));
+
+        List<String> facilityInformationList = Arrays.stream(
+            room.getFacilityInformation().split("\n")).toList();
+
+        int listSize = facilityInformationList.size();
+        for (int i = 0; i < listSize; i++) {
+            String facility = facilityInformationList.get(i);
+            for (String word : removeWordList) {
+                if (facility.contains(word)) {
+                    facilityInformationList.remove(i);
+                    break;
+                }
+            }
+        }
+
+        return String.join("\n", facilityInformationList);
     }
 
 
