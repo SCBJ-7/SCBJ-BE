@@ -135,10 +135,6 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductFindResponse findProduct(Long productId) {
         Product foundProduct = getProduct(productId);
-        Long currentMemberId = securityUtil.getCurrentMemberId();
-
-        Favorite favorite = favoriteRepository.findByMemberIdAndProductId(
-            currentMemberId, productId);
 
         Reservation foundReservation = foundProduct.getReservation();
         Hotel foundHotel = foundReservation.getHotel();
@@ -153,7 +149,19 @@ public class ProductService {
             getOriginalPrice(foundHotel),
             getSalePrice(foundProduct, foundReservation.getStartDate()),
             roomThemeResponse, getSaleStatus(foundProduct, foundReservation.getStartDate()),
-            checkSeller(foundProduct), getRemovedDuplicateInformation(foundHotel), favorite != null);
+            checkSeller(foundProduct), getRemovedDuplicateInformation(foundHotel), checkLikeState(productId));
+    }
+
+    private boolean checkLikeState(Long productId) {
+        if(securityUtil.isUserNotAuthenticated()) {
+            return false;
+        }
+        Long currentMemberId = securityUtil.getCurrentMemberId();
+
+        Favorite favorite = favoriteRepository.findByMemberIdAndProductId(
+            currentMemberId, productId);
+
+        return favorite != null;
     }
 
     private boolean getSaleStatus(Product product, LocalDateTime checkIn) {
