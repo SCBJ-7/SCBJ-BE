@@ -219,8 +219,8 @@ public class ProductService {
         String[] targetWord = {"베드", "기준", "최대"};
         removeWordList.addAll(List.of(targetWord));
 
-        List<String> facilityInformationList = Arrays.stream(
-            room.getFacilityInformation().split("\n")).toList();
+        List<String> facilityInformationList = new java.util.ArrayList<>(Arrays.stream(
+            room.getFacilityInformation().split("\n")).toList());
 
         int listSize = facilityInformationList.size();
         for (int i = 0; i < listSize; i++) {
