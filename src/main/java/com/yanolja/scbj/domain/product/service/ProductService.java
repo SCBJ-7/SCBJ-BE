@@ -143,13 +143,19 @@ public class ProductService {
         RoomThemeFindResponse roomThemeResponse = RoomThemeMapper.toFindResponse(
             foundRoom.getRoomTheme());
 
-        return ProductMapper.toProductFindResponse(foundHotel,
-            getHotelRoomImageUrlList(foundHotel.getHotelRoomImageList()), foundRoom,
-            foundReservation.getStartDate(), foundReservation.getEndDate(),
+        return ProductMapper.toProductFindResponse(
+            foundHotel,
+            getHotelRoomImageUrlList(foundHotel.getHotelRoomImageList()),
+            foundRoom,
+            foundReservation.getStartDate(),
+            foundReservation.getEndDate(),
             getOriginalPrice(foundHotel),
             getSalePrice(foundProduct, foundReservation.getStartDate()),
-            roomThemeResponse, getSaleStatus(foundProduct, foundReservation.getStartDate()),
-            checkSeller(foundProduct), getRemovedDuplicateInformation(foundHotel), checkLikeState(productId));
+            roomThemeResponse,
+            getSaleStatus(foundProduct, foundReservation.getStartDate()),
+            checkSeller(foundProduct),
+            getRemovedDuplicateInformation(foundHotel),
+            checkLikeState(productId));
     }
 
     private boolean checkLikeState(Long productId) {
