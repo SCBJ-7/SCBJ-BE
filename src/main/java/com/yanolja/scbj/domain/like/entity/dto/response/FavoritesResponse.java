@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 
 public record FavoritesResponse(
+    Long id,
     String hotelName,
     String roomType,
     String imageUrl,
