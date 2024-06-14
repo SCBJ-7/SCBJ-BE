@@ -12,6 +12,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite,Long> {
 
     @Query("""
     SELECT new com.yanolja.scbj.domain.like.entity.dto.response.FavoritesResponse(
+        p.id,
         h.hotelName,
         h.room.bedType,
         hImg.url,
