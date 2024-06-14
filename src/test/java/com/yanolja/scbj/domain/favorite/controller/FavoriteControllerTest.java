@@ -119,8 +119,9 @@ public class FavoriteControllerTest {
         public void testGetFavorites() throws Exception {
             when(securityUtil.getCurrentMemberId()).thenReturn(1L);
             List<FavoritesResponse> mockFavorites = List.of(
-                FavoritesResponse.builder().
-                    hotelName("시그니엘")
+                FavoritesResponse.builder()
+                    .id(5L)
+                    .hotelName("시그니엘")
                     .roomType("스탠다드")
                     .imageUrl("https://example.com/image2.jpg")
                     .checkInDate(LocalDateTime.of(2024, 5, 20, 14, 0))
@@ -128,8 +129,9 @@ public class FavoriteControllerTest {
                     .price(90000)
                     .build()
                 ,
-                FavoritesResponse.builder().
-                    hotelName("롯데")
+                FavoritesResponse.builder()
+                    .id(4L)
+                    .hotelName("롯데")
                     .roomType("디럭스")
                     .imageUrl("https://example.com/image2.jpg")
                     .checkInDate(LocalDateTime.of(2024, 5, 20, 14, 0))
@@ -144,6 +146,7 @@ public class FavoriteControllerTest {
 
             result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("조회에 성공하였습니다"))
+                .andExpect(jsonPath("$.data[0].id").value(5L))
                 .andExpect(jsonPath("$.data[0].hotelName").value("시그니엘"))
                 .andExpect(jsonPath("$.data[0].roomType").value("스탠다드"))
                 .andExpect(jsonPath("$.data[1].hotelName").value("롯데"))
