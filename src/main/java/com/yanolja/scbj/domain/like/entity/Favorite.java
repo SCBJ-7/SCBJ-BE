@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +15,14 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+    name = "favorite",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"member_id", "product_id"})
+    }
+)
 public class Favorite extends BaseEntity {
 
     @Id
@@ -44,3 +52,4 @@ public class Favorite extends BaseEntity {
         this.favoriteStatement = favoriteStatement;
     }
 }
+
