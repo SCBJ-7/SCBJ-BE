@@ -1,7 +1,7 @@
 package com.yanolja.scbj.domain.like.service;
 
+import com.yanolja.scbj.domain.like.dto.response.FavoriteDeleteResponse;
 import com.yanolja.scbj.domain.like.entity.Favorite;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteDeleteResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
