@@ -1,6 +1,7 @@
 package com.yanolja.scbj.domain.favorite.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -13,10 +14,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yanolja.scbj.domain.like.controller.FavoriteRestController;
-import com.yanolja.scbj.domain.like.entity.dto.request.FavoriteRegisterRequest;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteDeleteResponse;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteRegisterResponse;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoritesResponse;
+import com.yanolja.scbj.domain.like.dto.request.FavoriteRegisterRequest;
+import com.yanolja.scbj.domain.like.dto.response.FavoriteDeleteResponse;
+import com.yanolja.scbj.domain.like.dto.response.FavoriteRegisterResponse;
+import com.yanolja.scbj.domain.like.dto.response.FavoritesResponse;
 import com.yanolja.scbj.domain.like.service.FavoriteService;
 import com.yanolja.scbj.global.config.SecurityConfig;
 import com.yanolja.scbj.global.util.SecurityUtil;
@@ -31,6 +32,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -118,39 +123,45 @@ public class FavoriteControllerTest {
         @Test
         public void testGetFavorites() throws Exception {
             when(securityUtil.getCurrentMemberId()).thenReturn(1L);
-            List<FavoritesResponse> mockFavorites = List.of(
-                FavoritesResponse.builder()
-                    .id(5L)
-                    .hotelName("시그니엘")
-                    .roomType("스탠다드")
-                    .imageUrl("https://example.com/image2.jpg")
-                    .checkInDate(LocalDateTime.of(2024, 5, 20, 14, 0))
-                    .checkOutDate(LocalDateTime.of(2024, 5, 23, 10, 0))
-                    .price(90000)
-                    .build()
-                ,
-                FavoritesResponse.builder()
-                    .id(4L)
-                    .hotelName("롯데")
-                    .roomType("디럭스")
-                    .imageUrl("https://example.com/image2.jpg")
-                    .checkInDate(LocalDateTime.of(2024, 5, 20, 14, 0))
-                    .checkOutDate(LocalDateTime.of(2024, 5, 23, 10, 0))
-                    .price(90000)
-                    .build()
+
+            Pageable pageable = PageRequest.of(0, 10);
+            List<FavoritesResponse> mockFavoritesList = List.of(
+                new FavoritesResponse() {
+                    public Long getId() { return 5L; }
+                    public String getHotelName() { return "시그니엘"; }
+                    public String getBedType() { return "스탠다드"; }
+                    public String getImageUrl() { return "https://example.com/image2.jpg"; }
+                    public LocalDateTime getCheckInDate() { return LocalDateTime.of(2024, 5, 20, 14, 0); }
+                    public LocalDateTime getCheckOutDate() { return LocalDateTime.of(2024, 5, 23, 10, 0); }
+                    public int getPrice() { return 90000; }
+                },
+                new FavoritesResponse() {
+                    public Long getId() { return 4L; }
+                    public String getHotelName() { return "롯데"; }
+                    public String getBedType() { return "디럭스"; }
+                    public String getImageUrl() { return "https://example.com/image2.jpg"; }
+                    public LocalDateTime getCheckInDate() { return LocalDateTime.of(2024, 5, 20, 14, 0); }
+                    public LocalDateTime getCheckOutDate() { return LocalDateTime.of(2024, 5, 23, 10, 0); }
+                    public int getPrice() { return 90000; }
+                }
             );
 
-            when(favoriteService.getFavorites(anyLong())).thenReturn(mockFavorites);
+            Page<FavoritesResponse>
+                mockPage = new PageImpl<>(mockFavoritesList, pageable, mockFavoritesList.size());
+
+            when(favoriteService.getFavorites(anyLong(), any(Pageable.class))).thenReturn(mockPage);
+
+
 
             ResultActions result = mvc.perform(get("/v1/favorites"));
 
             result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("조회에 성공하였습니다"))
-                .andExpect(jsonPath("$.data[0].id").value(5L))
-                .andExpect(jsonPath("$.data[0].hotelName").value("시그니엘"))
-                .andExpect(jsonPath("$.data[0].roomType").value("스탠다드"))
-                .andExpect(jsonPath("$.data[1].hotelName").value("롯데"))
-                .andExpect(jsonPath("$.data[1].price").value(90000));
+                .andExpect(jsonPath("$.data.content[0].id").value(5L))
+                .andExpect(jsonPath("$.data.content[0].hotelName").value("시그니엘"))
+                .andExpect(jsonPath("$.data.content[0].bedType").value("스탠다드"))
+                .andExpect(jsonPath("$.data.content[1].hotelName").value("롯데"))
+                .andExpect(jsonPath("$.data.content[1].price").value(90000));
         }
     }
 }
