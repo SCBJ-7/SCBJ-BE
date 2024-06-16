@@ -1,7 +1,5 @@
 package com.yanolja.scbj.global.exception;
 
-import com.yanolja.scbj.domain.like.entity.Favorite;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteDeleteResponse;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
