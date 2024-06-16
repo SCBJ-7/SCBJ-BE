@@ -1,14 +1,16 @@
 package com.yanolja.scbj.domain.like.controller;
 
 
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteDeleteResponse;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteRegisterResponse;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoritesResponse;
+import com.yanolja.scbj.domain.like.dto.response.FavoriteDeleteResponse;
+import com.yanolja.scbj.domain.like.dto.response.FavoriteRegisterResponse;
+import com.yanolja.scbj.domain.like.dto.response.FavoritesResponse;
 import com.yanolja.scbj.domain.like.service.FavoriteService;
 import com.yanolja.scbj.global.common.ResponseDTO;
 import com.yanolja.scbj.global.util.SecurityUtil;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +31,8 @@ public class FavoriteRestController {
 
     @PostMapping("/{product_id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseDTO<FavoriteRegisterResponse> register(@PathVariable("product_id") Long productId) {
+    public ResponseDTO<FavoriteRegisterResponse> register(
+        @PathVariable("product_id") Long productId) {
         final boolean FAVORITE_STATUS = true;
         favoriteService.register(securityUtil.getCurrentMemberId(),
             productId,
@@ -45,11 +48,12 @@ public class FavoriteRestController {
             "삭제에 성공하였습니다");
     }
 
-
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseDTO<List<FavoritesResponse>> getFavorites() {
-        return ResponseDTO.res(favoriteService.getFavorites(securityUtil.getCurrentMemberId()),
-            "조회에 성공하였습니다");
+    public ResponseDTO<Page<FavoritesResponse>> getFavorites(
+        @PageableDefault Pageable pageable) {
+        Page<FavoritesResponse> favorites = favoriteService.getFavorites(securityUtil.getCurrentMemberId(), pageable);
+
+        return ResponseDTO.res(favorites, "조회에 성공하였습니다");
     }
 }
