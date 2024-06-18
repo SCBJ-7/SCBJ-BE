@@ -226,11 +226,12 @@ public class ProductService {
         for (int i = 0; i < listSize; i++) {
             String facility = facilityInformationList.get(i);
             for (String word : removeWordList) {
-                if (facility.contains(word)) {
+                if (facility.contains(word) || facility.isEmpty()) {
                     facilityInformationList.remove(i);
                     break;
                 }
             }
+            listSize = facilityInformationList.size();
         }
 
         return String.join("\n", facilityInformationList);
