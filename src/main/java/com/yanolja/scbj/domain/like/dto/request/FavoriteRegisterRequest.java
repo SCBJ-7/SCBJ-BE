@@ -1,4 +1,4 @@
-package com.yanolja.scbj.domain.like.entity.dto.request;
+package com.yanolja.scbj.domain.like.dto.request;
 
 import lombok.Builder;
 

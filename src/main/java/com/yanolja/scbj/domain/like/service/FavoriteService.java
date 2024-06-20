@@ -1,18 +1,18 @@
 package com.yanolja.scbj.domain.like.service;
 
+import com.yanolja.scbj.domain.like.dto.response.FavoriteDeleteResponse;
+import com.yanolja.scbj.domain.like.dto.response.FavoritesResponse;
 import com.yanolja.scbj.domain.like.entity.Favorite;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoriteDeleteResponse;
-import com.yanolja.scbj.domain.like.entity.dto.response.FavoritesResponse;
 import com.yanolja.scbj.domain.like.exception.FavoriteDeleteFailException;
 import com.yanolja.scbj.domain.like.repository.FavoriteRepository;
 import com.yanolja.scbj.global.exception.ErrorCode;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Collections;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,9 +72,10 @@ public class FavoriteService {
     }
 
     @Transactional(readOnly = true)
-    public List<FavoritesResponse> getFavorites(Long memberId) {
-        List<FavoritesResponse> response =
-            favoriteRepository.findFavoritesByMemberId(memberId);
-        return response.isEmpty() ? Collections.emptyList() : response;
+    public Page<FavoritesResponse> getFavorites(Long memberId,
+                                                Pageable pageable) {
+        Page<FavoritesResponse> response =
+            favoriteRepository.findFavoritesByMemberId(memberId, pageable);
+        return response.isEmpty() ? Page.empty(pageable) : response;
     }
 }
