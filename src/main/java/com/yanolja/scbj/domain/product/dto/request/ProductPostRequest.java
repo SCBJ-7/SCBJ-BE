@@ -2,6 +2,8 @@ package com.yanolja.scbj.domain.product.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.Builder;
 
 public record ProductPostRequest(
@@ -17,7 +19,9 @@ public record ProductPostRequest(
     boolean standardTimeSellingPolicy,
     boolean totalAmountPolicy,
     boolean sellingModificationPolicy,
-    boolean productAgreement
+    boolean productAgreement,
+    @Size(max = 5, message = "최대 5개만 선택할 수 있습니다.")
+    List<String> comments
 ) {
 
     @Builder

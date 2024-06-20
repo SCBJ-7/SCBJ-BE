@@ -38,6 +38,8 @@ import com.yanolja.scbj.global.helper.TestConstants;
 import com.yanolja.scbj.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,6 +83,7 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
             .totalAmountPolicy(true)
             .sellingModificationPolicy(true)
             .productAgreement(true)
+            .comments(new ArrayList<>(Arrays.asList("A", "B", "C", "D", "E")))
             .build();
 
         ProductPostResponse productPostResponse = ProductPostResponse.builder()
@@ -115,7 +118,9 @@ public class ProductRestControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("sellingModificationPolicy").type(JsonFieldType.BOOLEAN)
                         .description("판매가 수정 불가 방침"),
                     fieldWithPath("productAgreement").type(JsonFieldType.BOOLEAN)
-                        .description("판매 진행 동의 방침")
+                        .description("판매 진행 동의 방침"),
+                    fieldWithPath("comments").type(JsonFieldType.ARRAY)
+                        .description("판매자 코멘트")
                 ),
                 responseFields(responseCommon()).and(
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
