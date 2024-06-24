@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Converter
@@ -14,7 +15,7 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
     @Override
     public String convertToDatabaseColumn(List<String> attribute) {
         try {
-            return objectMapper.writeValueAsString(attribute);
+            return attribute == null ? "[]" : objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -23,7 +24,7 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
     @Override
     public List<String> convertToEntityAttribute(String dbData) {
         try {
-            return objectMapper.readValue(dbData, List.class);
+            return dbData == null || dbData.isEmpty() ? new ArrayList<>() : objectMapper.readValue(dbData, List.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
