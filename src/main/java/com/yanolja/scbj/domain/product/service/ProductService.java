@@ -154,8 +154,13 @@ public class ProductService {
             roomThemeResponse,
             getSaleStatus(foundProduct, foundReservation.getStartDate()),
             checkSeller(foundProduct),
+            foundProduct.getComments(),
             getRemovedDuplicateInformation(foundHotel),
             checkLikeState(productId));
+    }
+
+    private List<String> getSellerCommentList(Product product) {
+        product.getComments();
     }
 
     private boolean checkLikeState(Long productId) {
