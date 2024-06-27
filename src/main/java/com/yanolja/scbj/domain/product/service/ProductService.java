@@ -154,9 +154,11 @@ public class ProductService {
             roomThemeResponse,
             getSaleStatus(foundProduct, foundReservation.getStartDate()),
             checkSeller(foundProduct),
+            foundProduct.getComments(),
             getRemovedDuplicateInformation(foundHotel),
             checkLikeState(productId));
     }
+
 
     private boolean checkLikeState(Long productId) {
         if(securityUtil.isUserNotAuthenticated()) {

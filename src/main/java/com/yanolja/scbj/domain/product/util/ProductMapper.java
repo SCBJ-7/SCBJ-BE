@@ -50,7 +50,7 @@ public final class ProductMapper {
     public static ProductFindResponse toProductFindResponse(Hotel hotel, List<String> imageList,
         Room room, LocalDateTime checkIn, LocalDateTime checkOut, int originalPrice, int price,
         RoomThemeFindResponse roomThemeFindResponse, boolean saleStatus, boolean isSeller,
-        String facilityInformation, boolean likeState) {
+        List<String> comments, String facilityInformation, boolean likeState) {
 
         return ProductFindResponse.builder()
             .hotelName(hotel.getHotelName())
@@ -70,7 +70,7 @@ public final class ProductMapper {
             .isSeller(isSeller)
             .roomAllRating(room.getRoomAllRating())
             .hotelLevel(hotel.getHotelLevel())
-            .sellerCommentList(List.of("hello"))
+            .sellerCommentList(comments)
             .facilityInformation(facilityInformation)
             .isLike(likeState)
             .build();
