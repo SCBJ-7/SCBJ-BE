@@ -159,9 +159,6 @@ public class ProductService {
             checkLikeState(productId));
     }
 
-    private List<String> getSellerCommentList(Product product) {
-        product.getComments();
-    }
 
     private boolean checkLikeState(Long productId) {
         if(securityUtil.isUserNotAuthenticated()) {
